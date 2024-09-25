@@ -1,0 +1,119 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "crates/abigen",
+    "crates/contracts",
+    "crates/types",
+]
+
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"
+license-file = "LICENSE"
+repository = "https://github.com/dojoengine/dojo/"
+version = "1.0.0-rc.1"
+
+[profile.performance]
+codegen-units = 1
+incremental = false
+inherits = "release"
+lto = "fat"
+
+[workspace.dependencies]
+dojo-abigen = { path = "crates/abigen" }
+dojo-contracts = { path = "crates/contracts" }
+dojo-types = { path = "crates/types" }
+
+anyhow = "1.0.80"
+assert_fs = "1.1"
+assert_matches = "1.5.0"
+async-trait = "0.1.82"
+auto_impl = "1.2.0"
+base64 = "0.21.2"
+bigdecimal = "0.4.1"
+bytes = "1.6"
+cainome = { git = "https://github.com/cartridge-gg/cainome", rev = "da96e0a", features = [ "abigen-rs" ] }
+cairo-lang-compiler = "=2.7.1"
+cairo-lang-debug = "=2.7.1"
+cairo-lang-defs = "=2.7.1"
+cairo-lang-diagnostics = "=2.7.1"
+cairo-lang-filesystem = "=2.7.1"
+cairo-lang-formatter = "=2.7.1"
+cairo-lang-language-server = "=2.7.1"
+cairo-lang-lowering = "=2.7.1"
+cairo-lang-parser = "=2.7.1"
+cairo-lang-plugins = { version = "=2.7.1", features = [ "testing" ] }
+cairo-lang-project = "=2.7.1"
+cairo-lang-semantic = "=2.7.1"
+cairo-lang-sierra = "=2.7.1"
+cairo-lang-sierra-generator = "=2.7.1"
+cairo-lang-sierra-to-casm = "=2.7.1"
+cairo-lang-starknet = "=2.7.1"
+cairo-lang-starknet-classes = "=2.7.1"
+cairo-lang-syntax = "=2.7.1"
+cairo-lang-test-plugin = "=2.7.1"
+cairo-lang-test-runner = "=2.7.1"
+cairo-lang-test-utils = "=2.7.1"
+cairo-lang-utils = "=2.7.1"
+camino = { version = "1.1.2", features = [ "serde1" ] }
+chrono = { version = "0.4.24", features = [ "serde" ] }
+clap = { version = "4.5.4", features = [ "derive" ] }
+clap-verbosity-flag = "2.0.1"
+clap_complete = "4.3"
+console = "0.15.7"
+convert_case = "0.6.0"
+crypto-bigint = { version = "0.5.3", features = [ "serde" ] }
+derive_more = "0.99.17"
+flate2 = "1.0.24"
+futures = "0.3.30"
+futures-util = "0.3.30"
+hashlink = "0.9.1"
+hex = "0.4.3"
+http = "0.2.9"
+indexmap = "2.2.5"
+indoc = "1.0.7"
+itertools = "0.12.1"
+jsonrpsee = { version = "0.16.2", default-features = false }
+lazy_static = "1.4.0"
+log = "0.4.21"
+metrics = "0.23.0"
+num-traits = { version = "0.2", default-features = false }
+once_cell = "1.0"
+parking_lot = "0.12.1"
+pretty_assertions = "1.2.1"
+rand = "0.8.5"
+rayon = "1.8.0"
+regex = "1.10.3"
+reqwest = { version = "0.12", features = [ "blocking", "json", "rustls-tls" ], default-features = false }
+rpassword = "7.2.0"
+rstest = "0.18.2"
+rstest_reuse = "0.6.0"
+salsa = "0.16.1"
+scarb = { git = "https://github.com/software-mansion/scarb", tag = "v2.7.1" }
+scarb-ui = { git = "https://github.com/software-mansion/scarb", tag = "v2.7.1" }
+semver = "1.0.5"
+serde = { version = "1.0", features = [ "derive" ] }
+serde_json = { version = "1.0", features = [ "arbitrary_precision" ] }
+serde_with = "3.9.0"
+similar-asserts = "1.5.0"
+smol_str = { version = "0.2.0", features = [ "serde" ] }
+sqlx = { version = "0.7.2", features = [ "chrono", "macros", "regexp", "runtime-async-std", "runtime-tokio", "sqlite", "uuid" ] }
+starknet_api = "0.11.0"
+strum = "0.25"
+strum_macros = "0.25"
+tempfile = "3.9.0"
+test-log = "0.2.11"
+thiserror = "1.0.32"
+tokio = { version = "1.39.2", features = [ "full" ] }
+toml = "0.8"
+tower = "0.4.13"
+tower-http = "0.4.4"
+tracing = "0.1.34"
+tracing-subscriber = { version = "0.3.16", features = [ "env-filter", "json" ] }
+url = { version = "2.4.0", features = [ "serde" ] }
+walkdir = "2.5.0"
+
+starknet = "0.12.0"
+starknet-crypto = "0.7.1"
+starknet-types-core = "0.1.6"
