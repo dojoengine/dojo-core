@@ -58,7 +58,7 @@ fn test_set_metadata_resource_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `2827` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        "Account `2827` does NOT have OWNER role on model (or it's namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED',
     )
 )]
@@ -81,7 +81,7 @@ fn test_set_metadata_not_possible_for_resource_writer() {
 
 #[test]
 #[should_panic(
-    expected: ("Caller `2827` is not the owner of the resource `0`", 'ENTRYPOINT_FAILED',)
+    expected: ("Account `2827` does NOT have OWNER role on world", 'ENTRYPOINT_FAILED',)
 )]
 fn test_set_metadata_not_possible_for_random_account() {
     let world = deploy_world();
@@ -100,12 +100,7 @@ fn test_set_metadata_not_possible_for_random_account() {
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
-        'ENTRYPOINT_FAILED',
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED',))]
 fn test_set_metadata_through_malicious_contract() {
     let world = spawn_test_world(["dojo"].span(), [foo::TEST_CLASS_HASH].span(),);
 

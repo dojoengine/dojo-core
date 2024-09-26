@@ -383,7 +383,7 @@ pub mod world {
         ///
         /// `metadata` - The metadata content for the resource.
         fn set_metadata(ref self: ContractState, metadata: ResourceMetadata) {
-            self.assert_caller_is_resource_owner(metadata.resource_id);
+            self.assert_caller_permissions(metadata.resource_id, Permission::Owner);
 
             self
                 .write_model_entity(
@@ -427,7 +427,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.owners.write((resource, address), true);
 
@@ -448,7 +448,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.owners.write((resource, address), false);
 
@@ -483,7 +483,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.writers.write((resource, contract), true);
 
@@ -504,7 +504,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.writers.write((resource, contract), false);
 
@@ -1121,25 +1121,6 @@ pub mod world {
             panic_with_byte_array(
                 @format!("{} does NOT have {} role on {}", caller_name, permission, resource_name)
             )
-        }
-
-        /// Panics if the caller is NOT an owner of the resource.
-        ///
-        /// # Arguments
-        ///   * `resource_selector` - the selector of the resource.
-        #[inline(always)]
-        fn assert_caller_is_resource_owner(self: @ContractState, resource_selector: felt252) {
-            let caller = get_caller_address();
-
-            if self.is_owner(resource_selector, caller) {
-                return;
-            }
-
-            if self.is_caller_world_owner() {
-                return;
-            }
-
-            panic_with_byte_array(@errors::not_owner(caller, resource_selector));
         }
 
         /// Indicates if the provided namespace is already registered
