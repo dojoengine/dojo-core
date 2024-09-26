@@ -85,6 +85,9 @@ mod tests {
     }
     mod base;
     mod benchmarks;
+    mod expanded {
+        pub(crate) mod selector_attack;
+    }
     mod helpers;
     mod world {
         mod acl;
