@@ -13,6 +13,7 @@ pub trait IDescriptor<T> {
     fn name_hash(self: @T) -> felt252;
     fn namespace(self: @T) -> ByteArray;
     fn name(self: @T) -> ByteArray;
+    fn tag(self: @T) -> ByteArray;
 }
 
 /// A descriptor of a resource used to verify consistency of the selector from the namespace and the

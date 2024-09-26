@@ -2,9 +2,7 @@ use starknet::ContractAddress;
 
 pub const DELETE_ENTITY_MEMBER: felt252 = 'Cannot delete entity member';
 
-pub fn no_write_access_with_tags(
-    contract_tag: @ByteArray, on_type: @ByteArray, on_tag: @ByteArray
-) -> ByteArray {
+pub fn not_writer(contract_tag: @ByteArray, on_type: @ByteArray, on_tag: @ByteArray) -> ByteArray {
     format!("Caller `{}` has no write access on {} `{}`", contract_tag, on_type, on_tag)
 }
 

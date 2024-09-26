@@ -51,7 +51,9 @@ pub mod utils {
     };
 
     pub mod descriptor;
-    pub use descriptor::{Descriptor, DescriptorTrait};
+    pub use descriptor::{
+        Descriptor, DescriptorTrait, IDescriptorDispatcher, IDescriptorDispatcherTrait
+    };
 }
 
 pub mod world {

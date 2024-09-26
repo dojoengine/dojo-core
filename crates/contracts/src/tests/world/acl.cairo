@@ -257,7 +257,7 @@ fn test_revoke_writer_fails_for_non_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `dojo-foo_setter` has no write access on model (or it's namespace) `dojo-Foo`",
+        "Contract `dojo-foo_setter` does NOT have WRITER role on model (or it's namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED',
         'ENTRYPOINT_FAILED'
     )
