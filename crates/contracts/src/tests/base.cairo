@@ -8,24 +8,62 @@ use dojo::contract::upgradeable::{IUpgradeableDispatcher, IUpgradeableDispatcher
 use dojo::utils::test::{spawn_test_world};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
+#[starknet::contract]
+pub mod contract_invalid_upgrade {
+    use dojo::contract::IContract;
+
+    #[storage]
+    struct Storage {}
+
+    #[abi(embed_v0)]
+    pub impl ContractImpl of IContract<ContractState> {
+        fn name(self: @ContractState) -> ByteArray {
+            "test_contract"
+        }
+
+        fn namespace(self: @ContractState) -> ByteArray {
+            "dojo"
+        }
+
+        fn tag(self: @ContractState) -> ByteArray {
+            "dojo-test_contract"
+        }
+
+        fn namespace_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::namespace(self))
+        }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::name(self))
+        }
+
+        fn selector(self: @ContractState) -> felt252 {
+            selector_from_tag!("dojo-test_contract")
+        }
+    }
+}
+
+#[dojo::contract]
+mod test_contract {}
+
+#[starknet::interface]
+pub trait IQuantumLeap<T> {
+    fn plz_more_tps(self: @T) -> felt252;
+}
 
 #[starknet::contract]
-pub mod contract_upgrade {
+pub mod test_contract_upgrade {
+    use dojo::contract::IContract;
     use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, IWorldProvider};
 
     #[storage]
     struct Storage {}
 
-    #[starknet::interface]
-    pub trait IQuantumLeap<TState> {
-        fn plz_more_tps(self: @TState) -> felt252;
-    }
-
     #[constructor]
     fn constructor(ref self: ContractState) {}
 
     #[abi(embed_v0)]
-    pub impl QuantumLeap of IQuantumLeap<ContractState> {
+    pub impl QuantumLeap of super::IQuantumLeap<ContractState> {
         fn plz_more_tps(self: @ContractState) -> felt252 {
             'daddy'
         }
@@ -37,25 +75,39 @@ pub mod contract_upgrade {
             IWorldDispatcher { contract_address: starknet::contract_address_const::<'world'>() }
         }
     }
-}
 
-#[starknet::contract]
-pub mod contract_invalid_upgrade {
-    #[storage]
-    struct Storage {}
-}
+    #[abi(embed_v0)]
+    pub impl ContractImpl of IContract<ContractState> {
+        fn name(self: @ContractState) -> ByteArray {
+            "test_contract"
+        }
 
-use contract_upgrade::{IQuantumLeapDispatcher, IQuantumLeapDispatcherTrait};
+        fn namespace(self: @ContractState) -> ByteArray {
+            "dojo"
+        }
+
+        fn tag(self: @ContractState) -> ByteArray {
+            "dojo-test_contract"
+        }
+
+        fn namespace_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::namespace(self))
+        }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::name(self))
+        }
+
+        fn selector(self: @ContractState) -> felt252 {
+            selector_from_tag!("dojo-test_contract")
+        }
+    }
+}
 
 // Utils
 fn deploy_world() -> IWorldDispatcher {
     spawn_test_world(["dojo"].span(), [].span())
 }
-
-// A test contract needs to be used instead of previously used base contract since.
-// contracts now require a `dojo_init` method which normal base contract doesn't have
-#[dojo::contract]
-mod test_contract {}
 
 #[test]
 #[available_gas(6000000)]
@@ -64,10 +116,9 @@ fn test_upgrade_from_world() {
 
     let base_address = world
         .deploy_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
-    let new_class_hash: ClassHash = contract_upgrade::TEST_CLASS_HASH.try_into().unwrap();
+    let new_class_hash: ClassHash = test_contract_upgrade::TEST_CLASS_HASH.try_into().unwrap();
 
-    let selector = selector_from_tag!("dojo-test_contract");
-    world.upgrade_contract(selector, new_class_hash);
+    world.upgrade_contract(new_class_hash);
 
     let quantum_dispatcher = IQuantumLeapDispatcher { contract_address: base_address };
     assert(quantum_dispatcher.plz_more_tps() == 'daddy', 'quantum leap failed');
@@ -84,8 +135,7 @@ fn test_upgrade_from_world_not_world_provider() {
     let _ = world.deploy_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
     let new_class_hash: ClassHash = contract_invalid_upgrade::TEST_CLASS_HASH.try_into().unwrap();
 
-    let selector = selector_from_tag!("dojo-test_contract");
-    world.upgrade_contract(selector, new_class_hash);
+    world.upgrade_contract(new_class_hash);
 }
 
 #[test]
@@ -96,7 +146,7 @@ fn test_upgrade_direct() {
 
     let base_address = world
         .deploy_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
-    let new_class_hash: ClassHash = contract_upgrade::TEST_CLASS_HASH.try_into().unwrap();
+    let new_class_hash: ClassHash = test_contract_upgrade::TEST_CLASS_HASH.try_into().unwrap();
 
     let upgradeable_dispatcher = IUpgradeableDispatcher { contract_address: base_address };
     upgradeable_dispatcher.upgrade(new_class_hash);
@@ -108,6 +158,7 @@ trait IMetadataOnly<T> {
     fn name(self: @T) -> ByteArray;
     fn namespace(self: @T) -> ByteArray;
     fn namespace_hash(self: @T) -> felt252;
+    fn name_hash(self: @T) -> felt252;
 }
 
 #[starknet::contract]
@@ -132,6 +183,10 @@ mod invalid_legacy_model {
 
         fn name(self: @ContractState) -> ByteArray {
             "invalid_legacy_model"
+        }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::name(self))
         }
     }
 }
@@ -160,6 +215,10 @@ mod invalid_legacy_model_world {
         fn name(self: @ContractState) -> ByteArray {
             "invalid_legacy_model"
         }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::name(self))
+        }
     }
 }
 
@@ -186,6 +245,10 @@ mod invalid_model {
 
         fn name(self: @ContractState) -> ByteArray {
             "invalid_model"
+        }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::name(self))
         }
     }
 }
@@ -214,13 +277,20 @@ mod invalid_model_world {
         fn name(self: @ContractState) -> ByteArray {
             "invalid_model_world"
         }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@Self::name(self))
+        }
     }
 }
 
 #[test]
 #[available_gas(6000000)]
 #[should_panic(
-    expected: ("Resource `dojo-invalid_model` is already registered", 'ENTRYPOINT_FAILED',)
+    expected: (
+        "Descriptor: `selector` mismatch, expected `926629585226688883233756580070288922289294279106806075757077946233183245741` but found `2368393732245529956313345237151518608283468650081902115301417183793437311044`",
+        'ENTRYPOINT_FAILED',
+    )
 )]
 fn test_deploy_from_world_invalid_model() {
     let world = deploy_world();
@@ -232,8 +302,8 @@ fn test_deploy_from_world_invalid_model() {
 
 #[test]
 #[available_gas(6000000)]
-#[should_panic(expected: ("Invalid resource selector `0`", 'ENTRYPOINT_FAILED',))]
-fn test_deploy_from_world_invalid_model_world() {
+#[should_panic(expected: ("Descriptor: selector `0` is a reserved selector", 'ENTRYPOINT_FAILED',))]
+fn test_deploy_from_world_invalid_model_descriptor() {
     let world = deploy_world();
     world.register_model(invalid_model_world::TEST_CLASS_HASH.try_into().unwrap());
 }

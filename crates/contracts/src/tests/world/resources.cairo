@@ -354,7 +354,7 @@ fn test_deploy_contract_for_namespace_owner() {
     let event = event.unwrap();
     assert(event.salt == 'salt1', 'bad event salt');
     assert(event.class_hash == class_hash, 'bad class_hash');
-    assert(event.name == dispatcher.contract_name(), 'bad contract name');
+    assert(event.name == dispatcher.name(), 'bad contract name');
     assert(event.namespace == dispatcher.namespace(), 'bad namespace');
     assert(
         event.address != core::num::traits::Zero::<ContractAddress>::zero(), 'bad contract address'
@@ -429,13 +429,11 @@ fn test_upgrade_contract_from_resource_owner() {
     starknet::testing::set_account_contract_address(bob);
     starknet::testing::set_contract_address(bob);
 
-    let contract_address = world.deploy_contract('salt1', class_hash);
-
-    let dispatcher = IContractDispatcher { contract_address };
+    let _contract_address = world.deploy_contract('salt1', class_hash);
 
     drop_all_events(world.contract_address);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 
     let event = starknet::testing::pop_log::<ContractUpgraded>(world.contract_address);
     assert(event.is_some(), 'no ContractUpgraded event');
@@ -474,7 +472,7 @@ fn test_upgrade_contract_from_resource_writer() {
     starknet::testing::set_account_contract_address(alice);
     starknet::testing::set_contract_address(alice);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 }
 
 #[test]
@@ -488,15 +486,14 @@ fn test_upgrade_contract_from_random_account() {
     let world = deploy_world();
     let class_hash = test_contract::TEST_CLASS_HASH.try_into().unwrap();
 
-    let contract_address = world.deploy_contract('salt1', class_hash);
+    let _contract_address = world.deploy_contract('salt1', class_hash);
 
     let alice = starknet::contract_address_const::<0xa11ce>();
-    let dispatcher = IContractDispatcher { contract_address };
 
     starknet::testing::set_account_contract_address(alice);
     starknet::testing::set_contract_address(alice);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 }
 
 #[test]
@@ -518,11 +515,9 @@ fn test_upgrade_contract_through_malicious_contract() {
     starknet::testing::set_account_contract_address(bob);
     starknet::testing::set_contract_address(bob);
 
-    let contract_address = world.deploy_contract('salt1', class_hash);
-
-    let dispatcher = IContractDispatcher { contract_address };
+    let _contract_address = world.deploy_contract('salt1', class_hash);
 
     starknet::testing::set_contract_address(malicious_contract);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 }

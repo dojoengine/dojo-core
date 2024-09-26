@@ -14,7 +14,6 @@ pub mod model {
     pub mod model;
     pub use model::{
         Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
-        deploy_and_get_metadata
     };
 
     #[cfg(target: "test")]
@@ -48,8 +47,11 @@ pub mod utils {
     pub mod utils;
     pub use utils::{
         bytearray_hash, entity_id_from_keys, find_field_layout, find_model_field_layout, any_none,
-        sum, combine_key, selector_from_names
+        sum, combine_key, selector_from_names,
     };
+
+    pub mod descriptor;
+    pub use descriptor::{Descriptor, DescriptorTrait};
 }
 
 pub mod world {
