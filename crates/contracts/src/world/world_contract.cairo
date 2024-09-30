@@ -748,7 +748,9 @@ pub mod world {
 
                 class_hash
             } else {
-                panic_with_byte_array(@errors::invalid_resource_selector(new_descriptor.selector()))
+                panic_with_byte_array(
+                    @errors::resource_conflict(new_descriptor.name(), @"contract")
+                )
             }
         }
 
