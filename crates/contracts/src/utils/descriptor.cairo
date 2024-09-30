@@ -83,28 +83,6 @@ pub impl DescriptorImpl of DescriptorTrait {
         descriptor
     }
 
-    /// Initializes and asserts the descriptor from a class hash.
-    ///
-    /// # Arguments
-    ///
-    /// * `contract_address` - The contract address of the resource.
-    ///
-    /// # Returns
-    ///
-    /// * `Descriptor` - The descriptor of the resource.
-    fn from_library_assert(class_hash: ClassHash) -> Descriptor {
-        let d = IDescriptorLibraryDispatcher { class_hash };
-        let name = d.name();
-        let namespace = d.namespace();
-        let namespace_hash = d.namespace_hash();
-        let name_hash = d.name_hash();
-        let selector = d.selector();
-
-        let descriptor = Self::from_names(@namespace, @name);
-        descriptor.assert_hashes(selector, namespace_hash, name_hash);
-        descriptor
-    }
-
     /// Asserts the provided hashes to map the descriptor, which has been initialized from plain
     /// names.
     ///

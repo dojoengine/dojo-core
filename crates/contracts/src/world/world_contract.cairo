@@ -714,7 +714,16 @@ pub mod world {
         ///
         /// * `ClassHash` - The new class hash of the contract.
         fn upgrade_contract(ref self: ContractState, class_hash: ClassHash) -> ClassHash {
-            let new_descriptor = DescriptorTrait::from_library_assert(class_hash);
+            // Using a library call is not safe as arbitrary code is executed.
+            // But deploying the contract we can check the descriptor.
+            // If a new syscall supports calling library code with safety checks, we could switch
+            // back to using it. But for now, this is the safest option even if it's more expensive.
+            let (check_address, _) = deploy_syscall(
+                class_hash, starknet::get_tx_info().unbox().transaction_hash, [].span(), false
+            )
+                .unwrap_syscall();
+
+            let new_descriptor = DescriptorTrait::from_contract_assert(check_address);
 
             if let Resource::Contract((_, contract_address)) = self
                 .resources
