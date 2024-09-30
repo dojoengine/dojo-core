@@ -61,6 +61,7 @@ pub fn get(table: felt252, key: felt252, layout: Span<u8>) -> Span<felt252> {
 ///   * `table` - the table selector
 ///   * `key` - key of the record to write
 ///   * `value` - the new raw unpacked data value of the record
+///   * `offset` - the offset in value to start writing from
 ///   * `layout` - the layout of the record to write.
 pub fn set(table: felt252, key: felt252, value: Span<felt252>, offset: u32, layout: Span<u8>) {
     let storage_key = get_storage_key(table, key);

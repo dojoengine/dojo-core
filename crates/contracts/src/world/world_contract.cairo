@@ -399,29 +399,29 @@ pub mod world {
             );
         }
 
-        /// Checks if the provided account is an owner of the resource.
+        /// Checks if the provided account has owner permission for the resource.
         ///
         /// # Arguments
         ///
-        /// * `resource` - The resource.
-        /// * `address` - The contract address.
+        /// * `resource` - The selector of the resource.
+        /// * `address` - The address of the contract.
         ///
         /// # Returns
         ///
-        /// * `bool` - True if the address is an owner of the resource, false otherwise.
+        /// * `bool` - True if the address has owner permission for the resource, false otherwise.
         fn is_owner(self: @ContractState, resource: felt252, address: ContractAddress) -> bool {
             self.owners.read((resource, address))
         }
 
-        /// Grants ownership of the resource to the address.
+        /// Grants owner permission to the address.
         /// Can only be called by an existing owner or the world admin.
         ///
         /// Note that this resource must have been registered to the world first.
         ///
         /// # Arguments
         ///
-        /// * `resource` - The resource.
-        /// * `address` - The contract address.
+        /// * `resource` - The selector of the resource.
+        /// * `address` - The address of the contract to grant owner permission to.
         fn grant_owner(ref self: ContractState, resource: felt252, address: ContractAddress) {
             if self.resources.read(resource).is_unregistered() {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
@@ -434,15 +434,15 @@ pub mod world {
             EventEmitter::emit(ref self, OwnerUpdated { address, resource, value: true });
         }
 
-        /// Revokes owner permission to the contract for the model.
+        /// Revokes owner permission to the contract for the resource.
         /// Can only be called by an existing owner or the world admin.
         ///
         /// Note that this resource must have been registered to the world first.
         ///
         /// # Arguments
         ///
-        /// * `resource` - The resource.
-        /// * `address` - The contract address.
+        /// * `resource` - The selector of the resource.
+        /// * `address` - The address of the contract to revoke owner permission from.
         fn revoke_owner(ref self: ContractState, resource: felt252, address: ContractAddress) {
             if self.resources.read(resource).is_unregistered() {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
@@ -455,16 +455,16 @@ pub mod world {
             EventEmitter::emit(ref self, OwnerUpdated { address, resource, value: false });
         }
 
-        /// Checks if the provided contract is a writer of the resource.
+        /// Checks if the provided contract has writer permission for the resource.
         ///
         /// # Arguments
         ///
-        /// * `resource` - The hash of the resource name.
-        /// * `contract` - The name of the contract.
+        /// * `resource` - The selector of the resource.
+        /// * `contract` - The address of the contract.
         ///
         /// # Returns
         ///
-        /// * `bool` - True if the contract is a writer of the resource, false otherwise
+        /// * `bool` - True if the contract has writer permission for the resource, false otherwise.
         fn is_writer(self: @ContractState, resource: felt252, contract: ContractAddress) -> bool {
             self.writers.read((resource, contract))
         }
@@ -476,8 +476,8 @@ pub mod world {
         ///
         /// # Arguments
         ///
-        /// * `resource` - The hash of the resource name.
-        /// * `contract` - The name of the contract.
+        /// * `resource` - The selector of the resource.
+        /// * `contract` - The address of the contract to grant writer permission to.
         fn grant_writer(ref self: ContractState, resource: felt252, contract: ContractAddress) {
             if self.resources.read(resource).is_unregistered() {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
@@ -490,15 +490,15 @@ pub mod world {
             EventEmitter::emit(ref self, WriterUpdated { resource, contract, value: true });
         }
 
-        /// Revokes writer permission to the contract for the model.
-        /// Can only be called by an existing model owner or the world admin.
+        /// Revokes writer permission to the contract for the resource.
+        /// Can only be called by an existing resource owner or the world admin.
         ///
         /// Note that this resource must have been registered to the world first.
         ///
         /// # Arguments
         ///
-        /// * `model` - The name of the model.
-        /// * `contract` - The name of the contract.
+        /// * `resource` - The selector of the resource.
+        /// * `contract` - The address of the contract to revoke writer permission from.
         fn revoke_writer(ref self: ContractState, resource: felt252, contract: ContractAddress) {
             if self.resources.read(resource).is_unregistered() {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
@@ -664,7 +664,6 @@ pub mod world {
         ///
         /// * `salt` - The salt use for contract deployment.
         /// * `class_hash` - The class hash of the contract.
-        /// * `init_calldata` - Calldata used to initialize the contract.
         ///
         /// # Returns
         ///
