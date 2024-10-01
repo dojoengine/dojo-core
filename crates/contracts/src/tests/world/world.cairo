@@ -352,12 +352,7 @@ fn test_can_call_init_only_world() {
 
 #[test]
 #[available_gas(6000000)]
-#[should_panic(
-    expected: (
-        "Caller `4919` cannot initialize contract `dojo-test_contract` (not owner)",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_can_call_init_only_owner() {
     let world = deploy_world();
     let _address = world

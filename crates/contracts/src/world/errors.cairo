@@ -6,10 +6,6 @@ pub fn not_writer(contract_tag: @ByteArray, on_type: @ByteArray, on_tag: @ByteAr
     format!("Caller `{}` has no write access on {} `{}`", contract_tag, on_type, on_tag)
 }
 
-pub fn not_owner_init(contract_tag: @ByteArray, caller: ContractAddress) -> ByteArray {
-    format!("Caller `{:?}` cannot initialize contract `{}` (not owner)", caller, contract_tag)
-}
-
 pub fn contract_already_initialized(contract_tag: @ByteArray) -> ByteArray {
     format!("Contract `{}` has already been initialized", contract_tag)
 }
