@@ -760,11 +760,9 @@ pub mod world {
         /// * `init_calldata` - Calldata used to initialize the contract.
         fn init_contract(ref self: ContractState, selector: felt252, init_calldata: Span<felt252>) {
             if let Resource::Contract((_, contract_address)) = self.resources.read(selector) {
-                let dispatcher = IContractDispatcher { contract_address };
-                let tag = dispatcher.tag();
-
                 if self.initialized_contract.read(selector) {
-                    panic_with_byte_array(@errors::contract_already_initialized(@tag));
+                    let dispatcher = IContractDispatcher { contract_address };
+                    panic_with_byte_array(@errors::contract_already_initialized(@dispatcher.tag()));
                 } else {
                     self.assert_caller_permissions(selector, Permission::Owner);
 
