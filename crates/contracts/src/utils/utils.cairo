@@ -72,7 +72,7 @@ pub fn find_model_field_layout(model_layout: Layout, member_selector: felt252) -
     }
 }
 
-/// Indicates if at least of array item is None.
+/// Indicates if at least one array item is None.
 pub fn any_none<T>(arr: @Array<Option<T>>) -> bool {
     let mut i = 0;
     let mut res = false;

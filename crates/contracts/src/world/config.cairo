@@ -23,7 +23,7 @@ pub trait IConfig<T> {
     ///
     /// # Returns
     ///
-    /// The program hash and it's configuration hash.
+    /// The program hash and its configuration hash.
     fn get_differ_program_hash(self: @T) -> felt252;
     fn get_merger_program_hash(self: @T) -> felt252;
 
