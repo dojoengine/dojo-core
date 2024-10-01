@@ -1098,13 +1098,13 @@ pub mod world {
                     _, contract_address
                 )) => {
                     let d = IDescriptorDispatcher { contract_address };
-                    format!("contract (or it's namespace) `{}`", d.tag())
+                    format!("contract (or its namespace) `{}`", d.tag())
                 },
                 Resource::Model((
                     _, contract_address
                 )) => {
                     let d = IDescriptorDispatcher { contract_address };
-                    format!("model (or it's namespace) `{}`", d.tag())
+                    format!("model (or its namespace) `{}`", d.tag())
                 },
                 Resource::Namespace(ns) => { format!("namespace `{}`", ns) },
                 Resource::World => { format!("world") },
