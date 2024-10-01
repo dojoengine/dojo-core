@@ -4,7 +4,7 @@ use core::traits::{Into, TryInto};
 
 use starknet::{ClassHash, ContractAddress};
 
-const PACKING_MAX_BITS: u8 = 251;
+pub const PACKING_MAX_BITS: u8 = 251;
 
 pub fn pack(
     ref packed: Array<felt252>, ref unpacked: Span<felt252>, offset: u32, ref layout: Span<u8>
