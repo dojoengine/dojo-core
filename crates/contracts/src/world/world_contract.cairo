@@ -861,8 +861,14 @@ pub mod world {
             values: Span<felt252>,
             layout: Layout
         ) {
-            self.assert_caller_permissions(model_selector, Permission::Writer);
-            self.set_entity_internal(model_selector, index, values, layout);
+            if let Resource::Model((_, _)) = self.resources.read(model_selector) {
+                self.assert_caller_permissions(model_selector, Permission::Writer);
+                self.set_entity_internal(model_selector, index, values, layout);
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{model_selector}"), @"model")
+                );
+            }
         }
 
         /// Deletes a record/entity of a model..
@@ -876,8 +882,14 @@ pub mod world {
         fn delete_entity(
             ref self: ContractState, model_selector: felt252, index: ModelIndex, layout: Layout
         ) {
-            self.assert_caller_permissions(model_selector, Permission::Writer);
-            self.delete_entity_internal(model_selector, index, layout);
+            if let Resource::Model((_, _)) = self.resources.read(model_selector) {
+                self.assert_caller_permissions(model_selector, Permission::Writer);
+                self.delete_entity_internal(model_selector, index, layout);
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{model_selector}"), @"model")
+                );
+            }
         }
 
         /// Gets the base contract class hash.
