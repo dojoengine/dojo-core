@@ -92,42 +92,15 @@ fn test_delete() {
 fn test_contract_getter() {
     let world = deploy_world();
 
-    let _ = world.deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
+    let address = world
+        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
 
-    if let Resource::Contract((class_hash, _)) = world
+    if let Resource::Contract((contract_address, namespace_hash)) = world
         .resource(selector_from_tag!("dojo-test_contract")) {
-        assert(
-            class_hash == test_contract::TEST_CLASS_HASH.try_into().unwrap(),
-            'invalid contract class hash'
-        );
+        assert(address == contract_address, 'invalid contract address');
+
+        assert(namespace_hash == bytearray_hash(@"dojo"), 'invalid namespace hash');
     }
-}
-
-#[test]
-#[available_gas(6000000)]
-fn test_model_class_hash_getter() {
-    let world = deploy_world();
-    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    if let Resource::Model((class_hash, _)) = world.resource(Model::<Foo>::selector()) {
-        assert(class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'foo wrong class hash');
-    } else {
-        panic!("Foo model not found");
-    };
-}
-
-#[test]
-#[ignore]
-#[available_gas(6000000)]
-fn test_legacy_model_class_hash_getter() {
-    let world = deploy_world();
-    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    if let Resource::Model((class_hash, _)) = world.resource('Foo') {
-        assert(class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'foo wrong class hash');
-    } else {
-        panic!("Foo model not found");
-    };
 }
 
 #[test]

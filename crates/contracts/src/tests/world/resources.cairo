@@ -197,8 +197,7 @@ fn test_upgrade_model_from_model_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `2827` cannot upgrade the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883` (not owner)",
-        'ENTRYPOINT_FAILED',
+        "Account `659918` does NOT have OWNER role on namespace `dojo`", 'ENTRYPOINT_FAILED',
     )
 )]
 fn test_upgrade_model_from_model_writer() {

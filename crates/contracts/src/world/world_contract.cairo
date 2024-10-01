@@ -6,10 +6,21 @@ use starknet::{ContractAddress, ClassHash, storage_access::StorageBaseAddress, S
 use dojo::model::{ModelIndex, ResourceMetadata};
 use dojo::model::{Layout};
 
+/// Resource is the type of the resource that can be registered in the world.
+///
+/// Caching the namespace hash of a contract and model in the world saves gas, instead
+/// of re-computing the descriptor each time, which involves several poseidon hash
+/// operations.
+///
+/// - Model: (ContractAddress, NamespaceHash)
+/// - Contract: (ContractAddress, NamespaceHash)
+/// - Namespace: ByteArray
+/// - World: The world itself, identified by the selector 0.
+/// - Unregistered: The unregistered state.
 #[derive(Drop, starknet::Store, Serde, Default, Debug)]
 pub enum Resource {
-    Model: (ClassHash, ContractAddress),
-    Contract: (ClassHash, ContractAddress),
+    Model: (ContractAddress, felt252),
+    Contract: (ContractAddress, felt252),
     Namespace: ByteArray,
     World,
     #[default]
@@ -244,7 +255,6 @@ pub mod world {
         pub name: ByteArray,
         pub namespace: ByteArray,
         pub class_hash: ClassHash,
-        pub prev_class_hash: ClassHash,
         pub address: ContractAddress,
         pub prev_address: ContractAddress,
     }
@@ -324,7 +334,9 @@ pub mod world {
             .resources
             .write(
                 Model::<ResourceMetadata>::selector(),
-                Resource::Model((metadata::initial_class_hash(), metadata::initial_address()))
+                Resource::Model(
+                    (metadata::initial_address(), Model::<ResourceMetadata>::namespace_hash())
+                )
             );
         self.owners.write((WORLD, creator), true);
 
@@ -544,7 +556,10 @@ pub mod world {
 
             self
                 .resources
-                .write(descriptor.selector(), Resource::Model((class_hash, contract_address)));
+                .write(
+                    descriptor.selector(),
+                    Resource::Model((contract_address, descriptor.namespace_hash()))
+                );
             self.owners.write((descriptor.selector(), caller), true);
 
             EventEmitter::emit(
@@ -559,7 +574,6 @@ pub mod world {
         }
 
         fn upgrade_model(ref self: ContractState, class_hash: ClassHash) {
-            let caller = get_caller_address();
             let salt = self.models_salt.read();
 
             let (new_contract_address, _) = starknet::syscalls::deploy_syscall(
@@ -579,25 +593,12 @@ pub mod world {
 
             self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
 
-            let mut prev_class_hash = core::num::traits::Zero::<ClassHash>::zero();
             let mut prev_address = core::num::traits::Zero::<ContractAddress>::zero();
 
             // If the namespace or name of the model have been changed, the descriptor
             // will be different, hence not upgradeable.
             match self.resources.read(new_descriptor.selector()) {
-                // If model is already registered, validate permission to update.
-                Resource::Model((
-                    model_hash, model_address
-                )) => {
-                    if !self.is_owner(new_descriptor.selector(), caller) {
-                        panic_with_byte_array(
-                            @errors::not_owner_upgrade(caller, new_descriptor.selector())
-                        );
-                    }
-
-                    prev_class_hash = model_hash;
-                    prev_address = model_address;
-                },
+                Resource::Model((model_address, _)) => { prev_address = model_address; },
                 Resource::Unregistered => {
                     panic_with_byte_array(
                         @errors::model_not_registered(
@@ -616,7 +617,8 @@ pub mod world {
             self
                 .resources
                 .write(
-                    new_descriptor.selector(), Resource::Model((class_hash, new_contract_address))
+                    new_descriptor.selector(),
+                    Resource::Model((new_contract_address, new_descriptor.namespace_hash()))
                 );
 
             EventEmitter::emit(
@@ -627,7 +629,6 @@ pub mod world {
                     prev_address,
                     address: new_contract_address,
                     class_hash,
-                    prev_class_hash
                 }
             );
         }
@@ -702,7 +703,10 @@ pub mod world {
             self.owners.write((descriptor.selector(), caller), true);
             self
                 .resources
-                .write(descriptor.selector(), Resource::Contract((class_hash, contract_address)));
+                .write(
+                    descriptor.selector(),
+                    Resource::Contract((contract_address, descriptor.namespace_hash()))
+                );
 
             EventEmitter::emit(
                 ref self,
@@ -730,7 +734,7 @@ pub mod world {
         fn upgrade_contract(ref self: ContractState, class_hash: ClassHash) -> ClassHash {
             let new_descriptor = DescriptorTrait::from_library_assert(class_hash);
 
-            if let Resource::Contract((_, contract_address)) = self
+            if let Resource::Contract((contract_address, _)) = self
                 .resources
                 .read(new_descriptor.selector()) {
                 self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
@@ -759,7 +763,7 @@ pub mod world {
         /// * `selector` - The selector of the contract to initialize.
         /// * `init_calldata` - Calldata used to initialize the contract.
         fn init_contract(ref self: ContractState, selector: felt252, init_calldata: Span<felt252>) {
-            if let Resource::Contract((_, contract_address)) = self.resources.read(selector) {
+            if let Resource::Contract((contract_address, _)) = self.resources.read(selector) {
                 if self.initialized_contract.read(selector) {
                     let dispatcher = IContractDispatcher { contract_address };
                     panic_with_byte_array(@errors::contract_already_initialized(@dispatcher.tag()));
@@ -1048,18 +1052,8 @@ pub mod world {
             // At this point, [`Resource::Contract`] and [`Resource::Model`] requires extra checks
             // by switching to the namespace hash being the resource selector.
             let namespace_hash = match self.resources.read(resource_selector) {
-                Resource::Contract((
-                    _, contract_address
-                )) => {
-                    let d = IDescriptorDispatcher { contract_address };
-                    d.namespace_hash()
-                },
-                Resource::Model((
-                    _, contract_address
-                )) => {
-                    let d = IDescriptorDispatcher { contract_address };
-                    d.namespace_hash()
-                },
+                Resource::Contract((_, namespace_hash)) => { namespace_hash },
+                Resource::Model((_, namespace_hash)) => { namespace_hash },
                 Resource::Unregistered => {
                     panic_with_byte_array(@errors::resource_not_registered(resource_selector))
                 },
@@ -1093,13 +1087,13 @@ pub mod world {
         ) -> core::never {
             let resource_name = match self.resources.read(resource_selector) {
                 Resource::Contract((
-                    _, contract_address
+                    contract_address, _
                 )) => {
                     let d = IDescriptorDispatcher { contract_address };
                     format!("contract (or its namespace) `{}`", d.tag())
                 },
                 Resource::Model((
-                    _, contract_address
+                    contract_address, _
                 )) => {
                     let d = IDescriptorDispatcher { contract_address };
                     format!("model (or its namespace) `{}`", d.tag())
