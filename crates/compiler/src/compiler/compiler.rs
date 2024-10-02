@@ -16,7 +16,9 @@ use convert_case::{Case, Casing};
 use itertools::{izip, Itertools};
 use scarb::compiler::helpers::{build_compiler_config, collect_main_crate_ids};
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
-use scarb::core::{PackageName, TargetKind, Workspace};
+use scarb::core::{Config, Package, PackageName, TargetKind, Workspace};
+use scarb::ops::CompileOpts;
+use scarb_ui::args::{FeaturesSpec, PackagesFilter};
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use starknet::core::types::contract::SierraClass;
@@ -59,6 +61,102 @@ impl DojoCompiler {
     pub fn new(output_debug_info: bool) -> Self {
         Self { output_debug_info }
     }
+
+    pub fn compile_workspace(
+        config: &Config,
+        packages_filter: Option<PackagesFilter>,
+        features: FeaturesSpec,
+    ) -> Result<()> {
+        let ws = scarb::ops::read_workspace(config.manifest_path(), config)?;
+
+        let packages: Vec<Package> = if let Some(filter) = packages_filter {
+            filter.match_many(&ws)?.into_iter().collect()
+        } else {
+            ws.members().collect()
+        };
+
+        for p in &packages {
+            check_package_dojo_version(&ws, p)?;
+        }
+
+        let _profile_name = ws
+            .current_profile()
+            .expect("Scarb profile is expected.")
+            .to_string();
+
+        // Manifest path is always a file, we can unwrap safely to get the parent folder.
+        let _manifest_dir = ws.manifest_path().parent().unwrap().to_path_buf();
+
+        // TODO: clean base manifests dir.
+        //let profile_dir = manifest_dir.join(MANIFESTS_DIR).join(profile_name);
+        //CleanArgs::clean_manifests(&profile_dir)?;
+
+        trace!(?packages);
+
+        let compile_info = crate::scarb_internal::compile_workspace(
+            config,
+            CompileOpts {
+                include_target_names: vec![],
+                include_target_kinds: vec![],
+                exclude_target_kinds: vec![TargetKind::TEST],
+                features: features.try_into()?,
+            },
+            packages.iter().map(|p| p.id).collect(),
+        )?;
+
+        trace!(?compile_info, "Compiled workspace.");
+
+        Ok(())
+    }
+}
+
+/// Checks if the package has a compatible version of dojo-core.
+/// In case of a workspace with multiple packages, each package is individually checked
+/// and the workspace manifest path is returned in case of virtual workspace.
+pub fn check_package_dojo_version(ws: &Workspace<'_>, package: &Package) -> anyhow::Result<()> {
+    if let Some(dojo_dep) = package
+        .manifest
+        .summary
+        .dependencies
+        .iter()
+        .find(|dep| dep.name.as_str() == "dojo")
+    {
+        let dojo_version = env!("CARGO_PKG_VERSION");
+
+        let dojo_dep_str = dojo_dep.to_string();
+
+        // Only in case of git dependency with an explicit tag, we check if the tag is the same as
+        // the current version.
+        if dojo_dep_str.contains("git+")
+            && dojo_dep_str.contains("tag=v")
+            && !dojo_dep_str.contains(dojo_version)
+        {
+            if let Ok(cp) = ws.current_package() {
+                let path = if cp.id == package.id {
+                    package.manifest_path()
+                } else {
+                    ws.manifest_path()
+                };
+
+                anyhow::bail!(
+                    "Found dojo-core version mismatch: expected {}. Please verify your dojo \
+                     dependency in {}",
+                    dojo_version,
+                    path
+                )
+            } else {
+                // Virtual workspace.
+                anyhow::bail!(
+                    "Found dojo-core version mismatch: expected {}. Please verify your dojo \
+                     dependency in {}",
+                    dojo_version,
+                    ws.manifest_path()
+                )
+            }
+        }
+    }
+
+    Ok(())
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
