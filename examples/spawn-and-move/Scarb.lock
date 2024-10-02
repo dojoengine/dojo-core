@@ -21,7 +21,7 @@ version = "1.0.0-rc.1"
 
 [[package]]
 name = "dojo_examples"
-version = "1.0.0-alpha.8"
+version = "1.0.0-rc1"
 dependencies = [
  "armory",
  "bestiary",

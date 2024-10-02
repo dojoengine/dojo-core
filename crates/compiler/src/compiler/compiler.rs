@@ -4,10 +4,10 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Context, Result};
 use cairo_lang_compiler::db::RootDatabase;
+use cairo_lang_compiler::CompilerConfig;
 use cairo_lang_defs::ids::NamedLanguageElementId;
 use cairo_lang_filesystem::db::FilesGroup;
 use cairo_lang_filesystem::ids::{CrateId, CrateLongId};
-use cairo_lang_semantic::db::SemanticGroup;
 use cairo_lang_starknet::compile::compile_prepared_db;
 use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
 use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
@@ -16,19 +16,22 @@ use cairo_lang_utils::UpcastMut;
 use camino::Utf8PathBuf;
 use convert_case::{Case, Casing};
 use itertools::{izip, Itertools};
-use scarb::compiler::helpers::{build_compiler_config, collect_main_crate_ids};
+use scarb::compiler::helpers::build_compiler_config;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
 use scarb::core::{Config, Package, PackageName, TargetKind, TomlManifest, Workspace};
 use scarb::ops::CompileOpts;
 use scarb_ui::args::{FeaturesSpec, PackagesFilter};
+use scarb_ui::Ui;
 use semver::Version;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
-use tracing::{debug, trace, trace_span};
+use tracing::{trace, trace_span};
 
 use crate::scarb_internal::debug::SierraToCairoDebugInfo;
+
+const GLOB_PATH_SELECTOR: &str = "*";
 
 #[derive(Debug, Clone)]
 pub struct CompiledArtifact {
@@ -43,8 +46,6 @@ pub struct CompiledArtifact {
 type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
 
 const CAIRO_PATH_SEPARATOR: &str = "::";
-
-pub(crate) const LOG_TARGET: &str = "dojo_lang::compiler";
 
 #[cfg(test)]
 #[path = "compiler_test.rs"]
@@ -243,6 +244,35 @@ impl ContractSelector {
             last_segment.to_case(Case::Snake)
         )
     }
+
+    /// Checks if the contract selector is/has a wildcard.
+    /// Wildcard selectors are only supported in the last segment of the path.
+    pub fn is_wildcard(&self) -> bool {
+        self.0.ends_with(GLOB_PATH_SELECTOR)
+    }
+
+    /// Returns the partial path without the wildcard.
+    pub fn partial_path(&self) -> String {
+        let parts = self
+            .0
+            .split_once(GLOB_PATH_SELECTOR)
+            .unwrap_or((self.0.as_str(), ""));
+        parts.0.to_string()
+    }
+
+    /// Returns the full path.
+    pub fn full_path(&self) -> String {
+        self.0.clone()
+    }
+
+    /// Checks if the contract path matches the selector with wildcard support.
+    pub fn matches(&self, contract_path: &str) -> bool {
+        if self.is_wildcard() {
+            contract_path.starts_with(&self.partial_path())
+        } else {
+            contract_path == self.path_with_model_snake_case()
+        }
+    }
 }
 
 impl Compiler for DojoCompiler {
@@ -250,7 +280,6 @@ impl Compiler for DojoCompiler {
         TargetKind::new("dojo")
     }
 
-    // TODO: refacto the main loop here, could be much more simpler and efficient.
     fn compile(
         &self,
         unit: CairoCompilationUnit,
@@ -258,120 +287,59 @@ impl Compiler for DojoCompiler {
         ws: &Workspace<'_>,
     ) -> Result<()> {
         let props: Props = unit.main_component().target_props()?;
-        //let target_dir = unit.target_dir(ws);
+        verify_props(&props)?;
 
-        // TODO: if we want to output the manifests at the package level,
-        // we must iterate on the ws members, to find the location of the
-        // sole package with the `dojo` target.
-        // In this case, we can use this path to output the manifests.
-
-        let mut main_crate_ids = collect_main_crate_ids(&unit, db);
-        let core_crate_ids: Vec<CrateId> = collect_core_crate_ids(db);
-        main_crate_ids.extend(core_crate_ids);
-
+        let main_crate_ids = collect_main_crate_ids(&unit, db);
         let compiler_config = build_compiler_config(&unit, &main_crate_ids, ws);
 
-        trace!(target: LOG_TARGET, unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
+        trace!(unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
 
         let contracts = find_project_contracts(
-            db.upcast_mut(),
+            db,
             main_crate_ids.clone(),
             props.build_external_contracts.clone(),
+            &ws.config().ui(),
         )?;
 
-        let contract_paths = contracts
-            .iter()
-            .map(|decl| decl.module_id().full_path(db.upcast_mut()))
-            .collect::<Vec<_>>();
-        trace!(target: LOG_TARGET, contracts = ?contract_paths);
+        compile_contracts(
+            db,
+            &contracts,
+            compiler_config,
+            &ws.config().ui(),
+            self.output_debug_info,
+        )?;
 
-        let contracts = contracts.iter().collect::<Vec<_>>();
-
-        let classes = {
-            let _ = trace_span!("compile_starknet").enter();
-            compile_prepared_db(db, &contracts, compiler_config)?
-        };
-
-        let debug_info_classes: Vec<Option<SierraToCairoDebugInfo>> = if self.output_debug_info {
-            let debug_classes =
-                crate::scarb_internal::debug::compile_prepared_db_to_debug_info(db, &contracts)?;
-
-            debug_classes
-                .into_iter()
-                .map(|d| Some(crate::scarb_internal::debug::get_sierra_to_cairo_debug_info(&d, db)))
-                .collect()
-        } else {
-            vec![None; contracts.len()]
-        };
-
-        let mut compiled_classes: CompiledArtifactByPath = HashMap::new();
-        let list_selector = ListSelector::default();
-
-        for (decl, contract_class, debug_info) in izip!(contracts, classes, debug_info_classes) {
-            let contract_name = decl.submodule_id.name(db.upcast_mut());
-            // note that the qualified path is in snake case while
-            // the `full_path()` method of StructId uses the original struct name case.
-            // (see in `get_dojo_model_artifacts`)
-            let qualified_path = decl.module_id().full_path(db.upcast_mut());
-
-            match contract_class.validate_version_compatible(list_selector.clone()) {
-                Ok(()) => {}
-                Err(AllowedLibfuncsError::UnsupportedLibfunc {
-                    invalid_libfunc,
-                    allowed_libfuncs_list_name: _,
-                }) => {
-                    let diagnostic = format! {r#"
-                        Contract `{contract_name}` ({qualified_path}) includes `{invalid_libfunc}` function that is not allowed in the default libfuncs for public Starknet networks (mainnet, sepolia).
-                        It will work on Katana, but don't forget to remove it before deploying on a public Starknet network.
-                    "#};
-
-                    ws.config().ui().warn(diagnostic);
-                }
-                Err(e) => {
-                    return Err(e).with_context(|| {
-                        format!(
-                            "Failed to check allowed libfuncs for contract: {}",
-                            contract_name
-                        )
-                    });
-                }
-            }
-
-            let class_hash =
-                compute_class_hash_of_contract_class(&contract_class).with_context(|| {
-                    format!(
-                        "problem computing class hash for contract `{}`",
-                        qualified_path.clone()
-                    )
-                })?;
-
-            compiled_classes.insert(
-                qualified_path,
-                CompiledArtifact {
-                    class_hash,
-                    contract_class: Rc::new(contract_class),
-                    debug_info: debug_info.map(Rc::new),
-                },
-            );
-        }
+        // TODO: write artifacts to disk.
 
         Ok(())
     }
 }
 
-fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
-    let class_str = serde_json::to_string(&class)?;
-    let sierra_class = serde_json::from_str::<SierraClass>(&class_str)
-        .map_err(|e| anyhow!("error parsing Sierra class: {e}"))?;
-    sierra_class
-        .class_hash()
-        .map_err(|e| anyhow!("problem hashing sierra contract: {e}"))
+/// Verifies the props are correct.
+///
+/// Currently, it verifies that the external contracts path do not have multiple global path selectors.
+fn verify_props(props: &Props) -> Result<()> {
+    if let Some(external_contracts) = props.build_external_contracts.clone() {
+        for path in external_contracts.iter() {
+            if path.0.matches(GLOB_PATH_SELECTOR).count() > 1 {
+                anyhow::bail!("external contract path `{}` has multiple global path selectors, only one '*' selector is allowed",
+                path.0);
+            }
+        }
+    }
+
+    Ok(())
 }
 
+/// Finds the contracts in the project.
+///
+/// First searches for internal contracts in the main crates.
+/// Then searches for external contracts in the external crates.
 fn find_project_contracts(
-    mut db: &dyn SemanticGroup,
+    db: &mut RootDatabase,
     main_crate_ids: Vec<CrateId>,
     external_contracts: Option<Vec<ContractSelector>>,
+    ui: &Ui,
 ) -> Result<Vec<ContractDeclaration>> {
     let internal_contracts = {
         let _ = trace_span!("find_internal_contracts").enter();
@@ -380,30 +348,46 @@ fn find_project_contracts(
 
     let external_contracts = if let Some(external_contracts) = external_contracts {
         let _ = trace_span!("find_external_contracts").enter();
-        debug!(target: LOG_TARGET, external_contracts = ?external_contracts, "External contracts selectors.");
+        trace!(external_contracts = ?external_contracts, "External contracts selectors from manifest.");
 
-        let crate_ids = external_contracts
-            .iter()
-            .map(|selector| selector.package().into())
-            .unique()
-            .map(|package_name: SmolStr| {
-                debug!(target: LOG_TARGET, %package_name, "Looking for internal crates.");
-                db.upcast_mut()
-                    .intern_crate(CrateLongId::Real(package_name))
-            })
-            .collect::<Vec<_>>();
+        let crate_ids = collect_crates_ids_from_selectors(db, &external_contracts);
 
-        find_contracts(db, crate_ids.as_ref())
+        let filtered_contracts: Vec<ContractDeclaration> = find_contracts(db, crate_ids.as_ref())
             .into_iter()
             .filter(|decl| {
-                let contract_path = decl.module_id().full_path(db.upcast());
+                let contract_path = decl.module_id().full_path(db);
                 external_contracts
                     .iter()
-                    .any(|selector| contract_path == selector.path_with_model_snake_case())
+                    .any(|selector| selector.matches(&contract_path))
             })
-            .collect::<Vec<ContractDeclaration>>()
+            .collect::<Vec<ContractDeclaration>>();
+
+        // Display warnings for external contracts that were not found, due to invalid paths
+        // most of the time.
+        external_contracts
+            .iter()
+            .filter(|selector| {
+                !filtered_contracts.iter().any(|decl| {
+                    let contract_path = decl.module_id().full_path(db);
+                    selector.matches(&contract_path)
+                })
+            })
+            .for_each(|selector| {
+                let diagnostic = format!("No contract found for path `{}`.", selector.full_path());
+                ui.warn(diagnostic);
+            });
+
+        // Display contracts that were found.
+        let contract_paths = filtered_contracts
+            .iter()
+            .map(|decl| decl.module_id().full_path(db))
+            .collect::<Vec<_>>();
+
+        trace!(contracts = ?contract_paths, "Collecting all the contracts eligible for compilation.");
+
+        filtered_contracts
     } else {
-        debug!(target: LOG_TARGET, "No external contracts selected.");
+        trace!("No external contracts found in the manifest.");
         Vec::new()
     };
 
@@ -413,23 +397,121 @@ fn find_project_contracts(
         .collect())
 }
 
-pub fn collect_core_crate_ids(db: &RootDatabase) -> Vec<CrateId> {
-    [
-        ContractSelector("dojo::contract::base_contract::base".to_string()),
-        ContractSelector("dojo::world::world_contract::world".to_string()),
-    ]
-    .iter()
-    .map(|selector| selector.package().into())
-    .unique()
-    .map(|package_name: SmolStr| db.intern_crate(CrateLongId::Real(package_name)))
-    .collect::<Vec<_>>()
+/// Compiles the contracts.
+fn compile_contracts(
+    db: &mut RootDatabase,
+    contracts: &[ContractDeclaration],
+    compiler_config: CompilerConfig,
+    ui: &Ui,
+    do_output_debug_info: bool,
+) -> Result<CompiledArtifactByPath> {
+    let contracts: Vec<&ContractDeclaration> = contracts.iter().collect::<Vec<_>>();
+
+    let classes = {
+        let _ = trace_span!("compile_starknet").enter();
+        compile_prepared_db(db, &contracts, compiler_config)?
+    };
+
+    let debug_info_classes: Vec<Option<SierraToCairoDebugInfo>> = if do_output_debug_info {
+        let debug_classes =
+            crate::scarb_internal::debug::compile_prepared_db_to_debug_info(db, &contracts)?;
+
+        debug_classes
+            .into_iter()
+            .map(|d| Some(crate::scarb_internal::debug::get_sierra_to_cairo_debug_info(&d, db)))
+            .collect()
+    } else {
+        vec![None; contracts.len()]
+    };
+
+    let mut compiled_classes: CompiledArtifactByPath = HashMap::new();
+    let list_selector = ListSelector::default();
+
+    for (decl, contract_class, debug_info) in izip!(contracts, classes, debug_info_classes) {
+        let contract_name = decl.submodule_id.name(db.upcast_mut());
+        // note that the qualified path is in snake case while
+        // the `full_path()` method of StructId uses the original struct name case.
+        // (see in `get_dojo_model_artifacts`)
+        let qualified_path = decl.module_id().full_path(db.upcast_mut());
+
+        match contract_class.validate_version_compatible(list_selector.clone()) {
+            Ok(()) => {}
+            Err(AllowedLibfuncsError::UnsupportedLibfunc {
+                invalid_libfunc,
+                allowed_libfuncs_list_name: _,
+            }) => {
+                let diagnostic = format! {r#"
+                    Contract `{contract_name}` ({qualified_path}) includes `{invalid_libfunc}` function that is not allowed in the default libfuncs for public Starknet networks (mainnet, sepolia).
+                    It will work on Katana, but don't forget to remove it before deploying on a public Starknet network.
+                "#};
+
+                ui.warn(diagnostic);
+            }
+            Err(e) => {
+                return Err(e).with_context(|| {
+                    format!(
+                        "Failed to check allowed libfuncs for contract: {}",
+                        contract_name
+                    )
+                });
+            }
+        }
+
+        let class_hash =
+            compute_class_hash_of_contract_class(&contract_class).with_context(|| {
+                format!(
+                    "problem computing class hash for contract `{}`",
+                    qualified_path.clone()
+                )
+            })?;
+
+        compiled_classes.insert(
+            qualified_path,
+            CompiledArtifact {
+                class_hash,
+                contract_class: Rc::new(contract_class),
+                debug_info: debug_info.map(Rc::new),
+            },
+        );
+    }
+
+    Ok(compiled_classes)
 }
 
-pub fn collect_external_crate_ids(
+/// Computes the class hash of a contract class.
+fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
+    let class_str = serde_json::to_string(&class)?;
+    let sierra_class = serde_json::from_str::<SierraClass>(&class_str)
+        .map_err(|e| anyhow!("error parsing Sierra class: {e}"))?;
+    sierra_class
+        .class_hash()
+        .map_err(|e| anyhow!("problem hashing sierra contract: {e}"))
+}
+
+/// Collects the main crate ids for Dojo including the core crates.
+pub fn collect_main_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) -> Vec<CrateId> {
+    let mut main_crate_ids = scarb::compiler::helpers::collect_main_crate_ids(&unit, db);
+
+    if unit.main_package_id.name.to_string() != "dojo" {
+        let core_crate_ids: Vec<CrateId> = collect_crates_ids_from_selectors(
+            db,
+            &[
+                ContractSelector("dojo::contract::base_contract::base".to_string()),
+                ContractSelector("dojo::world::world_contract::world".to_string()),
+            ],
+        );
+
+        main_crate_ids.extend(core_crate_ids);
+    }
+
+    main_crate_ids
+}
+/// Collects the crate ids containing the given contract selectors.
+pub fn collect_crates_ids_from_selectors(
     db: &RootDatabase,
-    external_contracts: Vec<ContractSelector>,
+    contract_selectors: &[ContractSelector],
 ) -> Vec<CrateId> {
-    external_contracts
+    contract_selectors
         .iter()
         .map(|selector| selector.package().into())
         .unique()
