@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::rc::Rc;
+use std::str::FromStr;
 
 use anyhow::{anyhow, Context, Result};
 use cairo_lang_compiler::db::RootDatabase;
@@ -12,13 +13,15 @@ use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
 use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cairo_lang_utils::UpcastMut;
+use camino::Utf8PathBuf;
 use convert_case::{Case, Casing};
 use itertools::{izip, Itertools};
 use scarb::compiler::helpers::{build_compiler_config, collect_main_crate_ids};
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
-use scarb::core::{Config, Package, PackageName, TargetKind, Workspace};
+use scarb::core::{Config, Package, PackageName, TargetKind, TomlManifest, Workspace};
 use scarb::ops::CompileOpts;
 use scarb_ui::args::{FeaturesSpec, PackagesFilter};
+use semver::Version;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use starknet::core::types::contract::SierraClass;
@@ -155,6 +158,49 @@ pub fn check_package_dojo_version(ws: &Workspace<'_>, package: &Package) -> anyh
             }
         }
     }
+
+    Ok(())
+}
+
+pub fn generate_version() -> String {
+    const DOJO_VERSION: &str = env!("CARGO_PKG_VERSION");
+    let scarb_version = scarb::version::get().version;
+    let scarb_sierra_version = scarb::version::get().sierra.version;
+    let scarb_cairo_version = scarb::version::get().cairo.version;
+
+    let version_string = format!(
+        "{}\nscarb: {}\ncairo: {}\nsierra: {}",
+        DOJO_VERSION, scarb_version, scarb_cairo_version, scarb_sierra_version,
+    );
+    version_string
+}
+
+/// Verifies that the Cairo version specified in the manifest file is compatible with the current
+/// version of Cairo used by Dojo.
+pub fn verify_cairo_version_compatibility(manifest_path: &Utf8PathBuf) -> Result<()> {
+    let scarb_cairo_version = scarb::version::get().cairo;
+
+    let Ok(manifest) = TomlManifest::read_from_path(manifest_path) else {
+        return Ok(());
+    };
+    let Some(package) = manifest.package else {
+        return Ok(());
+    };
+    let Some(cairo_version) = package.cairo_version else {
+        return Ok(());
+    };
+
+    let version_req = cairo_version.as_defined().unwrap();
+    let version = Version::from_str(scarb_cairo_version.version).unwrap();
+
+    trace!(version_req = %version_req, version = %version, "Cairo version compatibility.");
+
+    if !version_req.matches(&version) {
+        anyhow::bail!(
+            "Cairo version `{version_req}` specified in the manifest file `{manifest_path}` is not supported by dojo, which is expecting `{version}`. \
+             Please verify and update dojo or change the Cairo version in the manifest file.",
+        );
+    };
 
     Ok(())
 }
