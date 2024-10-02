@@ -26,8 +26,9 @@ use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
 use super::contract_selector::ContractSelector;
+use super::scarb_internal;
+use super::scarb_internal::debug::SierraToCairoDebugInfo;
 use super::version::check_package_dojo_version;
-use crate::scarb_internal::debug::SierraToCairoDebugInfo;
 
 #[derive(Debug, Clone)]
 pub struct CompiledArtifact {
@@ -91,7 +92,7 @@ impl DojoCompiler {
 
         trace!(?packages);
 
-        let compile_info = crate::scarb_internal::compile_workspace(
+        let compile_info = scarb_internal::compile_workspace(
             config,
             CompileOpts {
                 include_target_names: vec![],
@@ -213,24 +214,26 @@ fn find_project_contracts(
                 ui.warn(diagnostic);
             });
 
-        // Display contracts that were found.
-        let contract_paths = filtered_contracts
-            .iter()
-            .map(|decl| decl.module_id().full_path(db))
-            .collect::<Vec<_>>();
-
-        trace!(contracts = ?contract_paths, "Collecting all the contracts eligible for compilation.");
-
         filtered_contracts
     } else {
         trace!("No external contracts found in the manifest.");
         Vec::new()
     };
 
-    Ok(internal_contracts
+    let all_contracts: Vec<ContractDeclaration> = internal_contracts
         .into_iter()
         .chain(external_contracts)
-        .collect())
+        .collect();
+
+    // Display contracts that were found.
+    let contract_paths = all_contracts
+        .iter()
+        .map(|decl| decl.module_id().full_path(db))
+        .collect::<Vec<_>>();
+
+    trace!(contracts = ?contract_paths, "Collecting contracts eligible for compilation.");
+
+    Ok(all_contracts)
 }
 
 /// Compiles the contracts.
@@ -250,11 +253,15 @@ fn compile_contracts(
 
     let debug_info_classes: Vec<Option<SierraToCairoDebugInfo>> = if do_output_debug_info {
         let debug_classes =
-            crate::scarb_internal::debug::compile_prepared_db_to_debug_info(db, &contracts)?;
+            scarb_internal::debug::compile_prepared_db_to_debug_info(db, &contracts)?;
 
         debug_classes
             .into_iter()
-            .map(|d| Some(crate::scarb_internal::debug::get_sierra_to_cairo_debug_info(&d, db)))
+            .map(|d| {
+                Some(scarb_internal::debug::get_sierra_to_cairo_debug_info(
+                    &d, db,
+                ))
+            })
             .collect()
     } else {
         vec![None; contracts.len()]

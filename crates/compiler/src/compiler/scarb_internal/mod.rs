@@ -1,9 +1,7 @@
-// I have copied source code from https://github.com/software-mansion/scarb/blob/main/scarb/src/compiler/db.rs
-// since build_scarb_root_database is not public.
-//
-// NOTE: This files needs to be updated whenever scarb version is updated.
-// NOTE: This file was moved here from `sozo` as we need to compile here too,
-//       and `sozo` has `dojo-lang` as dependency.
+//! Scarb internal code used to compile Cairo contracts.
+//!
+//! Copied from source code from https://github.com/software-mansion/scarb/blob/main/scarb/src/compiler/db.rs
+//! since build_scarb_root_database is not public.
 use anyhow::Result;
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_compiler::project::{ProjectConfig, ProjectConfigContent};
@@ -29,9 +27,8 @@ use crate::compiler::config::{CompilerConfig, DojoConfigLoader};
 use crate::namespace_config::{
     NamespaceConfig, DEFAULT_NAMESPACE_CFG_KEY, DOJO_MANIFESTS_DIR_CFG_KEY, NAMESPACE_CFG_PREFIX,
 };
-use crate::plugin::dojo_plugin_suite;
+use crate::plugin::plugin::dojo_plugin_suite;
 
-pub(crate) const LOG_TARGET: &str = "dojo_lang::scarb_internal";
 pub mod debug;
 
 /// Compilation information of all the units found in the workspace.
@@ -125,7 +122,7 @@ pub fn compile_workspace(
     let mut compile_error_units = vec![];
 
     for unit in compilation_units {
-        trace!(target: LOG_TARGET, unit_name = %unit.name(), target_kind = %unit.main_component().target_kind(), "Compiling unit.");
+        trace!(unit_name = %unit.name(), target_kind = %unit.main_component().target_kind(), "Compiling unit.");
 
         // Proc macro are not supported yet on Dojo, hence we only consider processing Cairo
         // compilation units.
@@ -232,7 +229,7 @@ fn build_project_config(unit: &CairoCompilationUnit) -> Result<ProjectConfig> {
         content,
     };
 
-    trace!(target: LOG_TARGET, ?project_config);
+    trace!(?project_config);
 
     Ok(project_config)
 }
@@ -264,7 +261,7 @@ pub fn cfg_set_from_component(
         c.package.manifest_path()
     ));
 
-    tracing::debug!(target: LOG_TARGET, ?c, ?package_compiler_config);
+    tracing::debug!(?c, ?package_compiler_config);
 
     let component_cfg = Cfg {
         key: "component_name".into(),

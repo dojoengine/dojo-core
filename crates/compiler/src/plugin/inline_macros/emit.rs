@@ -8,7 +8,7 @@ use cairo_lang_diagnostics::Severity;
 use cairo_lang_starknet::plugin::consts::EVENT_TRAIT;
 use cairo_lang_syntax::node::{ast, TypedStablePtr, TypedSyntaxNode};
 
-use crate::inline_macros::unsupported_arg_diagnostic;
+use super::unsupported_arg_diagnostic;
 
 #[derive(Debug, Default)]
 pub struct EmitMacro;

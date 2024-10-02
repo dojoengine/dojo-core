@@ -15,7 +15,7 @@ use dojo_types::naming;
 use starknet::core::utils::get_selector_from_name;
 
 use crate::namespace_config::NamespaceConfig;
-use crate::plugin::{DojoAuxData, Member, ModelAuxData, DOJO_MODEL_ATTR};
+use crate::plugin::plugin::{DojoAuxData, Member, ModelAuxData, DOJO_MODEL_ATTR};
 
 const DEFAULT_MODEL_VERSION: u8 = 1;
 

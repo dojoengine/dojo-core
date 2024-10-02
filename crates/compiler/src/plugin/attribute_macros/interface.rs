@@ -8,8 +8,8 @@ use cairo_lang_syntax::node::db::SyntaxGroup;
 use cairo_lang_syntax::node::{ast, ids, Terminal, TypedStablePtr, TypedSyntaxNode};
 use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 
-use crate::syntax::self_param;
-use crate::syntax::world_param::{self, WorldParamInjectionKind};
+use crate::plugin::syntax::self_param;
+use crate::plugin::syntax::world_param::{self, WorldParamInjectionKind};
 
 #[derive(Debug)]
 pub struct DojoInterface {

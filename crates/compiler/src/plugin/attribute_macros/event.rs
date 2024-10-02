@@ -11,7 +11,7 @@ use cairo_lang_syntax::node::helpers::QueryAttrs;
 use cairo_lang_syntax::node::{ast, Terminal, TypedStablePtr, TypedSyntaxNode};
 use indoc::formatdoc;
 
-use crate::plugin::DojoAuxData;
+use crate::plugin::plugin::DojoAuxData;
 
 // A custom implementation of the starknet::Event derivation path.
 // We append the event selector directly within the append_keys_and_data function.

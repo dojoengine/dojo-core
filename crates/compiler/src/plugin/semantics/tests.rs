@@ -7,7 +7,7 @@ use cairo_lang_test_utils::parse_test_file::TestRunnerResult;
 use cairo_lang_test_utils::test_file_test;
 use cairo_lang_utils::ordered_hash_map::OrderedHashMap;
 
-use crate::semantics::test_utils::DojoSemanticDatabase;
+use super::test_utils::DojoSemanticDatabase;
 
 test_file_test!(
     dojo_semantics,

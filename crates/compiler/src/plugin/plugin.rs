@@ -22,20 +22,22 @@ use semver::Version;
 use smol_str::SmolStr;
 use url::Url;
 
-use crate::attribute_macros::contract::DojoContract;
-use crate::attribute_macros::event::handle_event_struct;
-use crate::attribute_macros::interface::DojoInterface;
-use crate::attribute_macros::model::handle_model_struct;
-use crate::inline_macros::delete::DeleteMacro;
-use crate::inline_macros::emit::EmitMacro;
-use crate::inline_macros::get::GetMacro;
-use crate::inline_macros::get_models_test_class_hashes::GetModelsTestClassHashes;
-use crate::inline_macros::selector_from_tag::SelectorFromTagMacro;
-use crate::inline_macros::set::SetMacro;
-use crate::inline_macros::spawn_test_world::SpawnTestWorld;
-use crate::introspect::{handle_introspect_enum, handle_introspect_struct};
+use super::attribute_macros::contract::DojoContract;
+use super::attribute_macros::event::handle_event_struct;
+use super::attribute_macros::interface::DojoInterface;
+use super::attribute_macros::model::handle_model_struct;
+use super::inline_macros::delete::DeleteMacro;
+use super::inline_macros::emit::EmitMacro;
+use super::inline_macros::get::GetMacro;
+use super::inline_macros::get_models_test_class_hashes::GetModelsTestClassHashes;
+use super::inline_macros::selector_from_tag::SelectorFromTagMacro;
+use super::inline_macros::set::SetMacro;
+use super::inline_macros::spawn_test_world::SpawnTestWorld;
+use super::introspect::{handle_introspect_enum, handle_introspect_struct};
+use super::print::{handle_print_enum, handle_print_struct};
+
 use crate::namespace_config::NamespaceConfig;
-use crate::print::{handle_print_enum, handle_print_struct};
+
 pub const DOJO_CONTRACT_ATTR: &str = "dojo::contract";
 pub const DOJO_INTERFACE_ATTR: &str = "dojo::interface";
 pub const DOJO_MODEL_ATTR: &str = "dojo::model";

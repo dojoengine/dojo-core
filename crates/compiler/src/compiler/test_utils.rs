@@ -13,9 +13,9 @@ use scarb::ops::{CompileOpts, FeaturesOpts, FeaturesSelector};
 use scarb_ui::Verbosity;
 use toml::{Table, Value};
 
+use crate::compiler::scarb_internal::{compile_workspace, CompileInfo};
 use crate::compiler::DojoCompiler;
 use crate::plugin::CairoPluginRepository;
-use crate::scarb_internal::{compile_workspace, CompileInfo};
 
 #[derive(Debug)]
 pub struct CompilerTestSetup {
