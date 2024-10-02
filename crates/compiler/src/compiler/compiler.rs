@@ -42,10 +42,6 @@ pub struct CompiledArtifact {
 /// A type alias for a map of compiled artifacts by their path.
 type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
 
-#[cfg(test)]
-#[path = "compiler_test.rs"]
-mod test;
-
 #[derive(Debug, Default)]
 pub struct DojoCompiler {
     /// Output the debug information of the compiled Sierra contracts.

@@ -25,7 +25,7 @@ use crate::namespace_config::DEFAULT_NAMESPACE_CFG_KEY;
 
 cairo_lang_test_utils::test_file_test!(
     expand_plugin,
-    "src/plugin_test_data",
+    "src/plugin/plugin_test_data",
     {
         model: "model",
         print: "print",

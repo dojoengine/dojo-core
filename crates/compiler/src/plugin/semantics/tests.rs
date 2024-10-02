@@ -11,7 +11,7 @@ use super::test_utils::DojoSemanticDatabase;
 
 test_file_test!(
     dojo_semantics,
-    "src/semantics/test_data",
+    "src/plugin/semantics/test_data",
     {
         get: "get",
 

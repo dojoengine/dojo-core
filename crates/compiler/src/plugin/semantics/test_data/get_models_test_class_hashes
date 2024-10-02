@@ -7,14 +7,33 @@ test_semantics
 get_models_test_class_hashes!()
 
 //! > expected
-Missing(
-    ExprMissing {
-        ty: <missing>,
+FunctionCall(
+    ExprFunctionCall {
+        function: ?0::span,
+        args: [
+            Value(
+                Snapshot(
+                    ExprSnapshot {
+                        inner: FixedSizeArray(
+                            ExprFixedSizeArray {
+                                items: Items(
+                                    [],
+                                ),
+                                ty: [<missing>; 0],
+                            },
+                        ),
+                        ty: @[<missing>; 0],
+                    },
+                ),
+            ),
+        ],
+        coupon_arg: None,
+        ty: core::array::Span::<<missing>>,
     },
 )
 
 //! > semantic_diagnostics
-error: Plugin diagnostic: Failed to load models and namespaces, ensure you have run `sozo build` first.
+error: Type annotations needed. Failed to infer ?0.
  --> lib.cairo:2:1
 get_models_test_class_hashes!()
 ^*****************************^
@@ -76,14 +95,33 @@ test_semantics
 get_models_test_class_hashes!(["ns1", "ns2"])
 
 //! > expected
-Missing(
-    ExprMissing {
-        ty: <missing>,
+FunctionCall(
+    ExprFunctionCall {
+        function: ?0::span,
+        args: [
+            Value(
+                Snapshot(
+                    ExprSnapshot {
+                        inner: FixedSizeArray(
+                            ExprFixedSizeArray {
+                                items: Items(
+                                    [],
+                                ),
+                                ty: [<missing>; 0],
+                            },
+                        ),
+                        ty: @[<missing>; 0],
+                    },
+                ),
+            ),
+        ],
+        coupon_arg: None,
+        ty: core::array::Span::<<missing>>,
     },
 )
 
 //! > semantic_diagnostics
-error: Plugin diagnostic: Failed to load models and namespaces, ensure you have run `sozo build` first.
+error: Type annotations needed. Failed to infer ?0.
  --> lib.cairo:2:1
 get_models_test_class_hashes!(["ns1", "ns2"])
 ^*******************************************^

@@ -88,3 +88,69 @@ impl ContractSelector {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_package() {
+        let selector = ContractSelector::new("my_package::my_contract".to_string());
+        assert_eq!(selector.package(), PackageName::new("my_package"));
+
+        let selector_no_separator = ContractSelector::new("my_package".to_string());
+        assert_eq!(
+            selector_no_separator.package(),
+            PackageName::new("my_package")
+        );
+    }
+
+    #[test]
+    fn test_path_with_model_snake_case() {
+        let selector = ContractSelector::new("my_package::MyContract".to_string());
+        assert_eq!(
+            selector.path_with_model_snake_case(),
+            "my_package::my_contract"
+        );
+
+        let selector_multiple_segments =
+            ContractSelector::new("my_package::sub_package::MyContract".to_string());
+        assert_eq!(
+            selector_multiple_segments.path_with_model_snake_case(),
+            "my_package::sub_package::my_contract"
+        );
+
+        // In snake case, erc20 should be erc_20. This test ensures that the path is converted to snake
+        // case only for the model's name.
+        let selector_erc20 = ContractSelector::new("my_package::erc20::Token".to_string());
+        assert_eq!(
+            selector_erc20.path_with_model_snake_case(),
+            "my_package::erc20::token"
+        );
+    }
+
+    #[test]
+    fn test_full_path() {
+        let selector = ContractSelector::new("my_package::sub_package::MyContract".to_string());
+        assert_eq!(selector.full_path(), "my_package::sub_package::MyContract");
+    }
+
+    #[test]
+    fn test_is_valid() {
+        let valid_selector =
+            ContractSelector::new("my_package::sub_package::MyContract".to_string());
+        assert!(valid_selector.is_valid().is_ok());
+
+        let invalid_selector = ContractSelector::new("my_package::*::*::MyContract".to_string());
+        assert!(invalid_selector.is_valid().is_err());
+    }
+
+    #[test]
+    fn test_matches() {
+        let selector = ContractSelector::new("my_package::*".to_string());
+        assert!(selector.matches("my_package::sub_package::MyContract"));
+        assert!(selector.matches("my_package::other_package::MyContract"));
+        assert!(!selector.matches("other_package::sub_package::MyContract"));
+        assert!(!selector.matches("package::sub_package::OtherContract"));
+    }
+}

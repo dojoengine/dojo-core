@@ -23,8 +23,9 @@ use cairo_lang_utils::ordered_hash_map::OrderedHashMap;
 use cairo_lang_utils::{extract_matches, OptionFrom, Upcast};
 use camino::Utf8PathBuf;
 use once_cell::sync::Lazy;
+use scarb::compiler::Profile;
 
-use crate::compiler::test_utils::corelib;
+use crate::compiler::test_utils::{build_test_config, corelib};
 use crate::plugin::dojo_plugin_suite;
 
 #[salsa::database(
@@ -62,10 +63,15 @@ impl DojoSemanticDatabase {
         db.set_inline_macro_plugins(suite.inline_macro_plugins.into());
         db.set_analyzer_plugins(suite.analyzer_plugins);
 
-        let dojo_path = Utf8PathBuf::from_path_buf("../../crates/dojo-core/src".into()).unwrap();
+        let dojo_path = Utf8PathBuf::from_path_buf("../../crates/contracts/src".into()).unwrap();
         let dojo_path: PathBuf = dojo_path.canonicalize_utf8().unwrap().into();
+        let dojo_scarb_manifest = dojo_path.parent().unwrap().join("Scarb.toml");
         let core_crate = db.intern_crate(CrateLongId::Real("dojo".into()));
         let core_root_dir = Directory::Real(dojo_path);
+
+        // Use a config to detect the corelib.
+        let config =
+            build_test_config(dojo_scarb_manifest.to_str().unwrap(), Profile::DEV).unwrap();
 
         // Ensure the crate[0] is dojo, to enable parsing of the Scarb.toml.
         db.set_crate_config(
@@ -73,8 +79,7 @@ impl DojoSemanticDatabase {
             Some(CrateConfiguration::default_for_root(core_root_dir)),
         );
 
-        init_dev_corelib(&mut db, corelib());
-
+        init_dev_corelib(&mut db, corelib(&config));
         db
     }
     /// Snapshots the db for read only.
