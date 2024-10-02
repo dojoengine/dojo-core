@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::str::FromStr;
 
 use anyhow::{anyhow, Context, Result};
 use cairo_lang_compiler::db::RootDatabase;
@@ -13,25 +12,22 @@ use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
 use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cairo_lang_utils::UpcastMut;
-use camino::Utf8PathBuf;
-use convert_case::{Case, Casing};
 use itertools::{izip, Itertools};
 use scarb::compiler::helpers::build_compiler_config;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
-use scarb::core::{Config, Package, PackageName, TargetKind, TomlManifest, Workspace};
+use scarb::core::{Config, Package, TargetKind, Workspace};
 use scarb::ops::CompileOpts;
 use scarb_ui::args::{FeaturesSpec, PackagesFilter};
 use scarb_ui::Ui;
-use semver::Version;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
+use super::contract_selector::ContractSelector;
+use super::version::check_package_dojo_version;
 use crate::scarb_internal::debug::SierraToCairoDebugInfo;
-
-const GLOB_PATH_SELECTOR: &str = "*";
 
 #[derive(Debug, Clone)]
 pub struct CompiledArtifact {
@@ -44,8 +40,6 @@ pub struct CompiledArtifact {
 
 /// A type alias for a map of compiled artifacts by their path.
 type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
-
-const CAIRO_PATH_SEPARATOR: &str = "::";
 
 #[cfg(test)]
 #[path = "compiler_test.rs"]
@@ -114,164 +108,22 @@ impl DojoCompiler {
     }
 }
 
-/// Checks if the package has a compatible version of dojo-core.
-/// In case of a workspace with multiple packages, each package is individually checked
-/// and the workspace manifest path is returned in case of virtual workspace.
-pub fn check_package_dojo_version(ws: &Workspace<'_>, package: &Package) -> anyhow::Result<()> {
-    if let Some(dojo_dep) = package
-        .manifest
-        .summary
-        .dependencies
-        .iter()
-        .find(|dep| dep.name.as_str() == "dojo")
-    {
-        let dojo_version = env!("CARGO_PKG_VERSION");
-
-        let dojo_dep_str = dojo_dep.to_string();
-
-        // Only in case of git dependency with an explicit tag, we check if the tag is the same as
-        // the current version.
-        if dojo_dep_str.contains("git+")
-            && dojo_dep_str.contains("tag=v")
-            && !dojo_dep_str.contains(dojo_version)
-        {
-            if let Ok(cp) = ws.current_package() {
-                let path = if cp.id == package.id {
-                    package.manifest_path()
-                } else {
-                    ws.manifest_path()
-                };
-
-                anyhow::bail!(
-                    "Found dojo-core version mismatch: expected {}. Please verify your dojo \
-                     dependency in {}",
-                    dojo_version,
-                    path
-                )
-            } else {
-                // Virtual workspace.
-                anyhow::bail!(
-                    "Found dojo-core version mismatch: expected {}. Please verify your dojo \
-                     dependency in {}",
-                    dojo_version,
-                    ws.manifest_path()
-                )
-            }
-        }
-    }
-
-    Ok(())
-}
-
-pub fn generate_version() -> String {
-    const DOJO_VERSION: &str = env!("CARGO_PKG_VERSION");
-    let scarb_version = scarb::version::get().version;
-    let scarb_sierra_version = scarb::version::get().sierra.version;
-    let scarb_cairo_version = scarb::version::get().cairo.version;
-
-    let version_string = format!(
-        "{}\nscarb: {}\ncairo: {}\nsierra: {}",
-        DOJO_VERSION, scarb_version, scarb_cairo_version, scarb_sierra_version,
-    );
-    version_string
-}
-
-/// Verifies that the Cairo version specified in the manifest file is compatible with the current
-/// version of Cairo used by Dojo.
-pub fn verify_cairo_version_compatibility(manifest_path: &Utf8PathBuf) -> Result<()> {
-    let scarb_cairo_version = scarb::version::get().cairo;
-
-    let Ok(manifest) = TomlManifest::read_from_path(manifest_path) else {
-        return Ok(());
-    };
-    let Some(package) = manifest.package else {
-        return Ok(());
-    };
-    let Some(cairo_version) = package.cairo_version else {
-        return Ok(());
-    };
-
-    let version_req = cairo_version.as_defined().unwrap();
-    let version = Version::from_str(scarb_cairo_version.version).unwrap();
-
-    trace!(version_req = %version_req, version = %version, "Cairo version compatibility.");
-
-    if !version_req.matches(&version) {
-        anyhow::bail!(
-            "Cairo version `{version_req}` specified in the manifest file `{manifest_path}` is not supported by dojo, which is expecting `{version}`. \
-             Please verify and update dojo or change the Cairo version in the manifest file.",
-        );
-    };
-
-    Ok(())
-}
-
 #[derive(Debug, Default, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Props {
     pub build_external_contracts: Option<Vec<ContractSelector>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ContractSelector(String);
-
-impl ContractSelector {
-    fn package(&self) -> PackageName {
-        let parts = self
-            .0
-            .split_once(CAIRO_PATH_SEPARATOR)
-            .unwrap_or((self.0.as_str(), ""));
-        PackageName::new(parts.0)
-    }
-
-    /// Returns the path with the model name in snake case.
-    /// This is used to match the output of the `compile()` function and Dojo plugin naming for
-    /// models contracts.
-    fn path_with_model_snake_case(&self) -> String {
-        let (path, last_segment) = self
-            .0
-            .rsplit_once(CAIRO_PATH_SEPARATOR)
-            .unwrap_or(("", &self.0));
-
-        // We don't want to snake case the whole path because some of names like `erc20`
-        // will be changed to `erc_20`, and leading to invalid paths.
-        // The model name has to be snaked case as it's how the Dojo plugin names the Model's
-        // contract.
-        format!(
-            "{}{}{}",
-            path,
-            CAIRO_PATH_SEPARATOR,
-            last_segment.to_case(Case::Snake)
-        )
-    }
-
-    /// Checks if the contract selector is/has a wildcard.
-    /// Wildcard selectors are only supported in the last segment of the path.
-    pub fn is_wildcard(&self) -> bool {
-        self.0.ends_with(GLOB_PATH_SELECTOR)
-    }
-
-    /// Returns the partial path without the wildcard.
-    pub fn partial_path(&self) -> String {
-        let parts = self
-            .0
-            .split_once(GLOB_PATH_SELECTOR)
-            .unwrap_or((self.0.as_str(), ""));
-        parts.0.to_string()
-    }
-
-    /// Returns the full path.
-    pub fn full_path(&self) -> String {
-        self.0.clone()
-    }
-
-    /// Checks if the contract path matches the selector with wildcard support.
-    pub fn matches(&self, contract_path: &str) -> bool {
-        if self.is_wildcard() {
-            contract_path.starts_with(&self.partial_path())
-        } else {
-            contract_path == self.path_with_model_snake_case()
+impl Props {
+    /// Verifies the props are correct.
+    pub fn verify(&self) -> Result<()> {
+        if let Some(external_contracts) = self.build_external_contracts.clone() {
+            for selector in external_contracts.iter() {
+                selector.is_valid()?;
+            }
         }
+
+        Ok(())
     }
 }
 
@@ -287,7 +139,7 @@ impl Compiler for DojoCompiler {
         ws: &Workspace<'_>,
     ) -> Result<()> {
         let props: Props = unit.main_component().target_props()?;
-        verify_props(&props)?;
+        props.verify()?;
 
         let main_crate_ids = collect_main_crate_ids(&unit, db);
         let compiler_config = build_compiler_config(&unit, &main_crate_ids, ws);
@@ -313,22 +165,6 @@ impl Compiler for DojoCompiler {
 
         Ok(())
     }
-}
-
-/// Verifies the props are correct.
-///
-/// Currently, it verifies that the external contracts path do not have multiple global path selectors.
-fn verify_props(props: &Props) -> Result<()> {
-    if let Some(external_contracts) = props.build_external_contracts.clone() {
-        for path in external_contracts.iter() {
-            if path.0.matches(GLOB_PATH_SELECTOR).count() > 1 {
-                anyhow::bail!("external contract path `{}` has multiple global path selectors, only one '*' selector is allowed",
-                path.0);
-            }
-        }
-    }
-
-    Ok(())
 }
 
 /// Finds the contracts in the project.
@@ -496,8 +332,8 @@ pub fn collect_main_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) ->
         let core_crate_ids: Vec<CrateId> = collect_crates_ids_from_selectors(
             db,
             &[
-                ContractSelector("dojo::contract::base_contract::base".to_string()),
-                ContractSelector("dojo::world::world_contract::world".to_string()),
+                ContractSelector::new("dojo::contract::base_contract::base".to_string()),
+                ContractSelector::new("dojo::world::world_contract::world".to_string()),
             ],
         );
 

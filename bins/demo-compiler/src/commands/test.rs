@@ -10,9 +10,10 @@ use cairo_lang_test_plugin::test_plugin_suite;
 use cairo_lang_test_runner::{CompiledTestRunner, RunProfilerConfig, TestCompiler, TestRunConfig};
 use clap::Args;
 use dojo_compiler::compiler::compiler::{
-    check_package_dojo_version, collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
+    collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
 };
 use dojo_compiler::compiler::config::{CompilerConfig, DojoConfigLoader};
+use dojo_compiler::compiler::version::check_package_dojo_version;
 use dojo_compiler::plugin::dojo_plugin_suite;
 use dojo_compiler::scarb_internal::{cfg_set_from_component, crates_config_for_compilation_unit};
 use scarb::compiler::helpers::collect_all_crate_ids;
