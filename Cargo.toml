@@ -4,6 +4,7 @@ resolver = "2"
 members = [
     "crates/abigen",
     "crates/contracts",
+    "crates/compiler",
     "crates/types",
 ]
 
@@ -24,6 +25,7 @@ lto = "fat"
 dojo-abigen = { path = "crates/abigen" }
 dojo-contracts = { path = "crates/contracts" }
 dojo-types = { path = "crates/types" }
+dojo-compiler = { path = "crates/compiler" }
 
 anyhow = "1.0.80"
 assert_fs = "1.1"

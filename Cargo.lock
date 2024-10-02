@@ -163,6 +163,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "assert_fs"
+version = "1.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7efdb1fdb47602827a342857666feb372712cbc64b414172bd6b167a02927674"
+dependencies = [
+ "anstyle",
+ "doc-comment",
+ "globwalk",
+ "predicates",
+ "predicates-core",
+ "predicates-tree",
+ "tempfile",
+]
+
+[[package]]
 name = "assert_matches"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -444,7 +459,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e4425280959f189d8a5ebf1f5363c10663bc9f843a4819253e6be87d183b583e"
 dependencies = [
  "cairo-lang-utils",
- "indoc",
+ "indoc 2.0.5",
  "num-bigint",
  "num-traits 0.2.19",
  "parity-scale-codec",
@@ -469,7 +484,7 @@ dependencies = [
  "cairo-lang-sierra-generator",
  "cairo-lang-syntax",
  "cairo-lang-utils",
- "indoc",
+ "indoc 2.0.5",
  "salsa",
  "semver",
  "smol_str",
@@ -645,7 +660,7 @@ dependencies = [
  "cairo-lang-syntax",
  "cairo-lang-utils",
  "indent",
- "indoc",
+ "indoc 2.0.5",
  "itertools 0.12.1",
  "salsa",
  "smol_str",
@@ -693,7 +708,7 @@ dependencies = [
  "cairo-lang-test-utils",
  "cairo-lang-utils",
  "id-arena",
- "indoc",
+ "indoc 2.0.5",
  "itertools 0.12.1",
  "num-bigint",
  "num-traits 0.2.19",
@@ -801,7 +816,7 @@ dependencies = [
  "cairo-lang-sierra-gas",
  "cairo-lang-sierra-type-size",
  "cairo-lang-utils",
- "indoc",
+ "indoc 2.0.5",
  "itertools 0.12.1",
  "num-bigint",
  "num-traits 0.2.19",
@@ -840,7 +855,7 @@ dependencies = [
  "cairo-lang-utils",
  "const_format",
  "indent",
- "indoc",
+ "indoc 2.0.5",
  "itertools 0.12.1",
  "once_cell",
  "serde",
@@ -920,7 +935,7 @@ dependencies = [
  "cairo-lang-starknet-classes",
  "cairo-lang-syntax",
  "cairo-lang-utils",
- "indoc",
+ "indoc 2.0.5",
  "itertools 0.12.1",
  "num-bigint",
  "num-traits 0.2.19",
@@ -1421,6 +1436,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
 
 [[package]]
+name = "difflib"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6184e33543162437515c2e2b48714794e37845ec9851711914eec9d308f6ebe8"
+
+[[package]]
 name = "diffy"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1483,6 +1504,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "doc-comment"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
+
+[[package]]
 name = "dojo-abigen"
 version = "1.0.0-rc.1"
 dependencies = [
@@ -1498,6 +1525,51 @@ dependencies = [
 ]
 
 [[package]]
+name = "dojo-compiler"
+version = "1.0.0-rc.1"
+dependencies = [
+ "anyhow",
+ "assert_fs",
+ "cairo-lang-compiler",
+ "cairo-lang-debug",
+ "cairo-lang-defs",
+ "cairo-lang-diagnostics",
+ "cairo-lang-filesystem",
+ "cairo-lang-formatter",
+ "cairo-lang-parser",
+ "cairo-lang-plugins",
+ "cairo-lang-project",
+ "cairo-lang-semantic",
+ "cairo-lang-sierra-generator",
+ "cairo-lang-starknet",
+ "cairo-lang-starknet-classes",
+ "cairo-lang-syntax",
+ "cairo-lang-test-plugin",
+ "cairo-lang-test-utils",
+ "cairo-lang-utils",
+ "camino",
+ "convert_case",
+ "dojo-types",
+ "indoc 1.0.9",
+ "itertools 0.12.1",
+ "once_cell",
+ "regex",
+ "salsa",
+ "scarb",
+ "scarb-ui",
+ "semver",
+ "serde",
+ "serde_json",
+ "smol_str",
+ "starknet",
+ "tempfile",
+ "test-log",
+ "toml",
+ "tracing",
+ "url",
+]
+
+[[package]]
 name = "dojo-contracts"
 version = "1.0.0-rc.1"
 
@@ -1505,14 +1577,17 @@ version = "1.0.0-rc.1"
 name = "dojo-types"
 version = "1.0.0-rc.1"
 dependencies = [
+ "anyhow",
  "cainome",
  "crypto-bigint",
  "hex",
  "itertools 0.12.1",
  "num-traits 0.2.19",
+ "regex",
  "serde",
  "serde_json",
  "starknet",
+ "starknet-crypto",
  "strum",
  "strum_macros",
  "thiserror",
@@ -2727,6 +2802,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "globwalk"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0bf760ebf69878d9fd8f110c89703d90ce35095324d1f1edcb595c63945ee757"
+dependencies = [
+ "bitflags 2.6.0",
+ "ignore",
+ "walkdir",
+]
+
+[[package]]
 name = "good_lp"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3088,6 +3174,12 @@ dependencies = [
  "portable-atomic",
  "unicode-width",
 ]
+
+[[package]]
+name = "indoc"
+version = "1.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bfa799dd5ed20a7e349f3b4639aa80d74549c81716d9ec4f994c9b5815598306"
 
 [[package]]
 name = "indoc"
@@ -3819,6 +3911,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
 
 [[package]]
+name = "predicates"
+version = "3.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e9086cc7640c29a356d1a29fd134380bee9d8f79a17410aa76e7ad295f42c97"
+dependencies = [
+ "anstyle",
+ "difflib",
+ "predicates-core",
+]
+
+[[package]]
+name = "predicates-core"
+version = "1.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ae8177bee8e75d6846599c6b9ff679ed51e882816914eec639944d7c9aa11931"
+
+[[package]]
+name = "predicates-tree"
+version = "1.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41b740d195ed3166cd147c8047ec98db0e22ec019eb8eeb76d343b795304fb13"
+dependencies = [
+ "predicates-core",
+ "termtree",
+]
+
+[[package]]
 name = "pretty_assertions"
 version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4310,7 +4429,7 @@ dependencies = [
  "glob",
  "ignore",
  "include_dir",
- "indoc",
+ "indoc 2.0.5",
  "itertools 0.12.1",
  "libloading",
  "once_cell",
@@ -5062,6 +5181,34 @@ dependencies = [
  "dirs-next",
  "rustversion",
  "winapi",
+]
+
+[[package]]
+name = "termtree"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3369f5ac52d5eb6ab48c6b4ffdc8efbcad6b89c765749064ba298f2c68a16a76"
+
+[[package]]
+name = "test-log"
+version = "0.2.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3dffced63c2b5c7be278154d76b479f9f9920ed34e7574201407f0b14e2bbb93"
+dependencies = [
+ "env_logger",
+ "test-log-macros",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "test-log-macros"
+version = "0.2.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5999e24eaa32083191ba4e425deb75cdf25efefabe5aaccb7446dd0d4122a3f5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.77",
 ]
 
 [[package]]
