@@ -37,28 +37,28 @@ base64 = "0.21.2"
 bigdecimal = "0.4.1"
 bytes = "1.6"
 cainome = { git = "https://github.com/cartridge-gg/cainome", rev = "da96e0a", features = [ "abigen-rs" ] }
-cairo-lang-compiler = "=2.8.2"
-cairo-lang-debug = "=2.8.2"
-cairo-lang-defs = "=2.8.2"
-cairo-lang-diagnostics = "=2.8.2"
-cairo-lang-filesystem = "=2.8.2"
-cairo-lang-formatter = "=2.8.2"
-cairo-lang-language-server = "=2.8.2"
-cairo-lang-lowering = "=2.8.2"
-cairo-lang-parser = "=2.8.2"
-cairo-lang-plugins = { version = "=2.8.2", features = [ "testing" ] }
-cairo-lang-project = "=2.8.2"
-cairo-lang-semantic = "=2.8.2"
-cairo-lang-sierra = "=2.8.2"
-cairo-lang-sierra-generator = "=2.8.2"
-cairo-lang-sierra-to-casm = "=2.8.2"
-cairo-lang-starknet = "=2.8.2"
-cairo-lang-starknet-classes = "=2.8.2"
-cairo-lang-syntax = "=2.8.2"
-cairo-lang-test-plugin = "=2.8.2"
-cairo-lang-test-runner = "=2.8.2"
-cairo-lang-test-utils = "=2.8.2"
-cairo-lang-utils = "=2.8.2"
+cairo-lang-compiler = "=2.7.1"
+cairo-lang-debug = "=2.7.1"
+cairo-lang-defs = "=2.7.1"
+cairo-lang-diagnostics = "=2.7.1"
+cairo-lang-filesystem = "=2.7.1"
+cairo-lang-formatter = "=2.7.1"
+cairo-lang-language-server = "=2.7.1"
+cairo-lang-lowering = "=2.7.1"
+cairo-lang-parser = "=2.7.1"
+cairo-lang-plugins = { version = "=2.7.1", features = [ "testing" ] }
+cairo-lang-project = "=2.7.1"
+cairo-lang-semantic = "=2.7.1"
+cairo-lang-sierra = "=2.7.1"
+cairo-lang-sierra-generator = "=2.7.1"
+cairo-lang-sierra-to-casm = "=2.7.1"
+cairo-lang-starknet = "=2.7.1"
+cairo-lang-starknet-classes = "=2.7.1"
+cairo-lang-syntax = "=2.7.1"
+cairo-lang-test-plugin = "=2.7.1"
+cairo-lang-test-runner = "=2.7.1"
+cairo-lang-test-utils = "=2.7.1"
+cairo-lang-utils = "=2.7.1"
 camino = { version = "1.1.2", features = [ "serde1" ] }
 chrono = { version = "0.4.24", features = [ "serde" ] }
 clap = { version = "4.5.4", features = [ "derive" ] }
@@ -93,8 +93,8 @@ rpassword = "7.2.0"
 rstest = "0.18.2"
 rstest_reuse = "0.6.0"
 salsa = "0.16.1"
-scarb = { git = "https://github.com/software-mansion/scarb", tag = "v2.8.2" }
-scarb-ui = { git = "https://github.com/software-mansion/scarb", tag = "v2.8.2" }
+scarb = { git = "https://github.com/software-mansion/scarb", tag = "v2.7.1" }
+scarb-ui = { git = "https://github.com/software-mansion/scarb", tag = "v2.7.1" }
 semver = "1.0.5"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_json = { version = "1.0", features = [ "arbitrary_precision" ] }

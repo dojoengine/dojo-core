@@ -70,25 +70,25 @@ pub mod world {
     pub use world_contract::{IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait};
 }
 
-// #[cfg(test)]
-// mod tests {
-//     mod model {
-//         mod introspect;
-//         mod model;
-//    }
-//    mod storage {
-//        mod database;
-//        mod packing;
-//        mod storage;
-//    }
-//     mod base;
-//     mod benchmarks;
-//     mod helpers;
-//     mod world {
-//         mod acl;
-//         mod entities;
-//         mod resources;
-//         mod world;
-//     }
-//     mod utils;
-// }
+#[cfg(test)]
+mod tests {
+    mod model {
+        mod introspect;
+        mod model;
+    }
+    mod storage {
+        mod database;
+        mod packing;
+        mod storage;
+    }
+    mod base;
+    mod benchmarks;
+    mod helpers;
+    mod world {
+        mod acl;
+        mod entities;
+        mod resources;
+        mod world;
+    }
+    mod utils;
+}

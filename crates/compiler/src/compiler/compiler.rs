@@ -269,7 +269,7 @@ impl Compiler for DojoCompiler {
         let core_crate_ids: Vec<CrateId> = collect_core_crate_ids(db);
         main_crate_ids.extend(core_crate_ids);
 
-        let compiler_config = build_compiler_config(&db, &unit, &main_crate_ids, ws);
+        let compiler_config = build_compiler_config(&unit, &main_crate_ids, ws);
 
         trace!(target: LOG_TARGET, unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
 
