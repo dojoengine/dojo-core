@@ -1,0 +1,24 @@
+[package]
+cairo-version = "=2.7.1"
+name = "dojo_examples"
+version = "1.0.0-rc1"
+# Use the prelude with the less imports as possible
+# from corelib.
+edition = "2024_07"
+
+[cairo]
+sierra-replace-ids = true
+
+[dependencies]
+armory = { path = "../game-lib/armory" }
+bestiary = { path = "../game-lib/bestiary" }
+dojo = { path = "../../crates/contracts" }
+
+[[target.dojo]]
+build-external-contracts = [ "armory::Flatbow", "bestiary::RiverSkale" ]
+
+[features]
+default = [ "dungeon" ]
+dungeon = [  ]
+
+[profile.saya]

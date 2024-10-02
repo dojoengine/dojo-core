@@ -632,7 +632,7 @@ pub mod world {
 
             let dispatcher = IContractDispatcher { contract_address };
             let namespace = dispatcher.namespace();
-            let name = dispatcher.contract_name();
+            let name = dispatcher.name();
             let namespace_hash = dispatcher.namespace_hash();
 
             if !self.is_namespace_registered(namespace_hash) {

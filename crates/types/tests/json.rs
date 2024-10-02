@@ -7,8 +7,16 @@ fn serialize_ty_to_json() {
     let ty = Ty::Struct(Struct {
         name: "Position".into(),
         children: vec![
-            Member { name: "x".into(), key: false, ty: Ty::Primitive(Primitive::U8(Some(128))) },
-            Member { name: "y".into(), key: false, ty: Ty::Primitive(Primitive::U64(Some(2048))) },
+            Member {
+                name: "x".into(),
+                key: false,
+                ty: Ty::Primitive(Primitive::U8(Some(128))),
+            },
+            Member {
+                name: "y".into(),
+                key: false,
+                ty: Ty::Primitive(Primitive::U64(Some(2048))),
+            },
             Member {
                 name: "kind".into(),
                 key: false,
@@ -16,8 +24,14 @@ fn serialize_ty_to_json() {
                     name: "PositionKind".into(),
                     option: Some(1),
                     options: vec![
-                        EnumOption { name: "Kind1".into(), ty: Ty::Tuple(vec![]) },
-                        EnumOption { name: "Kind2".into(), ty: Ty::Tuple(vec![]) },
+                        EnumOption {
+                            name: "Kind1".into(),
+                            ty: Ty::Tuple(vec![]),
+                        },
+                        EnumOption {
+                            name: "Kind2".into(),
+                            ty: Ty::Tuple(vec![]),
+                        },
                     ],
                 }),
             },
@@ -149,8 +163,16 @@ fn deserialize_ty_from_json() {
     let expected_value = Ty::Struct(Struct {
         name: "Position".into(),
         children: vec![
-            Member { name: "x".into(), key: false, ty: Ty::Primitive(Primitive::U8(Some(128))) },
-            Member { name: "y".into(), key: false, ty: Ty::Primitive(Primitive::U64(Some(2048))) },
+            Member {
+                name: "x".into(),
+                key: false,
+                ty: Ty::Primitive(Primitive::U8(Some(128))),
+            },
+            Member {
+                name: "y".into(),
+                key: false,
+                ty: Ty::Primitive(Primitive::U64(Some(2048))),
+            },
             Member {
                 name: "kind".into(),
                 key: false,
@@ -158,8 +180,14 @@ fn deserialize_ty_from_json() {
                     name: "PositionKind".into(),
                     option: Some(1),
                     options: vec![
-                        EnumOption { name: "Kind1".into(), ty: Ty::Tuple(vec![]) },
-                        EnumOption { name: "Kind2".into(), ty: Ty::Tuple(vec![]) },
+                        EnumOption {
+                            name: "Kind1".into(),
+                            ty: Ty::Tuple(vec![]),
+                        },
+                        EnumOption {
+                            name: "Kind2".into(),
+                            ty: Ty::Tuple(vec![]),
+                        },
                     ],
                 }),
             },
