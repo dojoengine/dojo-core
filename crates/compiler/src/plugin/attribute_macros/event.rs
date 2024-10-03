@@ -1,3 +1,10 @@
+//! A custom implementation of the starknet::Event derivation path.
+//! 
+//! We append the event selector directly within the append_keys_and_data function.
+//! Without the need of the enum for all event variants.
+//!
+//! https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-starknet/src/plugin/derive/event.rs
+
 use cairo_lang_defs::patcher::{ModifiedNode, RewriteNode};
 use cairo_lang_defs::plugin::PluginDiagnostic;
 use cairo_lang_starknet::plugin::aux_data::StarkNetEventAuxData;
@@ -11,78 +18,75 @@ use cairo_lang_syntax::node::helpers::QueryAttrs;
 use cairo_lang_syntax::node::{ast, Terminal, TypedStablePtr, TypedSyntaxNode};
 use indoc::formatdoc;
 
-use crate::plugin::plugin::DojoAuxData;
+use crate::aux_data::DojoAuxData;
 
-// A custom implementation of the starknet::Event derivation path.
-// We append the event selector directly within the append_keys_and_data function.
-// Without the need of the enum for all event variants.
+#[derive(Debug, Clone, Default)]
+pub struct DojoEvent {}
 
-// https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-starknet/src/plugin/derive/event.rs
+impl DojoEvent {
+    pub fn from_struct(
+        db: &dyn SyntaxGroup,
+        aux_data: &mut DojoAuxData,
+        struct_ast: ast::ItemStruct,
+    ) -> (RewriteNode, Vec<PluginDiagnostic>) {
+        let mut diagnostics = vec![];
 
-pub fn handle_event_struct(
-    db: &dyn SyntaxGroup,
-    aux_data: &mut DojoAuxData,
-    struct_ast: ast::ItemStruct,
-) -> (RewriteNode, Vec<PluginDiagnostic>) {
-    let mut diagnostics = vec![];
+        let generic_params = struct_ast.generic_params(db);
+        match generic_params {
+            ast::OptionWrappedGenericParamList::Empty(_) => {}
+            _ => {
+                diagnostics.push(PluginDiagnostic::error(
+                    generic_params.stable_ptr().untyped(),
+                    format!("{EVENT_TYPE_NAME} structs with generic arguments are unsupported"),
+                ));
+            }
+        }
 
-    // TODO(spapini): Support generics.
-    let generic_params = struct_ast.generic_params(db);
-    match generic_params {
-        ast::OptionWrappedGenericParamList::Empty(_) => {}
-        _ => {
-            diagnostics.push(PluginDiagnostic::error(
-                generic_params.stable_ptr().untyped(),
-                format!("{EVENT_TYPE_NAME} structs with generic arguments are unsupported"),
+        // Generate append_keys_and_data() code.
+        let mut append_members = vec![];
+        let mut deserialize_members = vec![];
+        let mut ctor = vec![];
+        let mut members = vec![];
+        for member in struct_ast.members(db).elements(db) {
+            let member_name = RewriteNode::new_trimmed(member.name(db).as_syntax_node());
+            let member_kind =
+                get_field_kind_for_member(db, &mut diagnostics, &member, EventFieldKind::DataSerde);
+            members.push((member.name(db).text(db), member_kind));
+
+            let member_for_append = RewriteNode::interpolate_patched(
+                "self.$member_name$",
+                &[("member_name".to_string(), member_name.clone())].into(),
+            );
+            let append_member = append_field(member_kind, member_for_append);
+            let deserialize_member = deserialize_field(member_kind, member_name.clone());
+            append_members.push(append_member);
+            deserialize_members.push(deserialize_member);
+            ctor.push(RewriteNode::interpolate_patched(
+                "$member_name$, ",
+                &[("member_name".to_string(), member_name)].into(),
             ));
         }
-    }
+        let event_data = EventData::Struct { members };
+        aux_data.events.push(StarkNetEventAuxData { event_data });
 
-    // Generate append_keys_and_data() code.
-    let mut append_members = vec![];
-    let mut deserialize_members = vec![];
-    let mut ctor = vec![];
-    let mut members = vec![];
-    for member in struct_ast.members(db).elements(db) {
-        let member_name = RewriteNode::new_trimmed(member.name(db).as_syntax_node());
-        let member_kind =
-            get_field_kind_for_member(db, &mut diagnostics, &member, EventFieldKind::DataSerde);
-        members.push((member.name(db).text(db), member_kind));
+        let append_members = RewriteNode::Modified(ModifiedNode {
+            children: Some(append_members),
+        });
+        let deserialize_members = RewriteNode::Modified(ModifiedNode {
+            children: Some(deserialize_members),
+        });
+        let ctor = RewriteNode::Modified(ModifiedNode {
+            children: Some(ctor),
+        });
 
-        let member_for_append = RewriteNode::interpolate_patched(
-            "self.$member_name$",
-            &[("member_name".to_string(), member_name.clone())].into(),
-        );
-        let append_member = append_field(member_kind, member_for_append);
-        let deserialize_member = deserialize_field(member_kind, member_name.clone());
-        append_members.push(append_member);
-        deserialize_members.push(deserialize_member);
-        ctor.push(RewriteNode::interpolate_patched(
-            "$member_name$, ",
-            &[("member_name".to_string(), member_name)].into(),
-        ));
-    }
-    let event_data = EventData::Struct { members };
-    aux_data.events.push(StarkNetEventAuxData { event_data });
-
-    let append_members = RewriteNode::Modified(ModifiedNode {
-        children: Some(append_members),
-    });
-    let deserialize_members = RewriteNode::Modified(ModifiedNode {
-        children: Some(deserialize_members),
-    });
-    let ctor = RewriteNode::Modified(ModifiedNode {
-        children: Some(ctor),
-    });
-
-    // Add an implementation for `Event<StructName>`.
-    let struct_name = RewriteNode::new_trimmed(struct_ast.name(db).as_syntax_node());
-    (
-        // Append the event selector using the struct_name for the selector
-        // and then append the members.
-        RewriteNode::interpolate_patched(
-            &formatdoc!(
-                "
+        // Add an implementation for `Event<StructName>`.
+        let struct_name = RewriteNode::new_trimmed(struct_ast.name(db).as_syntax_node());
+        (
+            // Append the event selector using the struct_name for the selector
+            // and then append the members.
+            RewriteNode::interpolate_patched(
+                &formatdoc!(
+                    "
             impl $struct_name$IsEvent of {EVENT_TRAIT}<$struct_name$> {{
                 fn append_keys_and_data(
                     self: @$struct_name$, ref keys: Array<felt252>, ref data: Array<felt252>
@@ -98,17 +102,18 @@ pub fn handle_event_struct(
                 }}
             }}
             "
+                ),
+                &[
+                    ("struct_name".to_string(), struct_name),
+                    ("append_members".to_string(), append_members),
+                    ("deserialize_members".to_string(), deserialize_members),
+                    ("ctor".to_string(), ctor),
+                ]
+                .into(),
             ),
-            &[
-                ("struct_name".to_string(), struct_name),
-                ("append_members".to_string(), append_members),
-                ("deserialize_members".to_string(), deserialize_members),
-                ("ctor".to_string(), ctor),
-            ]
-            .into(),
-        ),
-        diagnostics,
-    )
+            diagnostics,
+        )
+    }
 }
 
 /// Generates code to emit an event for a field

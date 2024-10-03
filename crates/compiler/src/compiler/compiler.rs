@@ -25,6 +25,8 @@ use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
+use crate::aux_data::DojoAuxData;
+
 use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
 use super::scarb_internal;
@@ -147,17 +149,21 @@ impl Compiler for DojoCompiler {
             self.output_debug_info,
         )?;
 
+        let _aux_data = DojoAuxData::from_crates(&main_crate_ids, db);
+
         for (qualified_path, _) in artifact_manager.iter() {
             let profile_target_dir = ws
                 .target_dir()
                 .child(ws.current_profile().unwrap().as_str());
             let n = qualified_path.replace("::", "_");
+
             artifact_manager.save_sierra_class(
                 &ws.config(),
                 &profile_target_dir,
                 qualified_path,
                 &n,
             )?;
+
             artifact_manager.save_abi(&ws.config(), &profile_target_dir, qualified_path, &n)?;
         }
 

@@ -1,3 +1,5 @@
+//! Handle the `dojo::model` attribute macro.
+
 use std::collections::HashMap;
 
 use cairo_lang_defs::patcher::RewriteNode;
@@ -14,14 +16,19 @@ use convert_case::{Case, Casing};
 use dojo_types::naming;
 use starknet::core::utils::get_selector_from_name;
 
+use crate::aux_data::{DojoAuxData, Member, ModelAuxData};
 use crate::namespace_config::NamespaceConfig;
-use crate::plugin::plugin::{DojoAuxData, Member, ModelAuxData, DOJO_MODEL_ATTR};
+
+use super::DOJO_MODEL_ATTR;
 
 const DEFAULT_MODEL_VERSION: u8 = 1;
 
 const MODEL_VERSION_NAME: &str = "version";
 const MODEL_NAMESPACE: &str = "namespace";
 const MODEL_NOMAPPING: &str = "nomapping";
+
+#[derive(Debug, Clone, Default)]
+pub struct DojoModel {}
 
 struct ModelParameters {
     version: u8,
@@ -202,150 +209,152 @@ fn get_model_parameters(
     parameters
 }
 
-/// A handler for Dojo code that modifies a model struct.
-/// Parameters:
-/// * db: The semantic database.
-/// * struct_ast: The AST of the model struct.
-///
-/// Returns:
-/// * A RewriteNode containing the generated code.
-pub fn handle_model_struct(
-    db: &dyn SyntaxGroup,
-    aux_data: &mut DojoAuxData,
-    struct_ast: ItemStruct,
-    namespace_config: &NamespaceConfig,
-) -> (RewriteNode, Vec<PluginDiagnostic>) {
-    let mut diagnostics = vec![];
+impl DojoModel {
+    /// A handler for Dojo code that modifies a model struct.
+    /// Parameters:
+    /// * db: The semantic database.
+    /// * struct_ast: The AST of the model struct.
+    ///
+    /// Returns:
+    /// * A RewriteNode containing the generated code.
+    pub fn from_struct(
+        db: &dyn SyntaxGroup,
+        aux_data: &mut DojoAuxData,
+        struct_ast: ItemStruct,
+        namespace_config: &NamespaceConfig,
+    ) -> (RewriteNode, Vec<PluginDiagnostic>) {
+        let mut diagnostics = vec![];
 
-    let parameters = get_model_parameters(db, struct_ast.clone(), &mut diagnostics);
+        let parameters = get_model_parameters(db, struct_ast.clone(), &mut diagnostics);
 
-    let model_name = struct_ast
-        .name(db)
-        .as_syntax_node()
-        .get_text(db)
-        .trim()
-        .to_string();
-    let unmapped_namespace = parameters
-        .namespace
-        .unwrap_or(namespace_config.default.clone());
+        let model_name = struct_ast
+            .name(db)
+            .as_syntax_node()
+            .get_text(db)
+            .trim()
+            .to_string();
+        let unmapped_namespace = parameters
+            .namespace
+            .unwrap_or(namespace_config.default.clone());
 
-    let model_namespace = if parameters.nomapping {
-        unmapped_namespace
-    } else {
-        // Maps namespace from the tag to ensure higher precision on matching namespace mappings.
-        namespace_config.get_mapping(&naming::get_tag(&unmapped_namespace, &model_name))
-    };
+        let model_namespace = if parameters.nomapping {
+            unmapped_namespace
+        } else {
+            // Maps namespace from the tag to ensure higher precision on matching namespace mappings.
+            namespace_config.get_mapping(&naming::get_tag(&unmapped_namespace, &model_name))
+        };
 
-    for (id, value) in [("name", &model_name), ("namespace", &model_namespace)] {
-        if !NamespaceConfig::is_name_valid(value) {
-            return (
-                RewriteNode::empty(),
-                vec![PluginDiagnostic {
-                    stable_ptr: struct_ast.name(db).stable_ptr().0,
-                    message: format!(
+        for (id, value) in [("name", &model_name), ("namespace", &model_namespace)] {
+            if !NamespaceConfig::is_name_valid(value) {
+                return (
+                    RewriteNode::empty(),
+                    vec![PluginDiagnostic {
+                        stable_ptr: struct_ast.name(db).stable_ptr().0,
+                        message: format!(
                         "The {id} '{value}' can only contain characters (a-z/A-Z), digits (0-9) \
                          and underscore (_)."
                     )
-                    .to_string(),
-                    severity: Severity::Error,
-                }],
-            );
+                        .to_string(),
+                        severity: Severity::Error,
+                    }],
+                );
+            }
         }
-    }
 
-    let model_tag = naming::get_tag(&model_namespace, &model_name);
-    let model_name_hash = naming::compute_bytearray_hash(&model_name);
-    let model_namespace_hash = naming::compute_bytearray_hash(&model_namespace);
+        let model_tag = naming::get_tag(&model_namespace, &model_name);
+        let model_name_hash = naming::compute_bytearray_hash(&model_name);
+        let model_namespace_hash = naming::compute_bytearray_hash(&model_namespace);
 
-    let (model_version, model_selector) = match parameters.version {
-        0 => (
-            RewriteNode::Text("0".to_string()),
-            RewriteNode::Text(format!("\"{model_name}\"")),
-        ),
-        _ => (
-            RewriteNode::Text(DEFAULT_MODEL_VERSION.to_string()),
-            RewriteNode::Text(
-                naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash)
-                    .to_string(),
+        let (model_version, model_selector) = match parameters.version {
+            0 => (
+                RewriteNode::Text("0".to_string()),
+                RewriteNode::Text(format!("\"{model_name}\"")),
             ),
-        ),
-    };
-
-    let mut members: Vec<Member> = vec![];
-    let mut members_values: Vec<RewriteNode> = vec![];
-    let mut param_keys: Vec<String> = vec![];
-    let mut serialized_keys: Vec<RewriteNode> = vec![];
-    let mut serialized_param_keys: Vec<RewriteNode> = vec![];
-    let mut serialized_values: Vec<RewriteNode> = vec![];
-    let mut field_accessors: Vec<RewriteNode> = vec![];
-    let mut entity_field_accessors: Vec<RewriteNode> = vec![];
-    let elements = struct_ast.members(db).elements(db);
-
-    elements.iter().for_each(|member_ast| {
-        let member = Member {
-            name: member_ast.name(db).text(db).to_string(),
-            ty: member_ast
-                .type_clause(db)
-                .ty(db)
-                .as_syntax_node()
-                .get_text(db)
-                .trim()
-                .to_string(),
-            key: member_ast.has_attr(db, "key"),
+            _ => (
+                RewriteNode::Text(DEFAULT_MODEL_VERSION.to_string()),
+                RewriteNode::Text(
+                    naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash)
+                        .to_string(),
+                ),
+            ),
         };
 
-        if member.key {
-            validate_key_member(&member, db, member_ast, &mut diagnostics);
-            serialized_keys.push(serialize_member_ty(&member, true));
-            serialized_param_keys.push(serialize_member_ty(&member, false));
-            param_keys.push(format!("{}: {}", member.name, member.ty));
-        } else {
-            serialized_values.push(serialize_member_ty(&member, true));
-            members_values.push(RewriteNode::Text(format!(
-                "pub {}: {},\n",
-                member.name, member.ty
-            )));
+        let mut members: Vec<Member> = vec![];
+        let mut members_values: Vec<RewriteNode> = vec![];
+        let mut param_keys: Vec<String> = vec![];
+        let mut serialized_keys: Vec<RewriteNode> = vec![];
+        let mut serialized_param_keys: Vec<RewriteNode> = vec![];
+        let mut serialized_values: Vec<RewriteNode> = vec![];
+        let mut field_accessors: Vec<RewriteNode> = vec![];
+        let mut entity_field_accessors: Vec<RewriteNode> = vec![];
+        let elements = struct_ast.members(db).elements(db);
+
+        elements.iter().for_each(|member_ast| {
+            let member = Member {
+                name: member_ast.name(db).text(db).to_string(),
+                ty: member_ast
+                    .type_clause(db)
+                    .ty(db)
+                    .as_syntax_node()
+                    .get_text(db)
+                    .trim()
+                    .to_string(),
+                key: member_ast.has_attr(db, "key"),
+            };
+
+            if member.key {
+                validate_key_member(&member, db, member_ast, &mut diagnostics);
+                serialized_keys.push(serialize_member_ty(&member, true));
+                serialized_param_keys.push(serialize_member_ty(&member, false));
+                param_keys.push(format!("{}: {}", member.name, member.ty));
+            } else {
+                serialized_values.push(serialize_member_ty(&member, true));
+                members_values.push(RewriteNode::Text(format!(
+                    "pub {}: {},\n",
+                    member.name, member.ty
+                )));
+            }
+
+            members.push(member);
+        });
+        let param_keys = param_keys.join(", ");
+
+        members.iter().filter(|m| !m.key).for_each(|member| {
+            field_accessors.push(generate_field_accessors(
+                model_name.clone(),
+                param_keys.clone(),
+                serialized_param_keys.clone(),
+                member,
+            ));
+            entity_field_accessors
+                .push(generate_entity_field_accessors(model_name.clone(), member));
+        });
+
+        if serialized_keys.is_empty() {
+            diagnostics.push(PluginDiagnostic {
+                message: "Model must define at least one #[key] attribute".into(),
+                stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
+                severity: Severity::Error,
+            });
         }
 
-        members.push(member);
-    });
-    let param_keys = param_keys.join(", ");
+        if serialized_values.is_empty() {
+            diagnostics.push(PluginDiagnostic {
+                message: "Model must define at least one member that is not a key".into(),
+                stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
+                severity: Severity::Error,
+            });
+        }
 
-    members.iter().filter(|m| !m.key).for_each(|member| {
-        field_accessors.push(generate_field_accessors(
-            model_name.clone(),
-            param_keys.clone(),
-            serialized_param_keys.clone(),
-            member,
-        ));
-        entity_field_accessors.push(generate_entity_field_accessors(model_name.clone(), member));
-    });
-
-    if serialized_keys.is_empty() {
-        diagnostics.push(PluginDiagnostic {
-            message: "Model must define at least one #[key] attribute".into(),
-            stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
-            severity: Severity::Error,
+        aux_data.models.push(ModelAuxData {
+            name: model_name.clone(),
+            namespace: model_namespace.clone(),
+            members,
         });
-    }
 
-    if serialized_values.is_empty() {
-        diagnostics.push(PluginDiagnostic {
-            message: "Model must define at least one member that is not a key".into(),
-            stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
-            severity: Severity::Error,
-        });
-    }
-
-    aux_data.models.push(ModelAuxData {
-        name: model_name.clone(),
-        namespace: model_namespace.clone(),
-        members,
-    });
-
-    (
-        RewriteNode::interpolate_patched(
-            "
+        (
+            RewriteNode::interpolate_patched(
+                "
 #[derive(Drop, Serde)]
 pub struct $type_name$Entity {
     __id: felt252, // private field
@@ -789,63 +798,64 @@ pub mod $contract_name$ {
     }
 }
 ",
-            &UnorderedHashMap::from([
-                (
-                    "contract_name".to_string(),
-                    RewriteNode::Text(model_name.to_case(Case::Snake)),
-                ),
-                ("type_name".to_string(), RewriteNode::Text(model_name)),
-                (
-                    "namespace".to_string(),
-                    RewriteNode::Text("namespace".to_string()),
-                ),
-                (
-                    "serialized_keys".to_string(),
-                    RewriteNode::new_modified(serialized_keys),
-                ),
-                (
-                    "serialized_values".to_string(),
-                    RewriteNode::new_modified(serialized_values),
-                ),
-                ("model_version".to_string(), model_version),
-                ("model_selector".to_string(), model_selector),
-                (
-                    "model_namespace".to_string(),
-                    RewriteNode::Text(model_namespace.clone()),
-                ),
-                (
-                    "model_name_hash".to_string(),
-                    RewriteNode::Text(model_name_hash.to_string()),
-                ),
-                (
-                    "model_namespace_hash".to_string(),
-                    RewriteNode::Text(model_namespace_hash.to_string()),
-                ),
-                (
-                    "model_tag".to_string(),
-                    RewriteNode::Text(model_tag.clone()),
-                ),
-                (
-                    "members_values".to_string(),
-                    RewriteNode::new_modified(members_values),
-                ),
-                ("param_keys".to_string(), RewriteNode::Text(param_keys)),
-                (
-                    "serialized_param_keys".to_string(),
-                    RewriteNode::new_modified(serialized_param_keys),
-                ),
-                (
-                    "field_accessors".to_string(),
-                    RewriteNode::new_modified(field_accessors),
-                ),
-                (
-                    "entity_field_accessors".to_string(),
-                    RewriteNode::new_modified(entity_field_accessors),
-                ),
-            ]),
-        ),
-        diagnostics,
-    )
+                &UnorderedHashMap::from([
+                    (
+                        "contract_name".to_string(),
+                        RewriteNode::Text(model_name.to_case(Case::Snake)),
+                    ),
+                    ("type_name".to_string(), RewriteNode::Text(model_name)),
+                    (
+                        "namespace".to_string(),
+                        RewriteNode::Text("namespace".to_string()),
+                    ),
+                    (
+                        "serialized_keys".to_string(),
+                        RewriteNode::new_modified(serialized_keys),
+                    ),
+                    (
+                        "serialized_values".to_string(),
+                        RewriteNode::new_modified(serialized_values),
+                    ),
+                    ("model_version".to_string(), model_version),
+                    ("model_selector".to_string(), model_selector),
+                    (
+                        "model_namespace".to_string(),
+                        RewriteNode::Text(model_namespace.clone()),
+                    ),
+                    (
+                        "model_name_hash".to_string(),
+                        RewriteNode::Text(model_name_hash.to_string()),
+                    ),
+                    (
+                        "model_namespace_hash".to_string(),
+                        RewriteNode::Text(model_namespace_hash.to_string()),
+                    ),
+                    (
+                        "model_tag".to_string(),
+                        RewriteNode::Text(model_tag.clone()),
+                    ),
+                    (
+                        "members_values".to_string(),
+                        RewriteNode::new_modified(members_values),
+                    ),
+                    ("param_keys".to_string(), RewriteNode::Text(param_keys)),
+                    (
+                        "serialized_param_keys".to_string(),
+                        RewriteNode::new_modified(serialized_param_keys),
+                    ),
+                    (
+                        "field_accessors".to_string(),
+                        RewriteNode::new_modified(field_accessors),
+                    ),
+                    (
+                        "entity_field_accessors".to_string(),
+                        RewriteNode::new_modified(entity_field_accessors),
+                    ),
+                ]),
+            ),
+            diagnostics,
+        )
+    }
 }
 
 /// Validates that the key member is valid.

@@ -19,14 +19,14 @@ pub struct DojoInterface {
 impl DojoInterface {
     pub fn from_trait(
         db: &dyn SyntaxGroup,
-        trait_ast: ast::ItemTrait,
+        trait_ast: &ast::ItemTrait,
         metadata: &MacroPluginMetadata<'_>,
     ) -> PluginResult {
         let name = trait_ast.name(db).text(db);
         let mut interface = DojoInterface {
             diagnostics: vec![],
         };
-        let mut builder = PatchBuilder::new(db, &trait_ast);
+        let mut builder = PatchBuilder::new(db, trait_ast);
 
         if let ast::MaybeTraitBody::Some(body) = trait_ast.body(db) {
             let body_nodes: Vec<_> = body

@@ -17,9 +17,11 @@ use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 use dojo_types::naming;
 
 use crate::namespace_config::NamespaceConfig;
-use crate::plugin::plugin::{ContractAuxData, DojoAuxData, DOJO_CONTRACT_ATTR};
+use crate::aux_data::{ContractAuxData, DojoAuxData};
 use crate::plugin::syntax::world_param::{self, WorldParamInjectionKind};
 use crate::plugin::syntax::{self_param, utils as syntax_utils};
+
+use super::DOJO_CONTRACT_ATTR;
 
 const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";
