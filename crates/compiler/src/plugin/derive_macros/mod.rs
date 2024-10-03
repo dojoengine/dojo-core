@@ -3,8 +3,8 @@
 //! A derive macros is a macro that is used to generate code generally for a struct or enum.
 //! The input of the macro consists of the AST of the struct or enum and the attributes of the derive macro.
 
-use cairo_lang_defs::patcher::RewriteNode;
-use cairo_lang_defs::plugin::PluginDiagnostic;
+use cairo_lang_defs::patcher::{PatchBuilder, RewriteNode};
+use cairo_lang_defs::plugin::{PluginDiagnostic, PluginGeneratedFile, PluginResult};
 use cairo_lang_diagnostics::Severity;
 use cairo_lang_syntax::attribute::structured::{AttributeArgVariant, AttributeStructurize};
 use cairo_lang_syntax::node::ast::Attribute;
@@ -21,6 +21,46 @@ pub mod print;
 pub const DOJO_PRINT_DERIVE: &str = "Print";
 pub const DOJO_INTROSPECT_DERIVE: &str = "Introspect";
 pub const DOJO_PACKED_DERIVE: &str = "IntrospectPacked";
+
+/// Handles all the dojo derives macro and returns the generated code and diagnostics.
+pub fn dojo_derive_all(
+    db: &dyn SyntaxGroup,
+    attrs: Vec<Attribute>,
+    item_ast: &ast::ModuleItem,
+) -> PluginResult {
+    if attrs.is_empty() {
+        return PluginResult::default();
+    }
+
+    let mut diagnostics = vec![];
+
+    let derive_attr_names = extract_derive_attr_names(db, &mut diagnostics, attrs);
+
+    let (rewrite_nodes, derive_diagnostics) =
+        handle_derive_attrs(db, &derive_attr_names, &item_ast);
+
+    diagnostics.extend(derive_diagnostics);
+
+    let mut builder = PatchBuilder::new(db, item_ast);
+    for node in rewrite_nodes {
+        builder.add_modified(node);
+    }
+
+    let (code, code_mappings) = builder.build();
+
+    let item_name = item_ast.as_syntax_node().get_text_without_trivia(db).into();
+
+    PluginResult {
+        code: Some(PluginGeneratedFile {
+            name: item_name,
+            content: code,
+            aux_data: None,
+            code_mappings,
+        }),
+        diagnostics,
+        remove_original_item: false,
+    }
+}
 
 /// Handles the derive attributes of a struct or enum.
 pub fn handle_derive_attrs(
@@ -90,7 +130,9 @@ pub fn handle_derive_attrs(
             // Currently Dojo plugin doesn't support derive macros on other items than struct and enum.
             diagnostics.push(PluginDiagnostic {
                 stable_ptr: item_ast.stable_ptr().0,
-                message: "Dojo plugin doesn't support derive macros on other items than struct and enum.".to_string(),
+                message:
+                    "Dojo plugin doesn't support derive macros on other items than struct and enum."
+                        .to_string(),
                 severity: Severity::Error,
             });
         }
@@ -100,16 +142,16 @@ pub fn handle_derive_attrs(
 }
 
 /// Extracts the names of the derive attributes from the given attributes.
-/// 
+///
 /// # Examples
-/// 
+///
 /// Derive usage should look like this:
-/// 
+///
 /// ```no_run
 /// #[derive(Introspect)]
 /// struct MyStruct {...}
 /// ```
-/// 
+///
 /// And this function will return `["Introspect"]`.
 pub fn extract_derive_attr_names(
     db: &dyn SyntaxGroup,

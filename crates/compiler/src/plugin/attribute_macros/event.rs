@@ -67,7 +67,7 @@ impl DojoEvent {
             ));
         }
         let event_data = EventData::Struct { members };
-        aux_data.events.push(StarkNetEventAuxData { event_data });
+        //aux_data.events.push(StarkNetEventAuxData { event_data });
 
         let append_members = RewriteNode::Modified(ModifiedNode {
             children: Some(append_members),

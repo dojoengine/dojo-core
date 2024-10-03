@@ -63,28 +63,11 @@ pub struct ModelAuxData {
     pub members: Vec<Member>,
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct ContractAuxData {
-    pub name: SmolStr,
-    pub namespace: String,
-    pub systems: Vec<String>,
-}
-
-/// Dojo related auxiliary data of the Dojo plugin.
-#[derive(Debug, Default, PartialEq)]
-pub struct DojoAuxData {
-    /// A list of models that were processed by the plugin.
-    pub models: Vec<ModelAuxData>,
-    /// A list of contracts that were processed by the plugin.
-    pub contracts: Vec<ContractAuxData>,
-    /// A list of events that were processed by the plugin.
-    pub events: Vec<StarkNetEventAuxData>,
-}
-
-impl GeneratedFileAuxData for DojoAuxData {
+impl GeneratedFileAuxData for ModelAuxData {
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
+
     fn eq(&self, other: &dyn GeneratedFileAuxData) -> bool {
         if let Some(other) = other.as_any().downcast_ref::<Self>() {
             self == other
@@ -94,9 +77,39 @@ impl GeneratedFileAuxData for DojoAuxData {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContractAuxData {
+    pub name: SmolStr,
+    pub namespace: String,
+    pub systems: Vec<String>,
+}
+
+impl GeneratedFileAuxData for ContractAuxData {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn eq(&self, other: &dyn GeneratedFileAuxData) -> bool {
+        if let Some(other) = other.as_any().downcast_ref::<Self>() {
+            self == other
+        } else {
+            false
+        }
+    }
+}
+
+/// Dojo related auxiliary data of the Dojo plugin.
+#[derive(Debug, Default, PartialEq)]
+pub struct DojoAuxData {
+    /// A list of models that were processed by the plugin.
+    pub models: Vec<ModelAuxData>,
+    /// A list of contracts that were processed by the plugin.
+    pub contracts: Vec<ContractAuxData>,
+}
+
 impl DojoAuxData {
     pub fn from_crates(crate_ids: &[CrateId], db: &RootDatabase) -> Self {
-        let aux_data = DojoAuxData::default();
+        let mut dojo_aux_data = DojoAuxData::default();
 
         for crate_id in crate_ids {
             for module_id in db.crate_modules(*crate_id).as_ref() {
@@ -111,12 +124,22 @@ impl DojoAuxData {
                     .filter_map(|info| info.as_ref().map(|i| &i.aux_data))
                     .filter_map(|aux_data| aux_data.as_ref().map(|aux_data| aux_data.0.as_any()))
                 {
-                    if let Some(dojo_aux_data) = aux_data.downcast_ref::<DojoAuxData>() {
-                        println!("dojo_aux_data: {:?} {:?}", module_id.full_path(db), dojo_aux_data);
+                    if let Some(model_aux_data) = aux_data.downcast_ref::<ModelAuxData>() {
+                        dojo_aux_data.models.push(model_aux_data.clone());
                     }
 
-                    if let Some(sn_contract_aux_data) = aux_data.downcast_ref::<StarkNetContractAuxData>() {
-                        println!("starknet_contract_aux_data: {:?} {:?}", module_id.full_path(db), sn_contract_aux_data);
+                    if let Some(contract_aux_data) = aux_data.downcast_ref::<ContractAuxData>() {
+                        dojo_aux_data.contracts.push(contract_aux_data.clone());
+                    }
+
+                    if let Some(sn_contract_aux_data) =
+                        aux_data.downcast_ref::<StarkNetContractAuxData>()
+                    {
+                        println!(
+                            "starknet_contract_aux_data: {:?} {:?}",
+                            module_id.full_path(db),
+                            sn_contract_aux_data
+                        );
                     }
 
                     // StarknetAuxData shouldn't be required. Every dojo contract and model are starknet
@@ -127,6 +150,6 @@ impl DojoAuxData {
             }
         }
 
-        aux_data
+        dojo_aux_data
     }
 }

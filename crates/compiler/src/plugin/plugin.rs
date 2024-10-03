@@ -1,11 +1,8 @@
 //! Dojo plugin for Cairo.
 
 use anyhow::Result;
-use cairo_lang_defs::patcher::PatchBuilder;
-use cairo_lang_defs::plugin::{
-    DynGeneratedFileAuxData, MacroPlugin, MacroPluginMetadata, PluginDiagnostic,
-    PluginGeneratedFile, PluginResult,
-};
+use cairo_lang_defs::plugin::{MacroPlugin, MacroPluginMetadata, PluginDiagnostic, PluginResult};
+use cairo_lang_defs::plugin_utils::PluginResultTrait;
 use cairo_lang_diagnostics::Severity;
 use cairo_lang_semantic::plugin::PluginSuite;
 use cairo_lang_syntax::node::db::SyntaxGroup;
@@ -18,18 +15,14 @@ use semver::Version;
 use url::Url;
 
 use super::attribute_macros::{
-    DojoContract, DojoEvent, DojoInterface, DojoModel, DOJO_CONTRACT_ATTR, DOJO_EVENT_ATTR,
+    DojoContract, DojoInterface, DojoModel, DOJO_CONTRACT_ATTR, DOJO_EVENT_ATTR,
     DOJO_INTERFACE_ATTR, DOJO_MODEL_ATTR,
 };
-use super::derive_macros::{
-    extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
-};
+use super::derive_macros::{dojo_derive_all, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE};
 use super::inline_macros::{
     DeleteMacro, EmitMacro, GetMacro, GetModelsTestClassHashes, SelectorFromTagMacro, SetMacro,
     SpawnTestWorld,
 };
-
-use crate::aux_data::DojoAuxData;
 
 #[cfg(test)]
 #[path = "plugin_test.rs"]
@@ -120,134 +113,50 @@ impl MacroPlugin for BuiltinDojoPlugin {
                     PluginResult::default()
                 }
             }
-            ast::ModuleItem::Enum(enum_ast) => {
-                let mut diagnostics = vec![];
-
-                let derive_attr_names = extract_derive_attr_names(
-                    db,
-                    &mut diagnostics,
-                    enum_ast.attributes(db).query_attr(db, "derive"),
-                );
-
-                let (rewrite_nodes, derive_diagnostics) =
-                    handle_derive_attrs(db, &derive_attr_names, &item_ast);
-
-                diagnostics.extend(derive_diagnostics);
-
-                if rewrite_nodes.is_empty() {
-                    return PluginResult {
-                        diagnostics,
-                        ..PluginResult::default()
-                    };
-                }
-
-                let name = enum_ast.name(db).text(db);
-                let mut builder = PatchBuilder::new(db, enum_ast);
-                for node in rewrite_nodes {
-                    builder.add_modified(node);
-                }
-
-                let (code, code_mappings) = builder.build();
-
-                PluginResult {
-                    code: Some(PluginGeneratedFile {
-                        name,
-                        content: code,
-                        aux_data: None,
-                        code_mappings,
-                    }),
-                    diagnostics,
-                    remove_original_item: false,
-                }
-            }
+            ast::ModuleItem::Enum(enum_ast) => dojo_derive_all(
+                db,
+                enum_ast.attributes(db).query_attr(db, "derive"),
+                &item_ast,
+            ),
             ast::ModuleItem::Struct(struct_ast) => {
-                let mut aux_data = DojoAuxData::default();
-                let mut diagnostics = vec![];
-
-                let mut derive_attr_names = extract_derive_attr_names(
-                    db,
-                    &mut diagnostics,
-                    struct_ast.attributes(db).query_attr(db, "derive"),
-                );
-
-                let is_model = struct_ast.has_attr(db, DOJO_MODEL_ATTR);
-                let is_event = struct_ast.has_attr(db, DOJO_EVENT_ATTR);
-
-                // Ensures models and events always derive Introspect if not already derived.
-                if is_model || is_event {
-                    if !derive_attr_names.contains(&DOJO_INTROSPECT_DERIVE.to_string())
-                        && !derive_attr_names.contains(&DOJO_PACKED_DERIVE.to_string())
-                    {
-                        derive_attr_names.push(DOJO_INTROSPECT_DERIVE.to_string());
-                    }
-                }
-
-                let (mut rewrite_nodes, derive_diagnostics) =
-                    handle_derive_attrs(db, &derive_attr_names, &item_ast);
-
-                diagnostics.extend(derive_diagnostics);
-
                 let n_model_attrs = struct_ast
                     .attributes(db)
                     .query_attr(db, DOJO_MODEL_ATTR)
                     .len();
+
                 let n_event_attrs = struct_ast
                     .attributes(db)
                     .query_attr(db, DOJO_EVENT_ATTR)
                     .len();
 
-                // TODO: when event will be separated from model, we need to check for conflicts.
-                // The same struct can't be used for both `#[dojo::model]` and `#[dojo::event]`.
-                //
-                // Events will be reworked to be similar to models, and emitted via a World's event
-                // instead of using the syscall.
-                //
-                // `#[dojo::event]` for now does nothing.
-
-                if is_model {
-                    if n_model_attrs == 1 {
-                        let (model_rewrite_nodes, model_diagnostics) = DojoModel::from_struct(
-                            db,
-                            &mut aux_data,
-                            struct_ast.clone(),
-                            &namespace_config,
-                        );
-                        rewrite_nodes.push(model_rewrite_nodes);
-                        diagnostics.extend(model_diagnostics);
-                    } else {
-                        diagnostics.push(PluginDiagnostic {
-                            message: "A Dojo model must have one dojo::model attribute.".into(),
-                            stable_ptr: struct_ast.stable_ptr().0,
-                            severity: Severity::Error,
-                        });
-                    }
+                if n_model_attrs > 0 && n_event_attrs > 0 {
+                    return PluginResult::diagnostic_only(PluginDiagnostic {
+                        stable_ptr: struct_ast.stable_ptr().0,
+                        message: format!(
+                            "The struct {} can only have one of the dojo::model or one dojo::event attribute.",
+                            struct_ast.name(db).text(db)
+                        ),
+                        severity: Severity::Error,
+                    });
+                } else if n_model_attrs == 1 {
+                    return DojoModel::from_struct(db, struct_ast.clone(), &namespace_config);
+                } else if n_event_attrs == 1 {
+                    // TODO: when event will be separated from model, we need to check for conflicts.
+                    // The same struct can't be used for both `#[dojo::model]` and `#[dojo::event]`.
+                    //
+                    // Events will be reworked to be similar to models, and emitted via a World's event
+                    // instead of using the syscall.
+                    //
+                    // `#[dojo::event]` for now does nothing.
+                    return PluginResult::default();
                 }
 
-                if rewrite_nodes.is_empty() {
-                    return PluginResult {
-                        diagnostics,
-                        ..PluginResult::default()
-                    };
-                }
-
-                let name = struct_ast.name(db).text(db);
-                let mut builder = PatchBuilder::new(db, struct_ast);
-                for node in rewrite_nodes {
-                    builder.add_modified(node);
-                }
-
-                let (code, code_mappings) = builder.build();
-
-                PluginResult {
-                    code: Some(PluginGeneratedFile {
-                        name,
-                        content: code,
-                        aux_data: Some(DynGeneratedFileAuxData::new(aux_data)),
-                        code_mappings,
-                    }),
-                    diagnostics,
-                    remove_original_item: false,
-                }
+                // Not a model or event, but has derives.
+                dojo_derive_all(
+                    db,
+                    struct_ast.attributes(db).query_attr(db, "derive"),
+                    &item_ast,
+                )
             }
             _ => PluginResult::default(),
         }

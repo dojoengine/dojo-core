@@ -17,15 +17,6 @@ pub mod models {
         pub id: u32,
         pub a: felt252,
     }
-
-    #[derive(Drop, Serde)]
-    #[dojo::model]
-    #[dojo::event]
-    pub struct EventA {
-        #[key]
-        pub id: u32,
-        pub a: felt252,
-    }
 }
 
 #[dojo::interface]

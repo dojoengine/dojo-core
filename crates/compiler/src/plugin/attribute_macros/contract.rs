@@ -16,11 +16,12 @@ use cairo_lang_syntax::node::{ast, ids, Terminal, TypedStablePtr, TypedSyntaxNod
 use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 use dojo_types::naming;
 
+use crate::aux_data::ContractAuxData;
 use crate::namespace_config::NamespaceConfig;
-use crate::aux_data::{ContractAuxData, DojoAuxData};
 use crate::plugin::syntax::world_param::{self, WorldParamInjectionKind};
 use crate::plugin::syntax::{self_param, utils as syntax_utils};
 
+use super::patches::{CONTRACT_PATCH, DEFAULT_INIT_PATCH};
 use super::DOJO_CONTRACT_ATTR;
 
 const DOJO_INIT_FN: &str = "dojo_init";
@@ -135,26 +136,7 @@ impl DojoContract {
 
             if !has_init {
                 let node = RewriteNode::interpolate_patched(
-                    "
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn $init_name$(self: @ContractState);
-                    }
-
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn $init_name$(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!(\"Only the world can init contract `{}`, but caller \
-                     is `{:?}`\",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                ",
+                    DEFAULT_INIT_PATCH,
                     &UnorderedHashMap::from([(
                         "init_name".to_string(),
                         RewriteNode::Text(DOJO_INIT_FN.to_string()),
@@ -174,63 +156,7 @@ impl DojoContract {
             let mut builder = PatchBuilder::new(db, module_ast);
             builder.add_modified(RewriteNode::Mapped {
                 node: Box::new(RewriteNode::interpolate_patched(
-                    "
-                #[starknet::contract]
-                pub mod $name$ {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
-                    use dojo::world::IWorldProvider;
-                    use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, \
-                     StoragePointerWriteAccess
-                    };
-
-                    component!(path: dojo::contract::upgradeable::upgradeable, storage: \
-                     upgradeable, event: UpgradeableEvent);
-
-                    #[abi(embed_v0)]
-                    pub impl ContractImpl of IContract<ContractState> {
-                        fn name(self: @ContractState) -> ByteArray {
-                            \"$name$\"
-                        }
-
-                        fn namespace(self: @ContractState) -> ByteArray {
-                            \"$contract_namespace$\"
-                        }
-
-                        fn tag(self: @ContractState) -> ByteArray {
-                            \"$contract_tag$\"
-                        }
-
-                        fn name_hash(self: @ContractState) -> felt252 {
-                            $contract_name_hash$
-                        }
-
-                        fn namespace_hash(self: @ContractState) -> felt252 {
-                            $contract_namespace_hash$
-                        }
-
-                        fn selector(self: @ContractState) -> felt252 {
-                            $contract_selector$
-                        }
-                    }
-
-                    #[abi(embed_v0)]
-                    impl WorldProviderImpl of IWorldProvider<ContractState> {
-                        fn world(self: @ContractState) -> IWorldDispatcher {
-                            self.world_dispatcher.read()
-                        }
-                    }
-
-                    #[abi(embed_v0)]
-                    impl UpgradableImpl = \
-                     dojo::contract::upgradeable::upgradeable::UpgradableImpl<ContractState>;
-
-                    $body$
-                }
-                ",
+                    CONTRACT_PATCH,
                     &UnorderedHashMap::from([
                         ("name".to_string(), RewriteNode::Text(name.to_string())),
                         ("body".to_string(), RewriteNode::new_modified(body_nodes)),
@@ -262,14 +188,10 @@ impl DojoContract {
                 code: Some(PluginGeneratedFile {
                     name: name.clone(),
                     content: code,
-                    aux_data: Some(DynGeneratedFileAuxData::new(DojoAuxData {
-                        models: vec![],
-                        contracts: vec![ContractAuxData {
-                            name,
-                            namespace: contract_namespace.clone(),
-                            systems: contract.systems.clone(),
-                        }],
-                        events: vec![],
+                    aux_data: Some(DynGeneratedFileAuxData::new(ContractAuxData {
+                        name,
+                        namespace: contract_namespace.clone(),
+                        systems: contract.systems.clone(),
                     })),
                     code_mappings,
                 }),
