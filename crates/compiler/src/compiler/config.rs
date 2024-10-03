@@ -2,7 +2,7 @@ use anyhow::Result;
 use camino::Utf8PathBuf;
 use scarb::core::{Package, TargetKind, Workspace};
 use serde::Deserialize;
-use tracing::trace;
+use tracing::{trace, warn};
 
 use crate::namespace_config::NamespaceConfig;
 
@@ -52,6 +52,8 @@ where
         trace!(package = ?package.id.name, manifest_dir = ?manifest_dir, profile = ?profile, "Loading dojo config.");
 
         if !dev_config_path.exists() {
+            warn!("Dojo configuration file not found, using default config. Consider adding `dojo_{profile}.toml` alongside your `Scarb.toml` to configure Dojo with this profile.");
+
             return Ok(Default::default());
         }
 

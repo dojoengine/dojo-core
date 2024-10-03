@@ -25,22 +25,11 @@ use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
+use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
 use super::scarb_internal;
 use super::scarb_internal::debug::SierraToCairoDebugInfo;
 use super::version::check_package_dojo_version;
-
-#[derive(Debug, Clone)]
-pub struct CompiledArtifact {
-    /// THe class hash of the Sierra contract.
-    pub class_hash: Felt,
-    /// The actual compiled Sierra contract class.
-    pub contract_class: Rc<ContractClass>,
-    pub debug_info: Option<Rc<SierraToCairoDebugInfo>>,
-}
-
-/// A type alias for a map of compiled artifacts by their path.
-type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
 
 #[derive(Debug, Default)]
 pub struct DojoCompiler {
@@ -150,7 +139,7 @@ impl Compiler for DojoCompiler {
             &ws.config().ui(),
         )?;
 
-        compile_contracts(
+        let artifact_manager = compile_contracts(
             db,
             &contracts,
             compiler_config,
@@ -158,7 +147,19 @@ impl Compiler for DojoCompiler {
             self.output_debug_info,
         )?;
 
-        // TODO: write artifacts to disk.
+        for (qualified_path, _) in artifact_manager.iter() {
+            let profile_target_dir = ws
+                .target_dir()
+                .child(ws.current_profile().unwrap().as_str());
+            let n = qualified_path.replace("::", "_");
+            artifact_manager.save_sierra_class(
+                &ws.config(),
+                &profile_target_dir,
+                qualified_path,
+                &n,
+            )?;
+            artifact_manager.save_abi(&ws.config(), &profile_target_dir, qualified_path, &n)?;
+        }
 
         Ok(())
     }
@@ -239,7 +240,7 @@ fn compile_contracts(
     compiler_config: CompilerConfig,
     ui: &Ui,
     do_output_debug_info: bool,
-) -> Result<CompiledArtifactByPath> {
+) -> Result<ArtifactManager> {
     let contracts: Vec<&ContractDeclaration> = contracts.iter().collect::<Vec<_>>();
 
     let classes = {
@@ -263,7 +264,7 @@ fn compile_contracts(
         vec![None; contracts.len()]
     };
 
-    let mut compiled_classes: CompiledArtifactByPath = HashMap::new();
+    let mut artifact_manager = ArtifactManager::new();
     let list_selector = ListSelector::default();
 
     for (decl, contract_class, debug_info) in izip!(contracts, classes, debug_info_classes) {
@@ -304,7 +305,7 @@ fn compile_contracts(
                 )
             })?;
 
-        compiled_classes.insert(
+        artifact_manager.add_artifact(
             qualified_path,
             CompiledArtifact {
                 class_hash,
@@ -314,7 +315,7 @@ fn compile_contracts(
         );
     }
 
-    Ok(compiled_classes)
+    Ok(artifact_manager)
 }
 
 /// Computes the class hash of a contract class.

@@ -1,3 +1,4 @@
+pub mod artifact_manager;
 pub mod compiler;
 pub mod config;
 pub mod contract_selector;
