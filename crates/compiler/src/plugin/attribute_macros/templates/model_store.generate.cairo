@@ -290,27 +290,27 @@ pub impl $type_name$ModelImpl of dojo::model::Model<$type_name$> {
 
     #[inline(always)]
     fn name() -> ByteArray {
-        "$type_name$"
+        $type_name$Attributes::name()
     }
 
     #[inline(always)]
     fn namespace() -> ByteArray {
-        "$model_namespace$"
+        $type_name$Attributes::namespace()
     }
 
     #[inline(always)]
     fn tag() -> ByteArray {
-        "$model_tag$"
+        $type_name$Attributes::tag()
     }
 
     #[inline(always)]
     fn version() -> u8 {
-        $model_version$
+        $type_name$Attributes::VERSION
     }
 
     #[inline(always)]
     fn selector() -> felt252 {
-        $model_selector$
+        $type_name$Attributes::SELECTOR
     }
 
     #[inline(always)]
@@ -320,12 +320,12 @@ pub impl $type_name$ModelImpl of dojo::model::Model<$type_name$> {
 
     #[inline(always)]
     fn name_hash() -> felt252 {
-        $model_name_hash$
+        $type_name$Attributes::NAME_HASH
     }
 
     #[inline(always)]
     fn namespace_hash() -> felt252 {
-        $model_namespace_hash$
+        $type_name$Attributes::NAMESPACE_HASH
     }
 
     #[inline(always)]
@@ -406,6 +406,7 @@ pub trait I$contract_name$<T> {
 pub mod $contract_name$ {
     use super::$type_name$;
     use super::I$contract_name$;
+    use super::$type_name$Attributes;
 
     #[storage]
     struct Storage {}
@@ -413,31 +414,31 @@ pub mod $contract_name$ {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-           "$type_name$"
+            $type_name$Attributes::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-           "$model_namespace$"
+            $type_name$Attributes::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            "$model_tag$"
+            $type_name$Attributes::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-           $model_version$
+            $type_name$Attributes::VERSION
         }
 
         fn selector(self: @ContractState) -> felt252 {
-           $model_selector$
+            $type_name$Attributes::SELECTOR
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            $model_name_hash$
+            $type_name$Attributes::NAME_HASH
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            $model_namespace_hash$
+            $type_name$Attributes::NAMESPACE_HASH
         }
 
         fn unpacked_size(self: @ContractState) -> Option<usize> {
