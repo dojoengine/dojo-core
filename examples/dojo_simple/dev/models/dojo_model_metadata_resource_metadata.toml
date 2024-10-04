@@ -1,4 +1,0 @@
-kind = "StarknetContractManifest"
-class_hash = "0x4b90860de7214ac71e247164edc73a651a36ddc41e18aff193705d5d7ff273"
-qualified_path = "dojo::model::metadata::resource_metadata"
-name = "resource_metadata"

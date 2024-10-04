@@ -1,5 +1,0 @@
-kind = "ContractManifest"
-class_hash = "0x6078639e85a23dbf0ba1def6d9f008fdc4829807d21dcb0630ccfebc3e13b73"
-qualified_path = "dojo_simple::actions"
-tag = "DEFAULT_NAMESPACE-actions"
-systems = ["spawn"]
