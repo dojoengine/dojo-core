@@ -40,18 +40,37 @@ cargo run -r -p dojo-abigen
 cargo run -r -p dojo-abigen -- --check
 ```
 
+At the moment, after running the abigen, you must run the `cargo fmt` to fix the formatting of the generated bindings.
+
+## Examples
+
+The examples folders are here to test the compiler support and showcase the features.
+
+* `dojo_simple`: showcase a simple dojo project without any external dependencies.
+* `workspace`: showcase a dojo project with multiple crates.
+
 ## Work in progress
 
 This repository is currently being built by extracting some parts of the [dojo](https://github.com/dojoengine/dojo) repo.
 
 Tasks:
 
-- [ ] Add back the artifacts and manifests generation.
 - [ ] Add back all the types including `Ty` for introspection.
-- [ ] [PR11](https://github.com/dojoengine/dojo-core/pull/11) to have `Event` as a new resource.
+- [ ] [PR11](https://github.com/dojoengine/dojo-core/pull/11) to have `Event` as a new resource -> to be rebased + change the core to use `EventEmitted` event with:
+    ```rust
+    struct EventEmitted {
+        #[key]
+        table: felt252,
+        #[key]
+        system_address: ContractAddress,
+        #[key]
+        historical: bool,
+        keys: Span<felt252>,
+        values: Span<felt252>,
+    }
+    ```
 - [ ] [PR12](https://github.com/dojoengine/dojo-core/pull/12) for world events to have keys.
 - [ ] Debug `2.8` panic that prevent the compiler from working with this Cairo version.
-- [ ] Simplify the plugin by having the expanded code into files instead of plain strings.
 - [ ] Add model extensibility (append only).
-- [ ] Check if base contract can be removed to instead use a component to inject the world dispatcher.
+- [ ] Check if base contract can be removed to instead use a component to inject the world dispatcher -> yes needs to be done.
 - [ ] Check the possibility to remove warnings during compilation if the users wants to.
