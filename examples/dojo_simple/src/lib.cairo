@@ -46,3 +46,11 @@ pub mod actions {
         }
     }
 }
+
+#[starknet::contract]
+pub mod sn_actions {
+
+    #[storage]
+    struct Storage {}
+
+}

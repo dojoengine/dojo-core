@@ -2,6 +2,12 @@
 //!
 //! The primary purpose of this module is to manage the compiled artifacts
 //! and abstract the writing of the artifacts to the filesystem.
+//!
+//! The artifact manager doesn't have any context of the nature of the contracts
+//! that are being compiled (dojo contract, model contract, starknet contract, ...).
+//!
+//! The plugin aux data are the one that will keep this information mapped to the
+//! qualified path of the compiled contracts.
 
 use std::collections::{BTreeMap, HashMap};
 use std::fs;

@@ -3,46 +3,18 @@
 //! The plugin generates aux data for models, contracts and events.
 //! Then the compiler uses this aux data to generate the manifests and organize the artifacts.
 
-use std::cmp::Ordering;
+use std::collections::HashMap;
 
-use anyhow::Result;
 use cairo_lang_compiler::db::RootDatabase;
-use cairo_lang_defs::patcher::PatchBuilder;
-use cairo_lang_defs::plugin::{
-    DynGeneratedFileAuxData, GeneratedFileAuxData, MacroPlugin, MacroPluginMetadata,
-    PluginDiagnostic, PluginGeneratedFile, PluginResult,
-};
-use cairo_lang_diagnostics::Severity;
-use cairo_lang_filesystem::ids::CrateId;
-use cairo_lang_semantic::plugin::PluginSuite;
-use cairo_lang_starknet::plugin::aux_data::{StarkNetContractAuxData, StarkNetEventAuxData};
-use cairo_lang_syntax::attribute::structured::{AttributeArgVariant, AttributeStructurize};
-use cairo_lang_syntax::node::ast::Attribute;
-use cairo_lang_syntax::node::db::SyntaxGroup;
-use cairo_lang_syntax::node::helpers::QueryAttrs;
-use cairo_lang_syntax::node::ids::SyntaxStablePtrId;
-use cairo_lang_syntax::node::{ast, Terminal, TypedSyntaxNode};
-
 use cairo_lang_defs::db::DefsGroup;
-use cairo_lang_defs::ids::{
-    ModuleId, ModuleItemId, NamedLanguageElementId, TopLevelLanguageElementId,
-};
-use cairo_lang_filesystem::db::FilesGroup;
-use cairo_lang_formatter::format_string;
-use cairo_lang_semantic::db::SemanticGroup;
-use cairo_lang_starknet::compile::compile_prepared_db;
-use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
-use cairo_lang_starknet_classes::abi;
-use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
-use cairo_lang_starknet_classes::contract_class::ContractClass;
-use cairo_lang_utils::UpcastMut;
-
-use scarb::compiler::plugin::builtin::BuiltinStarkNetPlugin;
-use scarb::compiler::plugin::{CairoPlugin, CairoPluginInstance};
-use scarb::core::{PackageId, PackageName, SourceId};
-use semver::Version;
+use cairo_lang_defs::plugin::GeneratedFileAuxData;
+use cairo_lang_filesystem::ids::CrateId;
+use cairo_lang_starknet::plugin::aux_data::StarkNetContractAuxData;
+use convert_case::{Case, Casing};
 use smol_str::SmolStr;
-use url::Url;
+use tracing::trace;
+
+use crate::compiler::contract_selector::CAIRO_PATH_SEPARATOR;
 
 /// Represents a member of a struct.
 #[derive(Clone, Debug, PartialEq)]
@@ -99,15 +71,29 @@ impl GeneratedFileAuxData for ContractAuxData {
 }
 
 /// Dojo related auxiliary data of the Dojo plugin.
+///
+/// All the keys are full paths to the cairo module that contains the expanded code.
+/// This eases the match with compiled artifacts that are using the fully qualified path
+/// as keys.
 #[derive(Debug, Default, PartialEq)]
 pub struct DojoAuxData {
     /// A list of models that were processed by the plugin.
-    pub models: Vec<ModelAuxData>,
+    pub models: HashMap<String, ModelAuxData>,
     /// A list of contracts that were processed by the plugin.
-    pub contracts: Vec<ContractAuxData>,
+    pub contracts: HashMap<String, ContractAuxData>,
+    /// A list of starknet contracts that were processed by the plugin (qualified path, contract name).
+    pub sn_contracts: HashMap<String, String>,
 }
 
 impl DojoAuxData {
+    /// Checks if a starknet contract with the given qualified path has been processed
+    /// for a contract or a model.
+    pub fn contains_starknet_contract(&self, qualified_path: &str) -> bool {
+        self.contracts.contains_key(qualified_path) || self.models.contains_key(qualified_path)
+    }
+
+    /// Creates a new `DojoAuxData` from a list of crate ids and a database by introspecting
+    /// the generated files of each module in the database.
     pub fn from_crates(crate_ids: &[CrateId], db: &RootDatabase) -> Self {
         let mut dojo_aux_data = DojoAuxData::default();
 
@@ -124,28 +110,77 @@ impl DojoAuxData {
                     .filter_map(|info| info.as_ref().map(|i| &i.aux_data))
                     .filter_map(|aux_data| aux_data.as_ref().map(|aux_data| aux_data.0.as_any()))
                 {
-                    if let Some(model_aux_data) = aux_data.downcast_ref::<ModelAuxData>() {
-                        dojo_aux_data.models.push(model_aux_data.clone());
-                    }
+                    let module_path = module_id.full_path(db);
 
                     if let Some(contract_aux_data) = aux_data.downcast_ref::<ContractAuxData>() {
-                        dojo_aux_data.contracts.push(contract_aux_data.clone());
+                        // The module path for contracts is the path to the contract file, not the fully
+                        // qualified path of the actual contract module.
+                        // Adding the contract name to the module path allows to get the fully qualified path.
+                        let contract_path = format!(
+                            "{}{}{}",
+                            module_path, CAIRO_PATH_SEPARATOR, contract_aux_data.name
+                        );
+
+                        trace!(
+                            contract_path,
+                            ?contract_aux_data,
+                            "Adding dojo contract to aux data."
+                        );
+
+                        dojo_aux_data
+                            .contracts
+                            .insert(contract_path, contract_aux_data.clone());
                     }
 
+                    if let Some(model_aux_data) = aux_data.downcast_ref::<ModelAuxData>() {
+                        // As models are defined from a struct (usually Pascal case), we have converted
+                        // the underlying starknet contract name to snake case in the `#[dojo::model]` attribute
+                        // macro processing.
+                        // Same thing as for contracts, we need to add the model name to the module path
+                        // to get the fully qualified path of the contract.
+                        let model_contract_path = format!(
+                            "{}{}{}",
+                            module_path,
+                            CAIRO_PATH_SEPARATOR,
+                            model_aux_data.name.to_case(Case::Snake)
+                        );
+
+                        trace!(
+                            model_contract_path,
+                            ?model_aux_data,
+                            "Adding dojo model to aux data."
+                        );
+
+                        dojo_aux_data
+                            .models
+                            .insert(model_contract_path, model_aux_data.clone());
+                        continue;
+                    }
+
+                    // As every contracts and models are starknet contracts under the hood,
+                    // we need to filter already processed Starknet contracts.
+                    // Also important to note that, the module id for a starknet contract is
+                    // already the fully qualified path of the contract.
+                    //
+                    // Important to note that all the dojo-core contracts are starknet contracts
+                    // (currently world, base and resource_metadata model). They will be added here
+                    // but we may choose to ignore them.
                     if let Some(sn_contract_aux_data) =
                         aux_data.downcast_ref::<StarkNetContractAuxData>()
                     {
-                        println!(
-                            "starknet_contract_aux_data: {:?} {:?}",
-                            module_id.full_path(db),
-                            sn_contract_aux_data
-                        );
-                    }
+                        if !dojo_aux_data.contains_starknet_contract(&module_path) {
+                            dojo_aux_data.sn_contracts.insert(
+                                module_path.clone(),
+                                sn_contract_aux_data.contract_name.to_string(),
+                            );
 
-                    // StarknetAuxData shouldn't be required. Every dojo contract and model are starknet
-                    // contracts under the hood. But the dojo aux data are attached to
-                    // the parent module of the actual contract, so StarknetAuxData will
-                    // only contain the contract's name.
+                            trace!(
+                                %module_path,
+                                contract_name = %sn_contract_aux_data.contract_name,
+                                "Adding starknet contract to aux data."
+                            );
+                        }
+                    }
                 }
             }
         }

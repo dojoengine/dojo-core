@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use anyhow::{anyhow, Context, Result};
@@ -12,6 +11,7 @@ use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
 use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cairo_lang_utils::UpcastMut;
+use dojo_types::naming;
 use itertools::{izip, Itertools};
 use scarb::compiler::helpers::build_compiler_config;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
@@ -26,6 +26,7 @@ use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
 use crate::aux_data::DojoAuxData;
+use crate::compiler::contract_selector::CAIRO_PATH_SEPARATOR;
 
 use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
@@ -149,23 +150,70 @@ impl Compiler for DojoCompiler {
             self.output_debug_info,
         )?;
 
-        let _aux_data = DojoAuxData::from_crates(&main_crate_ids, db);
+        let aux_data = DojoAuxData::from_crates(&main_crate_ids, db);
 
-        for (qualified_path, _) in artifact_manager.iter() {
-            let profile_target_dir = ws
-                .target_dir()
-                .child(ws.current_profile().unwrap().as_str());
-            let n = qualified_path.replace("::", "_");
+        let profile = ws.current_profile().unwrap().to_string();
+
+        // To give context to the artifacts manager where to store the artifacts,
+        // we need to process the aux data.
+
+        for (qualified_path, contract_aux_data) in aux_data.contracts.iter() {
+            let tag = naming::get_tag(&contract_aux_data.namespace, &contract_aux_data.name);
+            let filename = naming::get_filename_from_tag(&tag);
+
+            let artifact_dir = ws.target_dir().child(&profile).child("contracts");
 
             artifact_manager.save_sierra_class(
                 &ws.config(),
-                &profile_target_dir,
+                &artifact_dir,
                 qualified_path,
-                &n,
+                &filename,
             )?;
 
-            artifact_manager.save_abi(&ws.config(), &profile_target_dir, qualified_path, &n)?;
+            // If easier, just give the ABI to the manifest and it will write it?
+            // TODO: Write manifest file.
+
+            //artifact_manager.save_abi(&ws.config(), &artifact_dir, qualified_path, &filename)?;
         }
+
+        for (qualified_path, model_aux_data) in aux_data.models.iter() {
+            let tag = naming::get_tag(&model_aux_data.namespace, &model_aux_data.name);
+            let filename = naming::get_filename_from_tag(&tag);
+
+            let artifact_dir = ws.target_dir().child(&profile).child("models");
+
+            artifact_manager.save_sierra_class(
+                &ws.config(),
+                &artifact_dir,
+                qualified_path,
+                &filename,
+            )?;
+
+            // If easier, just give the ABI to the manifest and it will write it?
+            // TODO: Write manifest file.
+
+            //artifact_manager.save_abi(&ws.config(), &artifact_dir, qualified_path, &filename)?;
+        }
+
+        for (qualified_path, _) in aux_data.sn_contracts.iter() {
+            let filename = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
+
+            let artifact_dir = ws.target_dir().child(&profile);
+
+            artifact_manager.save_sierra_class(
+                &ws.config(),
+                &artifact_dir,
+                qualified_path,
+                &filename,
+            )?;
+
+            // If easier, just give the ABI to the manifest and it will write it?
+            // TODO: Write manifest file, only for world. (and base if we don't remove it).
+
+            //artifact_manager.save_abi(&ws.config(), &artifact_dir, qualified_path, &filename)?;
+        }
+
+        // TODO: add a check to ensure all the artifacts have been processed?
 
         Ok(())
     }
