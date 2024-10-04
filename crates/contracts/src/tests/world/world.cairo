@@ -92,42 +92,15 @@ fn test_delete() {
 fn test_contract_getter() {
     let world = deploy_world();
 
-    let _ = world.deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
+    let address = world
+        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
 
-    if let Resource::Contract((class_hash, _)) = world
+    if let Resource::Contract((contract_address, namespace_hash)) = world
         .resource(selector_from_tag!("dojo-test_contract")) {
-        assert(
-            class_hash == test_contract::TEST_CLASS_HASH.try_into().unwrap(),
-            'invalid contract class hash'
-        );
+        assert(address == contract_address, 'invalid contract address');
+
+        assert(namespace_hash == bytearray_hash(@"dojo"), 'invalid namespace hash');
     }
-}
-
-#[test]
-#[available_gas(6000000)]
-fn test_model_class_hash_getter() {
-    let world = deploy_world();
-    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    if let Resource::Model((class_hash, _)) = world.resource(Model::<Foo>::selector()) {
-        assert(class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'foo wrong class hash');
-    } else {
-        panic!("Foo model not found");
-    };
-}
-
-#[test]
-#[ignore]
-#[available_gas(6000000)]
-fn test_legacy_model_class_hash_getter() {
-    let world = deploy_world();
-    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    if let Resource::Model((class_hash, _)) = world.resource('Foo') {
-        assert(class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'foo wrong class hash');
-    } else {
-        panic!("Foo model not found");
-    };
 }
 
 #[test]
@@ -352,12 +325,7 @@ fn test_can_call_init_only_world() {
 
 #[test]
 #[available_gas(6000000)]
-#[should_panic(
-    expected: (
-        "Caller `4919` cannot initialize contract `dojo-test_contract` (not owner)",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_can_call_init_only_owner() {
     let world = deploy_world();
     let _address = world

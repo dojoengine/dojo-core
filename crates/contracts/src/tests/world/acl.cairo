@@ -66,7 +66,7 @@ fn test_grant_owner_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `659918` does NOT have OWNER role on model (or it's namespace) `dojo-Foo`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -107,7 +107,7 @@ fn test_revoke_owner_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `659918` does NOT have OWNER role on model (or it's namespace) `dojo-Foo`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -173,7 +173,7 @@ fn test_grant_writer_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `659918` does NOT have OWNER role on model (or it's namespace) `dojo-Foo`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -214,7 +214,7 @@ fn test_revoke_writer_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `659918` does NOT have OWNER role on model (or it's namespace) `dojo-Foo`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -237,7 +237,7 @@ fn test_revoke_writer_fails_for_non_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Contract `dojo-foo_setter` does NOT have WRITER role on model (or it's namespace) `dojo-Foo`",
+        "Contract `dojo-foo_setter` does NOT have WRITER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED',
         'ENTRYPOINT_FAILED'
     )

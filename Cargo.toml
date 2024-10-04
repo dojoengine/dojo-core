@@ -2,8 +2,10 @@
 resolver = "2"
 
 members = [
-    "crates/abigen",
+    "bins/abigen",
+    "bins/demo-compiler",
     "crates/contracts",
+    "crates/compiler",
     "crates/types",
 ]
 
@@ -21,9 +23,9 @@ inherits = "release"
 lto = "fat"
 
 [workspace.dependencies]
-dojo-abigen = { path = "crates/abigen" }
 dojo-contracts = { path = "crates/contracts" }
 dojo-types = { path = "crates/types" }
+dojo-compiler = { path = "crates/compiler" }
 
 anyhow = "1.0.80"
 assert_fs = "1.1"
@@ -33,7 +35,7 @@ auto_impl = "1.2.0"
 base64 = "0.21.2"
 bigdecimal = "0.4.1"
 bytes = "1.6"
-cainome = { git = "https://github.com/cartridge-gg/cainome", rev = "da96e0a", features = [ "abigen-rs" ] }
+cainome = { git = "https://github.com/cartridge-gg/cainome", tag = "v0.4.3", features = [ "abigen-rs" ] }
 cairo-lang-compiler = "=2.7.1"
 cairo-lang-debug = "=2.7.1"
 cairo-lang-defs = "=2.7.1"
@@ -110,6 +112,7 @@ toml = "0.8"
 tower = "0.4.13"
 tower-http = "0.4.4"
 tracing = "0.1.34"
+tracing-log = "0.1.3"
 tracing-subscriber = { version = "0.3.16", features = [ "env-filter", "json" ] }
 url = { version = "2.4.0", features = [ "serde" ] }
 walkdir = "2.5.0"

@@ -58,7 +58,7 @@ fn test_set_metadata_resource_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `2827` does NOT have OWNER role on model (or it's namespace) `dojo-Foo`",
+        "Account `2827` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED',
     )
 )]
@@ -197,8 +197,7 @@ fn test_upgrade_model_from_model_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `2827` cannot upgrade the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883` (not owner)",
-        'ENTRYPOINT_FAILED',
+        "Account `659918` does NOT have OWNER role on namespace `dojo`", 'ENTRYPOINT_FAILED',
     )
 )]
 fn test_upgrade_model_from_model_writer() {
@@ -434,7 +433,7 @@ fn test_upgrade_contract_from_resource_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `659918` does NOT have OWNER role on contract (or it's namespace) `dojo-test_contract`",
+        "Account `659918` does NOT have OWNER role on contract (or its namespace) `dojo-test_contract`",
         'ENTRYPOINT_FAILED',
     )
 )]
@@ -465,7 +464,7 @@ fn test_upgrade_contract_from_resource_writer() {
 #[test]
 #[should_panic(
     expected: (
-        "Account `659918` does NOT have OWNER role on contract (or it's namespace) `dojo-test_contract`",
+        "Account `659918` does NOT have OWNER role on contract (or its namespace) `dojo-test_contract`",
         'ENTRYPOINT_FAILED',
     )
 )]
