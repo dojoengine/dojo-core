@@ -1,0 +1,14 @@
+kind = "ModelManifest"
+class_hash = "0x3de358113242eb954128b030e82ab75762a619383d03ac6110fd05a832658b0"
+qualified_path = "dojo_simple::models::model_a"
+tag = "DEFAULT_NAMESPACE-ModelA"
+
+[[members]]
+name = "id"
+type = "u32"
+key = true
+
+[[members]]
+name = "a"
+type = "felt252"
+key = false

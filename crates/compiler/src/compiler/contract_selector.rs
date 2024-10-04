@@ -8,8 +8,9 @@ use convert_case::{Case, Casing};
 use scarb::core::PackageName;
 use serde::{Deserialize, Serialize};
 
+use crate::CAIRO_PATH_SEPARATOR;
+
 pub const GLOB_PATH_SELECTOR: &str = "*";
-pub const CAIRO_PATH_SEPARATOR: &str = "::";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ContractSelector(String);

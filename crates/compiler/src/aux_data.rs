@@ -14,19 +14,8 @@ use convert_case::{Case, Casing};
 use smol_str::SmolStr;
 use tracing::trace;
 
-use crate::compiler::contract_selector::CAIRO_PATH_SEPARATOR;
-
-/// Represents a member of a struct.
-#[derive(Clone, Debug, PartialEq)]
-pub struct Member {
-    // Name of the member.
-    pub name: String,
-    // Type of the member.
-    // #[serde(rename = "type")]
-    pub ty: String,
-    // Whether the member is a key.
-    pub key: bool,
-}
+use super::compiler::manifest::Member;
+use crate::CAIRO_PATH_SEPARATOR;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ModelAuxData {

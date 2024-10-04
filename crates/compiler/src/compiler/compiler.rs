@@ -26,7 +26,14 @@ use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
 use crate::aux_data::DojoAuxData;
-use crate::compiler::contract_selector::CAIRO_PATH_SEPARATOR;
+use crate::compiler::manifest::{
+    AbstractBaseManifest, ContractManifest, ModelManifest, StarknetContractManifest,
+};
+use crate::scarb_extensions::WorkspaceExt;
+use crate::{
+    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, MODELS_DIR,
+    RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
+};
 
 use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
@@ -142,76 +149,84 @@ impl Compiler for DojoCompiler {
             &ws.config().ui(),
         )?;
 
-        let artifact_manager = compile_contracts(
-            db,
-            &contracts,
-            compiler_config,
-            &ws.config().ui(),
-            self.output_debug_info,
-        )?;
+        let artifact_manager =
+            compile_contracts(db, &contracts, compiler_config, &ws, self.output_debug_info)?;
 
         let aux_data = DojoAuxData::from_crates(&main_crate_ids, db);
 
-        let profile = ws.current_profile().unwrap().to_string();
+        let mut base_manifest = AbstractBaseManifest::new(ws);
 
-        // To give context to the artifacts manager where to store the artifacts,
-        // we need to process the aux data.
-
+        // Combine the aux data info about the contracts with the artifact data
+        // to create the manifests.
         for (qualified_path, contract_aux_data) in aux_data.contracts.iter() {
             let tag = naming::get_tag(&contract_aux_data.namespace, &contract_aux_data.name);
             let filename = naming::get_filename_from_tag(&tag);
 
-            let artifact_dir = ws.target_dir().child(&profile).child("contracts");
+            let target_dir = ws.target_dir_profile().child(CONTRACTS_DIR);
 
-            artifact_manager.save_sierra_class(
-                &ws.config(),
-                &artifact_dir,
-                qualified_path,
-                &filename,
-            )?;
+            artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
 
-            // If easier, just give the ABI to the manifest and it will write it?
-            // TODO: Write manifest file.
-
-            //artifact_manager.save_abi(&ws.config(), &artifact_dir, qualified_path, &filename)?;
+            base_manifest.contracts.push(ContractManifest {
+                class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                qualified_path: qualified_path.to_string(),
+                tag,
+                systems: contract_aux_data.systems.clone(),
+            });
         }
 
         for (qualified_path, model_aux_data) in aux_data.models.iter() {
             let tag = naming::get_tag(&model_aux_data.namespace, &model_aux_data.name);
             let filename = naming::get_filename_from_tag(&tag);
 
-            let artifact_dir = ws.target_dir().child(&profile).child("models");
+            let target_dir = ws.target_dir_profile().child(MODELS_DIR);
 
-            artifact_manager.save_sierra_class(
-                &ws.config(),
-                &artifact_dir,
-                qualified_path,
-                &filename,
-            )?;
+            artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
 
-            // If easier, just give the ABI to the manifest and it will write it?
-            // TODO: Write manifest file.
-
-            //artifact_manager.save_abi(&ws.config(), &artifact_dir, qualified_path, &filename)?;
+            base_manifest.models.push(ModelManifest {
+                class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                qualified_path: qualified_path.to_string(),
+                tag,
+                members: model_aux_data.members.clone(),
+            });
         }
 
-        for (qualified_path, _) in aux_data.sn_contracts.iter() {
+        for (qualified_path, name) in aux_data.sn_contracts.iter() {
+            println!("qualified_path: {}", qualified_path);
             let filename = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
 
-            let artifact_dir = ws.target_dir().child(&profile);
+            let target_dir = ws.target_dir_profile();
 
-            artifact_manager.save_sierra_class(
-                &ws.config(),
-                &artifact_dir,
-                qualified_path,
-                &filename,
-            )?;
+            artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
 
-            // If easier, just give the ABI to the manifest and it will write it?
-            // TODO: Write manifest file, only for world. (and base if we don't remove it).
-
-            //artifact_manager.save_abi(&ws.config(), &artifact_dir, qualified_path, &filename)?;
+            match qualified_path.as_str() {
+                WORLD_QUALIFIED_PATH => {
+                    base_manifest.world = StarknetContractManifest {
+                        class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                        qualified_path: qualified_path.to_string(),
+                        name: WORLD_CONTRACT_TAG.to_string(),
+                    };
+                }
+                BASE_QUALIFIED_PATH => {
+                    base_manifest.base = StarknetContractManifest {
+                        class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                        qualified_path: qualified_path.to_string(),
+                        name: BASE_CONTRACT_TAG.to_string(),
+                    };
+                }
+                RESOURCE_METADATA_QUALIFIED_PATH => {
+                    // Skip this dojo contract as not used in the migration process.
+                }
+                _ => {
+                    base_manifest.sn_contracts.push(StarknetContractManifest {
+                        class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                        qualified_path: qualified_path.to_string(),
+                        name: name.clone(),
+                    });
+                }
+            }
         }
+
+        base_manifest.write()?;
 
         // TODO: add a check to ensure all the artifacts have been processed?
 
@@ -288,13 +303,13 @@ fn find_project_contracts(
 }
 
 /// Compiles the contracts.
-fn compile_contracts(
+fn compile_contracts<'w>(
     db: &mut RootDatabase,
     contracts: &[ContractDeclaration],
     compiler_config: CompilerConfig,
-    ui: &Ui,
+    ws: &'w Workspace<'w>,
     do_output_debug_info: bool,
-) -> Result<ArtifactManager> {
+) -> Result<ArtifactManager<'w>> {
     let contracts: Vec<&ContractDeclaration> = contracts.iter().collect::<Vec<_>>();
 
     let classes = {
@@ -318,7 +333,7 @@ fn compile_contracts(
         vec![None; contracts.len()]
     };
 
-    let mut artifact_manager = ArtifactManager::new();
+    let mut artifact_manager = ArtifactManager::new(ws);
     let list_selector = ListSelector::default();
 
     for (decl, contract_class, debug_info) in izip!(contracts, classes, debug_info_classes) {
@@ -339,7 +354,7 @@ fn compile_contracts(
                     It will work on Katana, but don't forget to remove it before deploying on a public Starknet network.
                 "#};
 
-                ui.warn(diagnostic);
+                ws.config().ui().warn(diagnostic);
             }
             Err(e) => {
                 return Err(e).with_context(|| {
@@ -400,6 +415,7 @@ pub fn collect_main_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) ->
 
     main_crate_ids
 }
+
 /// Collects the crate ids containing the given contract selectors.
 pub fn collect_crates_ids_from_selectors(
     db: &RootDatabase,

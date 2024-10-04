@@ -18,7 +18,8 @@ use convert_case::{Case, Casing};
 use dojo_types::naming;
 use starknet::core::utils::get_selector_from_name;
 
-use crate::aux_data::{DojoAuxData, Member, ModelAuxData};
+use crate::aux_data::ModelAuxData;
+use crate::compiler::manifest::Member;
 use crate::namespace_config::NamespaceConfig;
 use crate::plugin::derive_macros::{
     extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,

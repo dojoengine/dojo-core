@@ -9,43 +9,18 @@
 //! The plugin aux data are the one that will keep this information mapped to the
 //! qualified path of the compiled contracts.
 
-use std::collections::{BTreeMap, HashMap};
-use std::fs;
-use std::io::Write;
+use std::collections::HashMap;
 use std::ops::DerefMut;
 use std::rc::Rc;
 
-use anyhow::{anyhow, Context, Result};
-use cairo_lang_compiler::db::RootDatabase;
-use cairo_lang_compiler::CompilerConfig;
-use cairo_lang_defs::ids::NamedLanguageElementId;
-use cairo_lang_filesystem::db::FilesGroup;
-use cairo_lang_filesystem::ids::{CrateId, CrateLongId};
-use cairo_lang_starknet::compile::compile_prepared_db;
-use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
-use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
+use anyhow::{Context, Result};
 use cairo_lang_starknet_classes::contract_class::ContractClass;
-use cairo_lang_utils::UpcastMut;
-use dojo_types::naming;
-use itertools::{izip, Itertools};
-use scarb::compiler::helpers::build_compiler_config;
-use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
-use scarb::core::{Config, Package, TargetKind, Workspace};
+use scarb::core::Workspace;
 use scarb::flock::Filesystem;
-use scarb::ops::CompileOpts;
-use scarb_ui::args::{FeaturesSpec, PackagesFilter};
-use scarb_ui::Ui;
-use serde::de::DeserializeOwned;
-use serde::{Deserialize, Serialize};
-use smol_str::SmolStr;
-use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
-use tracing::{trace, trace_span};
+use tracing::trace;
 
-use super::contract_selector::ContractSelector;
-use super::scarb_internal;
 use super::scarb_internal::debug::SierraToCairoDebugInfo;
-use super::version::check_package_dojo_version;
 
 #[derive(Debug, Clone)]
 pub struct CompiledArtifact {
@@ -60,15 +35,18 @@ pub struct CompiledArtifact {
 /// A type alias for a map of compiled artifacts by their path.
 type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
 
-pub struct ArtifactManager {
+pub struct ArtifactManager<'w> {
+    /// The workspace of the current compilation.
+    workspace: &'w Workspace<'w>,
     /// The compiled artifacts.
     compiled_artifacts: CompiledArtifactByPath,
 }
 
-impl ArtifactManager {
+impl<'w> ArtifactManager<'w> {
     /// Creates a new artifact manager.
-    pub fn new() -> Self {
+    pub fn new(workspace: &'w Workspace) -> Self {
         Self {
+            workspace,
             compiled_artifacts: HashMap::new(),
         }
     }
@@ -79,8 +57,17 @@ impl ArtifactManager {
     }
 
     /// Gets a compiled artifact from the manager.
-    pub fn get_artifact(&self, path: &str) -> Option<&CompiledArtifact> {
-        self.compiled_artifacts.get(path)
+    pub fn get_artifact(&self, qualified_path: &str) -> Option<&CompiledArtifact> {
+        self.compiled_artifacts.get(qualified_path)
+    }
+
+    /// Gets the class hash of a compiled artifact.
+    pub fn get_class_hash(&self, qualified_path: &str) -> Result<Felt> {
+        let artifact = self.get_artifact(qualified_path).context(format!(
+            "Can't get class hash from artifact for qualified path {qualified_path}"
+        ))?;
+
+        Ok(artifact.class_hash)
     }
 
     /// Adds a compiled artifact to the manager.
@@ -96,14 +83,19 @@ impl ArtifactManager {
 
     /// Saves a Sierra contract class to a JSON file.
     /// If debug info is available, it will also be saved to a separate file.
-    pub fn save_sierra_class(
+    ///
+    /// # Arguments
+    ///
+    /// * `qualified_path` - The cairo module qualified path.
+    /// * `target_dir` - The target directory to save the artifact to.
+    /// * `file_name` - The name of the file to save the artifact to, without extension.
+    pub fn write_sierra_class(
         &self,
-        config: &Config,
-        target_dir: &Filesystem,
         qualified_path: &str,
+        target_dir: &Filesystem,
         file_name: &str,
     ) -> anyhow::Result<()> {
-        trace!(target_dir = %target_dir, qualified_path, file_name, "Saving sierra class file.");
+        trace!(target_dir = ?target_dir, qualified_path, file_name, "Saving sierra class file.");
 
         let artifact = self
             .get_artifact(qualified_path)
@@ -112,7 +104,7 @@ impl ArtifactManager {
         let mut file = target_dir.open_rw(
             format!("{file_name}.json"),
             &format!("sierra class file for `{}`", qualified_path),
-            config,
+            self.workspace.config(),
         )?;
 
         serde_json::to_writer_pretty(file.deref_mut(), &*artifact.contract_class)
@@ -122,7 +114,7 @@ impl ArtifactManager {
             let mut file = target_dir.open_rw(
                 format!("{file_name}.debug.json"),
                 &format!("sierra debug info for `{}`", qualified_path),
-                config,
+                self.workspace.config(),
             )?;
 
             serde_json::to_writer_pretty(file.deref_mut(), &**debug_info).with_context(|| {
@@ -134,14 +126,19 @@ impl ArtifactManager {
     }
 
     /// Saves the ABI of a compiled artifact to a JSON file.
-    pub fn save_abi(
+    ///
+    /// # Arguments
+    ///
+    /// * `qualified_path` - The cairo module qualified path.
+    /// * `target_dir` - The target directory to save the artifact to.
+    /// * `file_name` - The name of the file to save the artifact to, without extension.
+    pub fn write_abi(
         &self,
-        config: &Config,
-        target_dir: &Filesystem,
         qualified_path: &str,
+        target_dir: &Filesystem,
         file_name: &str,
     ) -> anyhow::Result<()> {
-        trace!(target_dir = %target_dir, qualified_path, file_name, "Saving abi file.");
+        trace!(target_dir = ?target_dir, qualified_path, file_name, "Saving abi file.");
 
         let artifact = self
             .get_artifact(qualified_path)
@@ -149,8 +146,8 @@ impl ArtifactManager {
 
         let mut file = target_dir.open_rw(
             format!("{file_name}.json"),
-            &format!("sierra class file for `{}`", qualified_path),
-            config,
+            &format!("abi file for `{}`", qualified_path),
+            self.workspace.config(),
         )?;
 
         serde_json::to_writer_pretty(file.deref_mut(), &artifact.contract_class.abi)
