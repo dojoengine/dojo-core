@@ -4,7 +4,7 @@ use std::process::exit;
 use anyhow::Result;
 use args::CompilerArgs;
 use clap::Parser;
-use dojo_compiler::compiler::{compiler, DojoCompiler};
+use dojo_compiler::compiler::{self, DojoCompiler};
 use dojo_compiler::plugin::CairoPluginRepository;
 use scarb::compiler::CompilerRepository;
 use scarb::core::Config;
@@ -47,7 +47,7 @@ fn cli_main(args: CompilerArgs) -> Result<()> {
 
     let manifest_path = scarb::ops::find_manifest_path(args.manifest_path.as_deref())?;
 
-    compiler::verify_cairo_version_compatibility(&manifest_path)?;
+    compiler::version::verify_cairo_version_compatibility(&manifest_path)?;
 
     let config = Config::builder(manifest_path.clone())
         .log_filter_directive(env::var_os("SCARB_LOG"))

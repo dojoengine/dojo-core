@@ -10,12 +10,15 @@ use cairo_lang_test_plugin::test_plugin_suite;
 use cairo_lang_test_runner::{CompiledTestRunner, RunProfilerConfig, TestCompiler, TestRunConfig};
 use clap::Args;
 use dojo_compiler::compiler::compiler::{
-    check_package_dojo_version, collect_core_crate_ids, collect_external_crate_ids, Props,
+    collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
 };
 use dojo_compiler::compiler::config::{CompilerConfig, DojoConfigLoader};
+use dojo_compiler::compiler::scarb_internal::{
+    cfg_set_from_component, crates_config_for_compilation_unit,
+};
+use dojo_compiler::compiler::version::check_package_dojo_version;
 use dojo_compiler::plugin::dojo_plugin_suite;
-use dojo_compiler::scarb_internal::{cfg_set_from_component, crates_config_for_compilation_unit};
-use scarb::compiler::helpers::{collect_all_crate_ids, collect_main_crate_ids};
+use scarb::compiler::helpers::collect_all_crate_ids;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnit, CompilationUnitAttributes};
 use scarb::core::{Config, Package, TargetKind};
 use scarb::ops::{self, CompileOpts};
@@ -164,13 +167,8 @@ impl TestArgs {
             let mut main_crate_ids = collect_all_crate_ids(&unit, &db);
             let test_crate_ids = collect_main_crate_ids(&unit, &db);
 
-            if unit.main_package_id.name.to_string() != "dojo" {
-                let core_crate_ids = collect_core_crate_ids(&db);
-                main_crate_ids.extend(core_crate_ids);
-            }
-
             if let Some(external_contracts) = props.build_external_contracts {
-                main_crate_ids.extend(collect_external_crate_ids(&db, external_contracts));
+                main_crate_ids.extend(collect_crates_ids_from_selectors(&db, &external_contracts));
             }
 
             let config = TestRunConfig {
@@ -224,7 +222,12 @@ fn build_project_config(unit: &CairoCompilationUnit) -> Result<ProjectConfig> {
         .filter(|c| !c.package.id.is_core())
         // NOTE: We're taking the first target of each compilation unit, which should always be the
         //       main package source root due to the order maintained by scarb.
-        .map(|c| (c.cairo_package_name(), c.targets[0].source_root().into()))
+        .map(|c| {
+            (
+                c.cairo_package_name(),
+                c.first_target().source_root().into(),
+            )
+        })
         .collect();
 
     let corelib = unit

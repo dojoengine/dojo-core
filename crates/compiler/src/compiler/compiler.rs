@@ -1,54 +1,46 @@
-use std::collections::HashMap;
+use std::fs;
 use std::rc::Rc;
-use std::str::FromStr;
 
 use anyhow::{anyhow, Context, Result};
 use cairo_lang_compiler::db::RootDatabase;
+use cairo_lang_compiler::CompilerConfig;
 use cairo_lang_defs::ids::NamedLanguageElementId;
 use cairo_lang_filesystem::db::FilesGroup;
 use cairo_lang_filesystem::ids::{CrateId, CrateLongId};
-use cairo_lang_semantic::db::SemanticGroup;
 use cairo_lang_starknet::compile::compile_prepared_db;
 use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
 use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cairo_lang_utils::UpcastMut;
-use camino::Utf8PathBuf;
-use convert_case::{Case, Casing};
+use dojo_types::naming;
 use itertools::{izip, Itertools};
-use scarb::compiler::helpers::{build_compiler_config, collect_main_crate_ids};
+use scarb::compiler::helpers::build_compiler_config;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
-use scarb::core::{Config, Package, PackageName, TargetKind, TomlManifest, Workspace};
+use scarb::core::{Config, Package, TargetKind, Workspace};
 use scarb::ops::CompileOpts;
 use scarb_ui::args::{FeaturesSpec, PackagesFilter};
-use semver::Version;
+use scarb_ui::Ui;
 use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
-use tracing::{debug, trace, trace_span};
+use tracing::{trace, trace_span};
 
-use crate::scarb_internal::debug::SierraToCairoDebugInfo;
+use crate::aux_data::DojoAuxData;
+use crate::compiler::manifest::{
+    AbstractBaseManifest, ContractManifest, ModelManifest, StarknetContractManifest,
+};
+use crate::scarb_extensions::{ProfileSpec, WorkspaceExt};
+use crate::{
+    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, MODELS_DIR,
+    RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
+};
 
-#[derive(Debug, Clone)]
-pub struct CompiledArtifact {
-    /// THe class hash of the Sierra contract.
-    pub class_hash: Felt,
-    /// The actual compiled Sierra contract class.
-    pub contract_class: Rc<ContractClass>,
-    pub debug_info: Option<Rc<SierraToCairoDebugInfo>>,
-}
-
-/// A type alias for a map of compiled artifacts by their path.
-type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
-
-const CAIRO_PATH_SEPARATOR: &str = "::";
-
-pub(crate) const LOG_TARGET: &str = "dojo_lang::compiler";
-
-#[cfg(test)]
-#[path = "compiler_test.rs"]
-mod test;
+use super::artifact_manager::{ArtifactManager, CompiledArtifact};
+use super::contract_selector::ContractSelector;
+use super::scarb_internal;
+use super::scarb_internal::debug::SierraToCairoDebugInfo;
+use super::version::check_package_dojo_version;
 
 #[derive(Debug, Default)]
 pub struct DojoCompiler {
@@ -82,21 +74,13 @@ impl DojoCompiler {
             check_package_dojo_version(&ws, p)?;
         }
 
-        let _profile_name = ws
-            .current_profile()
-            .expect("Scarb profile is expected.")
-            .to_string();
+        ws.profile_check()?;
 
-        // Manifest path is always a file, we can unwrap safely to get the parent folder.
-        let _manifest_dir = ws.manifest_path().parent().unwrap().to_path_buf();
-
-        // TODO: clean base manifests dir.
-        //let profile_dir = manifest_dir.join(MANIFESTS_DIR).join(profile_name);
-        //CleanArgs::clean_manifests(&profile_dir)?;
+        DojoCompiler::clean(config, ProfileSpec::WorkspaceCurrent, true)?;
 
         trace!(?packages);
 
-        let compile_info = crate::scarb_internal::compile_workspace(
+        let compile_info = scarb_internal::compile_workspace(
             config,
             CompileOpts {
                 include_target_names: vec![],
@@ -111,98 +95,52 @@ impl DojoCompiler {
 
         Ok(())
     }
-}
 
-/// Checks if the package has a compatible version of dojo-core.
-/// In case of a workspace with multiple packages, each package is individually checked
-/// and the workspace manifest path is returned in case of virtual workspace.
-pub fn check_package_dojo_version(ws: &Workspace<'_>, package: &Package) -> anyhow::Result<()> {
-    if let Some(dojo_dep) = package
-        .manifest
-        .summary
-        .dependencies
-        .iter()
-        .find(|dep| dep.name.as_str() == "dojo")
-    {
-        let dojo_version = env!("CARGO_PKG_VERSION");
+    pub fn clean(
+        config: &Config,
+        profile_spec: ProfileSpec,
+        remove_base_manifests: bool,
+    ) -> Result<()> {
+        let ws = scarb::ops::read_workspace(config.manifest_path(), config)?;
 
-        let dojo_dep_str = dojo_dep.to_string();
+        ws.profile_check()?;
 
-        // Only in case of git dependency with an explicit tag, we check if the tag is the same as
-        // the current version.
-        if dojo_dep_str.contains("git+")
-            && dojo_dep_str.contains("tag=v")
-            && !dojo_dep_str.contains(dojo_version)
-        {
-            if let Ok(cp) = ws.current_package() {
-                let path = if cp.id == package.id {
-                    package.manifest_path()
-                } else {
-                    ws.manifest_path()
-                };
+        let profile_name = ws
+            .current_profile()
+            .expect("Scarb profile is expected.")
+            .to_string();
 
-                anyhow::bail!(
-                    "Found dojo-core version mismatch: expected {}. Please verify your dojo \
-                     dependency in {}",
-                    dojo_version,
-                    path
-                )
-            } else {
-                // Virtual workspace.
-                anyhow::bail!(
-                    "Found dojo-core version mismatch: expected {}. Please verify your dojo \
-                     dependency in {}",
-                    dojo_version,
-                    ws.manifest_path()
-                )
+        trace!(
+            profile = profile_name,
+            ?profile_spec,
+            remove_base_manifests,
+            "Cleaning dojo compiler artifacts."
+        );
+
+        // Ignore fails to remove the directories as it might not exist.
+        match profile_spec {
+            ProfileSpec::All => {
+                let target_dir = ws.target_dir();
+                let _ = fs::remove_dir_all(target_dir.to_string());
+
+                if remove_base_manifests {
+                    let manifest_dir = ws.dojo_manifests_dir();
+                    let _ = fs::remove_dir_all(manifest_dir.to_string());
+                }
+            }
+            ProfileSpec::WorkspaceCurrent => {
+                let target_dir_profile = ws.target_dir_profile();
+                let _ = fs::remove_dir_all(target_dir_profile.to_string());
+
+                if remove_base_manifests {
+                    let manifest_dir_profile = ws.dojo_base_manfiests_dir_profile();
+                    let _ = fs::remove_dir_all(manifest_dir_profile.to_string());
+                }
             }
         }
+
+        Ok(())
     }
-
-    Ok(())
-}
-
-pub fn generate_version() -> String {
-    const DOJO_VERSION: &str = env!("CARGO_PKG_VERSION");
-    let scarb_version = scarb::version::get().version;
-    let scarb_sierra_version = scarb::version::get().sierra.version;
-    let scarb_cairo_version = scarb::version::get().cairo.version;
-
-    let version_string = format!(
-        "{}\nscarb: {}\ncairo: {}\nsierra: {}",
-        DOJO_VERSION, scarb_version, scarb_cairo_version, scarb_sierra_version,
-    );
-    version_string
-}
-
-/// Verifies that the Cairo version specified in the manifest file is compatible with the current
-/// version of Cairo used by Dojo.
-pub fn verify_cairo_version_compatibility(manifest_path: &Utf8PathBuf) -> Result<()> {
-    let scarb_cairo_version = scarb::version::get().cairo;
-
-    let Ok(manifest) = TomlManifest::read_from_path(manifest_path) else {
-        return Ok(());
-    };
-    let Some(package) = manifest.package else {
-        return Ok(());
-    };
-    let Some(cairo_version) = package.cairo_version else {
-        return Ok(());
-    };
-
-    let version_req = cairo_version.as_defined().unwrap();
-    let version = Version::from_str(scarb_cairo_version.version).unwrap();
-
-    trace!(version_req = %version_req, version = %version, "Cairo version compatibility.");
-
-    if !version_req.matches(&version) {
-        anyhow::bail!(
-            "Cairo version `{version_req}` specified in the manifest file `{manifest_path}` is not supported by dojo, which is expecting `{version}`. \
-             Please verify and update dojo or change the Cairo version in the manifest file.",
-        );
-    };
-
-    Ok(())
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -211,37 +149,16 @@ pub struct Props {
     pub build_external_contracts: Option<Vec<ContractSelector>>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ContractSelector(String);
+impl Props {
+    /// Verifies the props are correct.
+    pub fn verify(&self) -> Result<()> {
+        if let Some(external_contracts) = self.build_external_contracts.clone() {
+            for selector in external_contracts.iter() {
+                selector.is_valid()?;
+            }
+        }
 
-impl ContractSelector {
-    fn package(&self) -> PackageName {
-        let parts = self
-            .0
-            .split_once(CAIRO_PATH_SEPARATOR)
-            .unwrap_or((self.0.as_str(), ""));
-        PackageName::new(parts.0)
-    }
-
-    /// Returns the path with the model name in snake case.
-    /// This is used to match the output of the `compile()` function and Dojo plugin naming for
-    /// models contracts.
-    fn path_with_model_snake_case(&self) -> String {
-        let (path, last_segment) = self
-            .0
-            .rsplit_once(CAIRO_PATH_SEPARATOR)
-            .unwrap_or(("", &self.0));
-
-        // We don't want to snake case the whole path because some of names like `erc20`
-        // will be changed to `erc_20`, and leading to invalid paths.
-        // The model name has to be snaked case as it's how the Dojo plugin names the Model's
-        // contract.
-        format!(
-            "{}{}{}",
-            path,
-            CAIRO_PATH_SEPARATOR,
-            last_segment.to_case(Case::Snake)
-        )
+        Ok(())
     }
 }
 
@@ -250,7 +167,6 @@ impl Compiler for DojoCompiler {
         TargetKind::new("dojo")
     }
 
-    // TODO: refacto the main loop here, could be much more simpler and efficient.
     fn compile(
         &self,
         unit: CairoCompilationUnit,
@@ -258,107 +174,202 @@ impl Compiler for DojoCompiler {
         ws: &Workspace<'_>,
     ) -> Result<()> {
         let props: Props = unit.main_component().target_props()?;
-        //let target_dir = unit.target_dir(ws);
+        props.verify()?;
 
-        // TODO: if we want to output the manifests at the package level,
-        // we must iterate on the ws members, to find the location of the
-        // sole package with the `dojo` target.
-        // In this case, we can use this path to output the manifests.
-
-        let mut main_crate_ids = collect_main_crate_ids(&unit, db);
-        let core_crate_ids: Vec<CrateId> = collect_core_crate_ids(db);
-        main_crate_ids.extend(core_crate_ids);
-
+        let main_crate_ids = collect_main_crate_ids(&unit, db);
         let compiler_config = build_compiler_config(&unit, &main_crate_ids, ws);
 
-        trace!(target: LOG_TARGET, unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
+        trace!(unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
 
         let contracts = find_project_contracts(
-            db.upcast_mut(),
+            db,
             main_crate_ids.clone(),
             props.build_external_contracts.clone(),
+            &ws.config().ui(),
         )?;
 
-        let contract_paths = contracts
-            .iter()
-            .map(|decl| decl.module_id().full_path(db.upcast_mut()))
-            .collect::<Vec<_>>();
-        trace!(target: LOG_TARGET, contracts = ?contract_paths);
+        let artifact_manager =
+            compile_contracts(db, &contracts, compiler_config, &ws, self.output_debug_info)?;
 
-        let contracts = contracts.iter().collect::<Vec<_>>();
+        let aux_data = DojoAuxData::from_crates(&main_crate_ids, db);
 
-        let classes = {
-            let _ = trace_span!("compile_starknet").enter();
-            compile_prepared_db(db, &contracts, compiler_config)?
-        };
+        let mut base_manifest = AbstractBaseManifest::new(ws);
 
-        let debug_info_classes: Vec<Option<SierraToCairoDebugInfo>> = if self.output_debug_info {
-            let debug_classes =
-                crate::scarb_internal::debug::compile_prepared_db_to_debug_info(db, &contracts)?;
+        // Combine the aux data info about the contracts with the artifact data
+        // to create the manifests.
+        let contracts = write_dojo_contracts_artifacts(&artifact_manager, &aux_data)?;
+        let models = write_dojo_models_artifacts(&artifact_manager, &aux_data)?;
+        let (world, base, sn_contracts) =
+            write_sn_contract_artifacts(&artifact_manager, &aux_data)?;
 
-            debug_classes
-                .into_iter()
-                .map(|d| Some(crate::scarb_internal::debug::get_sierra_to_cairo_debug_info(&d, db)))
-                .collect()
-        } else {
-            vec![None; contracts.len()]
-        };
+        base_manifest.world = world;
+        base_manifest.base = base;
+        base_manifest.contracts.extend(contracts);
+        base_manifest.models.extend(models);
+        base_manifest.sn_contracts.extend(sn_contracts);
 
-        let mut compiled_classes: CompiledArtifactByPath = HashMap::new();
-        let list_selector = ListSelector::default();
+        base_manifest.write()?;
 
-        for (decl, contract_class, debug_info) in izip!(contracts, classes, debug_info_classes) {
-            let contract_name = decl.submodule_id.name(db.upcast_mut());
-            // note that the qualified path is in snake case while
-            // the `full_path()` method of StructId uses the original struct name case.
-            // (see in `get_dojo_model_artifacts`)
-            let qualified_path = decl.module_id().full_path(db.upcast_mut());
-
-            match contract_class.validate_version_compatible(list_selector.clone()) {
-                Ok(()) => {}
-                Err(AllowedLibfuncsError::UnsupportedLibfunc {
-                    invalid_libfunc,
-                    allowed_libfuncs_list_name: _,
-                }) => {
-                    let diagnostic = format! {r#"
-                        Contract `{contract_name}` ({qualified_path}) includes `{invalid_libfunc}` function that is not allowed in the default libfuncs for public Starknet networks (mainnet, sepolia).
-                        It will work on Katana, but don't forget to remove it before deploying on a public Starknet network.
-                    "#};
-
-                    ws.config().ui().warn(diagnostic);
-                }
-                Err(e) => {
-                    return Err(e).with_context(|| {
-                        format!(
-                            "Failed to check allowed libfuncs for contract: {}",
-                            contract_name
-                        )
-                    });
-                }
-            }
-
-            let class_hash =
-                compute_class_hash_of_contract_class(&contract_class).with_context(|| {
-                    format!(
-                        "problem computing class hash for contract `{}`",
-                        qualified_path.clone()
-                    )
-                })?;
-
-            compiled_classes.insert(
-                qualified_path,
-                CompiledArtifact {
-                    class_hash,
-                    contract_class: Rc::new(contract_class),
-                    debug_info: debug_info.map(Rc::new),
-                },
-            );
-        }
+        // TODO: add a check to ensure all the artifacts have been processed?
 
         Ok(())
     }
 }
 
+/// Finds the contracts in the project.
+///
+/// First searches for internal contracts in the main crates.
+/// Then searches for external contracts in the external crates.
+fn find_project_contracts(
+    db: &mut RootDatabase,
+    main_crate_ids: Vec<CrateId>,
+    external_contracts: Option<Vec<ContractSelector>>,
+    ui: &Ui,
+) -> Result<Vec<ContractDeclaration>> {
+    let internal_contracts = {
+        let _ = trace_span!("find_internal_contracts").enter();
+        find_contracts(db, &main_crate_ids)
+    };
+
+    let external_contracts = if let Some(external_contracts) = external_contracts {
+        let _ = trace_span!("find_external_contracts").enter();
+        trace!(external_contracts = ?external_contracts, "External contracts selectors from manifest.");
+
+        let crate_ids = collect_crates_ids_from_selectors(db, &external_contracts);
+
+        let filtered_contracts: Vec<ContractDeclaration> = find_contracts(db, crate_ids.as_ref())
+            .into_iter()
+            .filter(|decl| {
+                let contract_path = decl.module_id().full_path(db);
+                external_contracts
+                    .iter()
+                    .any(|selector| selector.matches(&contract_path))
+            })
+            .collect::<Vec<ContractDeclaration>>();
+
+        // Display warnings for external contracts that were not found, due to invalid paths
+        // most of the time.
+        external_contracts
+            .iter()
+            .filter(|selector| {
+                !filtered_contracts.iter().any(|decl| {
+                    let contract_path = decl.module_id().full_path(db);
+                    selector.matches(&contract_path)
+                })
+            })
+            .for_each(|selector| {
+                let diagnostic = format!("No contract found for path `{}`.", selector.full_path());
+                ui.warn(diagnostic);
+            });
+
+        filtered_contracts
+    } else {
+        trace!("No external contracts found in the manifest.");
+        Vec::new()
+    };
+
+    let all_contracts: Vec<ContractDeclaration> = internal_contracts
+        .into_iter()
+        .chain(external_contracts)
+        .collect();
+
+    // Display contracts that were found.
+    let contract_paths = all_contracts
+        .iter()
+        .map(|decl| decl.module_id().full_path(db))
+        .collect::<Vec<_>>();
+
+    trace!(contracts = ?contract_paths, "Collecting contracts eligible for compilation.");
+
+    Ok(all_contracts)
+}
+
+/// Compiles the contracts.
+fn compile_contracts<'w>(
+    db: &mut RootDatabase,
+    contracts: &[ContractDeclaration],
+    compiler_config: CompilerConfig,
+    ws: &'w Workspace<'w>,
+    do_output_debug_info: bool,
+) -> Result<ArtifactManager<'w>> {
+    let contracts: Vec<&ContractDeclaration> = contracts.iter().collect::<Vec<_>>();
+
+    let classes = {
+        let _ = trace_span!("compile_starknet").enter();
+        compile_prepared_db(db, &contracts, compiler_config)?
+    };
+
+    let debug_info_classes: Vec<Option<SierraToCairoDebugInfo>> = if do_output_debug_info {
+        let debug_classes =
+            scarb_internal::debug::compile_prepared_db_to_debug_info(db, &contracts)?;
+
+        debug_classes
+            .into_iter()
+            .map(|d| {
+                Some(scarb_internal::debug::get_sierra_to_cairo_debug_info(
+                    &d, db,
+                ))
+            })
+            .collect()
+    } else {
+        vec![None; contracts.len()]
+    };
+
+    let mut artifact_manager = ArtifactManager::new(ws);
+    let list_selector = ListSelector::default();
+
+    for (decl, contract_class, debug_info) in izip!(contracts, classes, debug_info_classes) {
+        let contract_name = decl.submodule_id.name(db.upcast_mut());
+        // note that the qualified path is in snake case while
+        // the `full_path()` method of StructId uses the original struct name case.
+        // (see in `get_dojo_model_artifacts`)
+        let qualified_path = decl.module_id().full_path(db.upcast_mut());
+
+        match contract_class.validate_version_compatible(list_selector.clone()) {
+            Ok(()) => {}
+            Err(AllowedLibfuncsError::UnsupportedLibfunc {
+                invalid_libfunc,
+                allowed_libfuncs_list_name: _,
+            }) => {
+                let diagnostic = format! {r#"
+                    Contract `{contract_name}` ({qualified_path}) includes `{invalid_libfunc}` function that is not allowed in the default libfuncs for public Starknet networks (mainnet, sepolia).
+                    It will work on Katana, but don't forget to remove it before deploying on a public Starknet network.
+                "#};
+
+                ws.config().ui().warn(diagnostic);
+            }
+            Err(e) => {
+                return Err(e).with_context(|| {
+                    format!(
+                        "Failed to check allowed libfuncs for contract: {}",
+                        contract_name
+                    )
+                });
+            }
+        }
+
+        let class_hash =
+            compute_class_hash_of_contract_class(&contract_class).with_context(|| {
+                format!(
+                    "problem computing class hash for contract `{}`",
+                    qualified_path.clone()
+                )
+            })?;
+
+        artifact_manager.add_artifact(
+            qualified_path,
+            CompiledArtifact {
+                class_hash,
+                contract_class: Rc::new(contract_class),
+                debug_info: debug_info.map(Rc::new),
+            },
+        );
+    }
+
+    Ok(artifact_manager)
+}
+
+/// Computes the class hash of a contract class.
 fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
     let class_str = serde_json::to_string(&class)?;
     let sierra_class = serde_json::from_str::<SierraClass>(&class_str)
@@ -368,71 +379,156 @@ fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
         .map_err(|e| anyhow!("problem hashing sierra contract: {e}"))
 }
 
-fn find_project_contracts(
-    mut db: &dyn SemanticGroup,
-    main_crate_ids: Vec<CrateId>,
-    external_contracts: Option<Vec<ContractSelector>>,
-) -> Result<Vec<ContractDeclaration>> {
-    let internal_contracts = {
-        let _ = trace_span!("find_internal_contracts").enter();
-        find_contracts(db, &main_crate_ids)
-    };
+/// Collects the main crate ids for Dojo including the core crates.
+pub fn collect_main_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) -> Vec<CrateId> {
+    let mut main_crate_ids = scarb::compiler::helpers::collect_main_crate_ids(&unit, db);
 
-    let external_contracts = if let Some(external_contracts) = external_contracts {
-        let _ = trace_span!("find_external_contracts").enter();
-        debug!(target: LOG_TARGET, external_contracts = ?external_contracts, "External contracts selectors.");
+    if unit.main_package_id.name.to_string() != "dojo" {
+        let core_crate_ids: Vec<CrateId> = collect_crates_ids_from_selectors(
+            db,
+            &[
+                ContractSelector::new("dojo::contract::base_contract::base".to_string()),
+                ContractSelector::new("dojo::world::world_contract::world".to_string()),
+            ],
+        );
 
-        let crate_ids = external_contracts
-            .iter()
-            .map(|selector| selector.package().into())
-            .unique()
-            .map(|package_name: SmolStr| {
-                debug!(target: LOG_TARGET, %package_name, "Looking for internal crates.");
-                db.upcast_mut()
-                    .intern_crate(CrateLongId::Real(package_name))
-            })
-            .collect::<Vec<_>>();
+        main_crate_ids.extend(core_crate_ids);
+    }
 
-        find_contracts(db, crate_ids.as_ref())
-            .into_iter()
-            .filter(|decl| {
-                let contract_path = decl.module_id().full_path(db.upcast());
-                external_contracts
-                    .iter()
-                    .any(|selector| contract_path == selector.path_with_model_snake_case())
-            })
-            .collect::<Vec<ContractDeclaration>>()
-    } else {
-        debug!(target: LOG_TARGET, "No external contracts selected.");
-        Vec::new()
-    };
-
-    Ok(internal_contracts
-        .into_iter()
-        .chain(external_contracts)
-        .collect())
+    main_crate_ids
 }
 
-pub fn collect_core_crate_ids(db: &RootDatabase) -> Vec<CrateId> {
-    [
-        ContractSelector("dojo::contract::base_contract::base".to_string()),
-        ContractSelector("dojo::world::world_contract::world".to_string()),
-    ]
-    .iter()
-    .map(|selector| selector.package().into())
-    .unique()
-    .map(|package_name: SmolStr| db.intern_crate(CrateLongId::Real(package_name)))
-    .collect::<Vec<_>>()
-}
-
-pub fn collect_external_crate_ids(
+/// Collects the crate ids containing the given contract selectors.
+pub fn collect_crates_ids_from_selectors(
     db: &RootDatabase,
-    external_contracts: Vec<ContractSelector>,
+    contract_selectors: &[ContractSelector],
 ) -> Vec<CrateId> {
-    external_contracts
+    contract_selectors
         .iter()
         .map(|selector| selector.package().into())
         .unique()
         .map(|package_name: SmolStr| db.intern_crate(CrateLongId::Real(package_name)))
         .collect::<Vec<_>>()
+}
+
+/// Writes the dojo contracts artifacts to the target directory and returns the contract manifests.
+fn write_dojo_contracts_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<Vec<ContractManifest>> {
+    let mut contracts = Vec::new();
+
+    for (qualified_path, contract_aux_data) in aux_data.contracts.iter() {
+        let tag = naming::get_tag(&contract_aux_data.namespace, &contract_aux_data.name);
+        let filename = naming::get_filename_from_tag(&tag);
+
+        let target_dir = artifact_manager
+            .workspace()
+            .target_dir_profile()
+            .child(CONTRACTS_DIR);
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
+
+        contracts.push(ContractManifest {
+            class_hash: artifact_manager.get_class_hash(qualified_path)?,
+            qualified_path: qualified_path.to_string(),
+            tag,
+            systems: contract_aux_data.systems.clone(),
+        });
+    }
+
+    Ok(contracts)
+}
+
+/// Writes the dojo models artifacts to the target directory and returns the model manifests.
+fn write_dojo_models_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<Vec<ModelManifest>> {
+    let mut models = Vec::new();
+
+    for (qualified_path, model_aux_data) in aux_data.models.iter() {
+        let tag = naming::get_tag(&model_aux_data.namespace, &model_aux_data.name);
+        let filename = naming::get_filename_from_tag(&tag);
+
+        let target_dir = artifact_manager
+            .workspace()
+            .target_dir_profile()
+            .child(MODELS_DIR);
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
+
+        models.push(ModelManifest {
+            class_hash: artifact_manager.get_class_hash(qualified_path)?,
+            qualified_path: qualified_path.to_string(),
+            tag,
+            members: model_aux_data.members.clone(),
+        });
+    }
+
+    Ok(models)
+}
+
+/// Writes the starknet contracts artifacts to the target directory and returns the starknet contract manifests.
+///
+/// Returns a tuple with the world contract manifest, the base contract manifest and the other starknet contract manifests.
+fn write_sn_contract_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<(
+    StarknetContractManifest,
+    StarknetContractManifest,
+    Vec<StarknetContractManifest>,
+)> {
+    let mut contracts = Vec::new();
+    let mut world = StarknetContractManifest::default();
+    let mut base = StarknetContractManifest::default();
+
+    for (qualified_path, contract_name) in aux_data.sn_contracts.iter() {
+        let target_dir = artifact_manager.workspace().target_dir_profile();
+
+        let file_name = match qualified_path.as_str() {
+            WORLD_QUALIFIED_PATH => {
+                let name = WORLD_CONTRACT_TAG.to_string();
+
+                world = StarknetContractManifest {
+                    class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                    qualified_path: qualified_path.to_string(),
+                    name: name.clone(),
+                };
+
+                name
+            }
+            BASE_QUALIFIED_PATH => {
+                let name = BASE_CONTRACT_TAG.to_string();
+
+                base = StarknetContractManifest {
+                    class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                    qualified_path: qualified_path.to_string(),
+                    name: name.clone(),
+                };
+
+                name
+            }
+            RESOURCE_METADATA_QUALIFIED_PATH => {
+                // Skip this dojo contract as not used in the migration process.
+                continue;
+            }
+            _ => {
+                let file_name = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
+
+                contracts.push(StarknetContractManifest {
+                    class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                    qualified_path: qualified_path.to_string(),
+                    name: contract_name.clone(),
+                });
+
+                file_name
+            }
+        };
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &file_name)?;
+    }
+
+    Ok((world, base, contracts))
 }

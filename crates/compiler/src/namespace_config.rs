@@ -10,6 +10,12 @@ pub const DEFAULT_NAMESPACE_CFG_KEY: &str = "namespace_default";
 pub const DOJO_MANIFESTS_DIR_CFG_KEY: &str = "dojo_manifests_dir";
 pub const DEFAULT_NAMESPACE: &str = "DEFAULT_NAMESPACE";
 
+/// Check if the provided name follows the format rules for Dojo toolchain.
+/// It's not yet enforced at the world level though.
+pub fn is_name_valid(name: &str) -> bool {
+    Regex::new(r"^[a-zA-Z0-9_]+$").unwrap().is_match(name)
+}
+
 /// Namespace configuration.
 #[derive(Debug, Clone, Deserialize)]
 pub struct NamespaceConfig {

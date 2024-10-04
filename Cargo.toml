@@ -35,7 +35,7 @@ auto_impl = "1.2.0"
 base64 = "0.21.2"
 bigdecimal = "0.4.1"
 bytes = "1.6"
-cainome = { git = "https://github.com/cartridge-gg/cainome", rev = "da96e0a", features = [ "abigen-rs" ] }
+cainome = { git = "https://github.com/cartridge-gg/cainome", tag = "v0.4.3", features = [ "abigen-rs" ] }
 cairo-lang-compiler = "=2.7.1"
 cairo-lang-debug = "=2.7.1"
 cairo-lang-defs = "=2.7.1"
