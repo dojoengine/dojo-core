@@ -17,6 +17,9 @@ pub trait FilesystemExt {
     ///
     /// This is a helper function since flock [`Filesystem`] only has a child method.
     fn children(&self, sub_dirs: &[impl AsRef<Utf8Path>]) -> Filesystem;
+
+    /// Lists all the files in the filesystem root, not recursively.
+    fn list_files(&self) -> Result<Vec<String>>;
 }
 
 impl FilesystemExt for Filesystem {
@@ -33,6 +36,21 @@ impl FilesystemExt for Filesystem {
 
         result
     }
+
+    fn list_files(&self) -> Result<Vec<String>> {
+        let mut files = Vec::new();
+
+        let path = self.to_string();
+
+        for entry in std::fs::read_dir(path)? {
+            let entry = entry?;
+            if entry.file_type()?.is_file() {
+                files.push(entry.file_name().to_string_lossy().to_string());
+            }
+        }
+
+        Ok(files)
+    }
 }
 
 /// Extension trait for the [`Workspace`] type.
@@ -43,6 +61,8 @@ pub trait WorkspaceExt {
     fn dojo_base_manfiests_dir_profile(&self) -> Filesystem;
     /// Returns the base manifests directory.
     fn dojo_manifests_dir(&self) -> Filesystem;
+    /// Returns the manifests directory for the current profile.
+    fn dojo_manifests_dir_profile(&self) -> Filesystem;
     /// Checks if the current profile is valid for the workspace.
     fn profile_check(&self) -> Result<()>;
 }
@@ -70,6 +90,16 @@ impl WorkspaceExt for Workspace<'_> {
     fn dojo_manifests_dir(&self) -> Filesystem {
         let base_dir = self.manifest_path().parent().unwrap();
         Filesystem::new(base_dir.to_path_buf()).child(MANIFESTS_DIR)
+    }
+
+    fn dojo_manifests_dir_profile(&self) -> Filesystem {
+        let manifests_dir = self.dojo_manifests_dir();
+
+        manifests_dir.child(
+            self.current_profile()
+                .expect("Current profile always exists")
+                .as_str(),
+        )
     }
 
     fn profile_check(&self) -> Result<()> {

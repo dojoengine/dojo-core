@@ -2,7 +2,6 @@
 
 This repository contains the contracts and associated tooling for Dojo.
 
-
 It includes the following crates:
 
 * `contracts`: the core contracts and logic for Dojo written in Cairo.
@@ -30,8 +29,6 @@ You can also compiles the examples by using the demo compiler, adjusting the pat
 ## Abigen
 
 Using [cainome](https://github.com/cartridge-gg/cainome) to generate the bindings from the Cairo ABI, the bindings must be maintained up to date with the contracts.
-
-/!\ The commands below will work when the compiler will newly generate the artifacts /!\
 
 ```bash
 # Note, use `-r` to run the binary in release mode as Scarb is very slow in debug mode.

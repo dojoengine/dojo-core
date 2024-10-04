@@ -4,7 +4,7 @@
 //! the contracts being compiled, since in Dojo
 //! every resource is represented as a starknet contract.
 
-use std::io::Write;
+use std::io::{Read, Write};
 
 use anyhow::Result;
 use dojo_types::naming;
@@ -14,7 +14,7 @@ use serde_with::serde_as;
 use starknet::core::serde::unsigned_field_element::UfeHex;
 use starknet::core::types::Felt;
 
-use crate::scarb_extensions::WorkspaceExt;
+use crate::scarb_extensions::{FilesystemExt, WorkspaceExt};
 use crate::{
     BASE_CONTRACT_TAG, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, MODELS_DIR, WORLD_CONTRACT_TAG,
 };
@@ -98,6 +98,57 @@ impl<'w> AbstractBaseManifest<'w> {
             sn_contracts: vec![],
         }
     }
+
+    pub fn read(&mut self) -> Result<()> {
+        let base_dir = self.workspace.dojo_base_manfiests_dir_profile();
+
+        let contracts_dir = base_dir.child(CONTRACTS_DIR);
+        for file_name in contracts_dir.list_files()? {
+            let mut file = contracts_dir.open_ro(
+                &file_name,
+                &format!("contract manifest for `{}`", &file_name),
+                self.workspace.config(),
+            )?;
+            let mut contract_str = String::new();
+            file.read_to_string(&mut contract_str)?;
+            self.contracts.push(toml::from_str(&contract_str)?);
+        }
+
+        let models_dir = base_dir.child(MODELS_DIR);
+        for file_name in models_dir.list_files()? {
+            let mut file = models_dir.open_ro(
+                &file_name,
+                &format!("model manifest for `{}`", &file_name),
+                self.workspace.config(),
+            )?;
+            let mut model_str = String::new();
+            file.read_to_string(&mut model_str)?;
+            self.models.push(toml::from_str(&model_str)?);
+        }
+
+        for file_name in base_dir.list_files()? {
+            let mut file = base_dir.open_ro(
+                &file_name,
+                &format!("starknet contract manifest for `{}`", &file_name),
+                self.workspace.config(),
+            )?;
+            let mut sn_contract_str = String::new();
+            file.read_to_string(&mut sn_contract_str)?;
+
+            if file_name == format!("{}.toml", naming::get_filename_from_tag(WORLD_CONTRACT_TAG)) {
+                self.world = toml::from_str(&sn_contract_str)?;
+            } else if file_name
+                == format!("{}.toml", naming::get_filename_from_tag(BASE_CONTRACT_TAG))
+            {
+                self.base = toml::from_str(&sn_contract_str)?;
+            } else {
+                self.sn_contracts.push(toml::from_str(&sn_contract_str)?);
+            }
+        }
+
+        Ok(())
+    }
+
     /// Writes the manifest to the given path.
     ///
     /// # Arguments

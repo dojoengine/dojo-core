@@ -176,7 +176,7 @@ impl Compiler for DojoCompiler {
         let props: Props = unit.main_component().target_props()?;
         props.verify()?;
 
-        let main_crate_ids = collect_main_crate_ids(&unit, db);
+        let main_crate_ids = collect_main_crate_ids(&unit, db, true);
         let compiler_config = build_compiler_config(&unit, &main_crate_ids, ws);
 
         trace!(unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
@@ -380,15 +380,19 @@ fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
 }
 
 /// Collects the main crate ids for Dojo including the core crates.
-pub fn collect_main_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) -> Vec<CrateId> {
+pub fn collect_main_crate_ids(
+    unit: &CairoCompilationUnit,
+    db: &RootDatabase,
+    with_dojo_core: bool,
+) -> Vec<CrateId> {
     let mut main_crate_ids = scarb::compiler::helpers::collect_main_crate_ids(&unit, db);
 
-    if unit.main_package_id.name.to_string() != "dojo" {
+    if unit.main_package_id.name.to_string() != "dojo" && with_dojo_core {
         let core_crate_ids: Vec<CrateId> = collect_crates_ids_from_selectors(
             db,
             &[
-                ContractSelector::new("dojo::contract::base_contract::base".to_string()),
-                ContractSelector::new("dojo::world::world_contract::world".to_string()),
+                ContractSelector::new(WORLD_QUALIFIED_PATH.to_string()),
+                ContractSelector::new(BASE_QUALIFIED_PATH.to_string()),
             ],
         );
 
