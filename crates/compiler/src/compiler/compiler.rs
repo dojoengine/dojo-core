@@ -488,39 +488,50 @@ fn write_sn_contract_artifacts(
     let mut world = StarknetContractManifest::default();
     let mut base = StarknetContractManifest::default();
 
-    for (qualified_path, name) in aux_data.sn_contracts.iter() {
-        let filename = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
-
+    for (qualified_path, contract_name) in aux_data.sn_contracts.iter() {
         let target_dir = artifact_manager.workspace().target_dir_profile();
 
-        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-        match qualified_path.as_str() {
+        let file_name = match qualified_path.as_str() {
             WORLD_QUALIFIED_PATH => {
+                let name = WORLD_CONTRACT_TAG.to_string();
+
                 world = StarknetContractManifest {
                     class_hash: artifact_manager.get_class_hash(qualified_path)?,
                     qualified_path: qualified_path.to_string(),
-                    name: WORLD_CONTRACT_TAG.to_string(),
+                    name: name.clone(),
                 };
+
+                name
             }
             BASE_QUALIFIED_PATH => {
+                let name = BASE_CONTRACT_TAG.to_string();
+
                 base = StarknetContractManifest {
                     class_hash: artifact_manager.get_class_hash(qualified_path)?,
                     qualified_path: qualified_path.to_string(),
-                    name: BASE_CONTRACT_TAG.to_string(),
+                    name: name.clone(),
                 };
+
+                name
             }
             RESOURCE_METADATA_QUALIFIED_PATH => {
                 // Skip this dojo contract as not used in the migration process.
+                continue;
             }
             _ => {
+                let file_name = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
+
                 contracts.push(StarknetContractManifest {
                     class_hash: artifact_manager.get_class_hash(qualified_path)?,
                     qualified_path: qualified_path.to_string(),
-                    name: name.clone(),
+                    name: contract_name.clone(),
                 });
+
+                file_name
             }
-        }
+        };
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &file_name)?;
     }
 
     Ok((world, base, contracts))
