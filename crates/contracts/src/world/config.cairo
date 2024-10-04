@@ -14,7 +14,6 @@ pub trait IConfig<T> {
     /// # Arguments
     ///
     /// * `program_hash` - The program hash.
-    /// * `config_hash` - The program's config hash.
     fn set_differ_program_hash(ref self: T, program_hash: felt252);
     fn set_merger_program_hash(ref self: T, program_hash: felt252);
 
