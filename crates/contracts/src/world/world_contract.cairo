@@ -732,9 +732,6 @@ pub mod world {
         ///
         /// * `ClassHash` - The new class hash of the contract.
         fn upgrade_contract(ref self: ContractState, class_hash: ClassHash) -> ClassHash {
-<<<<<<< HEAD
-            let new_descriptor = DescriptorTrait::from_library_assert(class_hash);
-=======
             // Using a library call is not safe as arbitrary code is executed.
             // But deploying the contract we can check the descriptor.
             // If a new syscall supports calling library code with safety checks, we could switch
@@ -745,7 +742,6 @@ pub mod world {
                 .unwrap_syscall();
 
             let new_descriptor = DescriptorTrait::from_contract_assert(check_address);
->>>>>>> main
 
             if let Resource::Contract((contract_address, _)) = self
                 .resources
