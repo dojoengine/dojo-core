@@ -45,12 +45,7 @@ fn test_grant_owner_not_registered_resource() {
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_grant_owner_through_malicious_contract() {
     let world = deploy_world();
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
@@ -71,7 +66,7 @@ fn test_grant_owner_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `659918` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -90,12 +85,7 @@ fn test_grant_owner_fails_for_non_owner() {
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_revoke_owner_through_malicious_contract() {
     let world = deploy_world();
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
@@ -117,7 +107,7 @@ fn test_revoke_owner_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `659918` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -162,12 +152,7 @@ fn test_writer_not_registered_resource() {
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_grant_writer_through_malicious_contract() {
     let world = deploy_world();
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
@@ -188,7 +173,7 @@ fn test_grant_writer_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `659918` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -207,12 +192,7 @@ fn test_grant_writer_fails_for_non_owner() {
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_revoke_writer_through_malicious_contract() {
     let world = deploy_world();
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
@@ -234,7 +214,7 @@ fn test_revoke_writer_through_malicious_contract() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `659918` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        "Account `659918` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED'
     )
 )]
@@ -246,7 +226,7 @@ fn test_revoke_writer_fails_for_non_owner() {
     let alice = starknet::contract_address_const::<0xa11ce>();
     let bob = starknet::contract_address_const::<0xb0b>();
 
-    world.grant_writer(foo_selector, bob);
+    world.grant_owner(foo_selector, bob);
 
     starknet::testing::set_account_contract_address(alice);
     starknet::testing::set_contract_address(alice);
@@ -257,7 +237,7 @@ fn test_revoke_writer_fails_for_non_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `dojo-foo_setter` has no write access on model (or it's namespace) `dojo-Foo`",
+        "Contract `dojo-foo_setter` does NOT have WRITER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED',
         'ENTRYPOINT_FAILED'
     )

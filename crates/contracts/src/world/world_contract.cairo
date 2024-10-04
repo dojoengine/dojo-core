@@ -1,3 +1,4 @@
+use core::fmt::{Display, Formatter, Error};
 use core::option::OptionTrait;
 use core::traits::{Into, TryInto};
 use starknet::{ContractAddress, ClassHash, storage_access::StorageBaseAddress, SyscallResult};
@@ -5,14 +6,42 @@ use starknet::{ContractAddress, ClassHash, storage_access::StorageBaseAddress, S
 use dojo::model::{ModelIndex, ResourceMetadata};
 use dojo::model::{Layout};
 
+/// Resource is the type of the resource that can be registered in the world.
+///
+/// Caching the namespace hash of a contract and model in the world saves gas, instead
+/// of re-computing the descriptor each time, which involves several poseidon hash
+/// operations.
+///
+/// - Model: (ContractAddress, NamespaceHash)
+/// - Contract: (ContractAddress, NamespaceHash)
+/// - Namespace: ByteArray
+/// - World: The world itself, identified by the selector 0.
+/// - Unregistered: The unregistered state.
 #[derive(Drop, starknet::Store, Serde, Default, Debug)]
 pub enum Resource {
-    Model: (ClassHash, ContractAddress),
-    Contract: (ClassHash, ContractAddress),
-    Namespace,
+    Model: (ContractAddress, felt252),
+    Contract: (ContractAddress, felt252),
+    Namespace: ByteArray,
     World,
     #[default]
     Unregistered,
+}
+
+#[derive(Copy, Drop, PartialEq)]
+pub enum Permission {
+    Writer,
+    Owner,
+}
+
+impl PermissionDisplay of Display<Permission> {
+    fn fmt(self: @Permission, ref f: Formatter) -> Result<(), Error> {
+        let str = match self {
+            Permission::Writer => @"WRITER",
+            Permission::Owner => @"OWNER",
+        };
+        f.buffer.append(str);
+        Result::Ok(())
+    }
 }
 
 #[starknet::interface]
@@ -122,10 +151,14 @@ pub mod world {
         ResourceMetadataTrait, metadata
     };
     use dojo::storage;
-    use dojo::utils::{entity_id_from_keys, bytearray_hash, Descriptor, DescriptorTrait};
+    use dojo::utils::{
+        entity_id_from_keys, bytearray_hash, Descriptor, DescriptorTrait, IDescriptorDispatcher,
+        IDescriptorDispatcherTrait
+    };
 
     use super::{
-        ModelIndex, IWorldDispatcher, IWorldDispatcherTrait, IWorld, IUpgradeableWorld, Resource
+        ModelIndex, IWorldDispatcher, IWorldDispatcherTrait, IWorld, IUpgradeableWorld, Resource,
+        Permission
     };
 
     const WORLD: felt252 = 0;
@@ -222,7 +255,6 @@ pub mod world {
         pub name: ByteArray,
         pub namespace: ByteArray,
         pub class_hash: ClassHash,
-        pub prev_class_hash: ClassHash,
         pub address: ContractAddress,
         pub prev_address: ContractAddress,
     }
@@ -303,13 +335,16 @@ pub mod world {
             .resources
             .write(
                 Model::<ResourceMetadata>::selector(),
-                Resource::Model((metadata::initial_class_hash(), metadata::initial_address()))
+                Resource::Model(
+                    (metadata::initial_address(), Model::<ResourceMetadata>::namespace_hash())
+                )
             );
         self.owners.write((WORLD, creator), true);
 
-        let dojo_namespace_hash = bytearray_hash(@"__DOJO__");
+        let dojo_namespace = "__DOJO__";
+        let dojo_namespace_hash = bytearray_hash(@dojo_namespace);
 
-        self.resources.write(dojo_namespace_hash, Resource::Namespace);
+        self.resources.write(dojo_namespace_hash, Resource::Namespace(dojo_namespace));
         self.owners.write((dojo_namespace_hash, creator), true);
 
         self.config.initializer(creator);
@@ -361,7 +396,7 @@ pub mod world {
         ///
         /// `metadata` - The metadata content for the resource.
         fn set_metadata(ref self: ContractState, metadata: ResourceMetadata) {
-            self.assert_caller_is_resource_owner(metadata.resource_id);
+            self.assert_caller_permissions(metadata.resource_id, Permission::Owner);
 
             self
                 .write_model_entity(
@@ -405,7 +440,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.owners.write((resource, address), true);
 
@@ -426,7 +461,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.owners.write((resource, address), false);
 
@@ -461,7 +496,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.writers.write((resource, contract), true);
 
@@ -482,7 +517,7 @@ pub mod world {
                 panic_with_byte_array(@errors::resource_not_registered(resource));
             }
 
-            self.assert_caller_is_resource_owner(resource);
+            self.assert_caller_permissions(resource, Permission::Owner);
 
             self.writers.write((resource, contract), false);
 
@@ -511,10 +546,7 @@ pub mod world {
                 panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
             }
 
-            self
-                .assert_caller_namespace_write_access(
-                    descriptor.namespace(), descriptor.namespace_hash()
-                );
+            self.assert_caller_permissions(descriptor.namespace_hash(), Permission::Owner);
 
             let maybe_existing_model = self.resources.read(descriptor.selector());
             if !maybe_existing_model.is_unregistered() {
@@ -525,7 +557,10 @@ pub mod world {
 
             self
                 .resources
-                .write(descriptor.selector(), Resource::Model((class_hash, contract_address)));
+                .write(
+                    descriptor.selector(),
+                    Resource::Model((contract_address, descriptor.namespace_hash()))
+                );
             self.owners.write((descriptor.selector(), caller), true);
 
             EventEmitter::emit(
@@ -540,7 +575,6 @@ pub mod world {
         }
 
         fn upgrade_model(ref self: ContractState, class_hash: ClassHash) {
-            let caller = get_caller_address();
             let salt = self.models_salt.read();
 
             let (new_contract_address, _) = starknet::syscalls::deploy_syscall(
@@ -558,30 +592,14 @@ pub mod world {
                 );
             }
 
-            self
-                .assert_caller_namespace_write_access(
-                    new_descriptor.namespace(), new_descriptor.namespace_hash()
-                );
+            self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
 
-            let mut prev_class_hash = core::num::traits::Zero::<ClassHash>::zero();
             let mut prev_address = core::num::traits::Zero::<ContractAddress>::zero();
 
             // If the namespace or name of the model have been changed, the descriptor
             // will be different, hence not upgradeable.
             match self.resources.read(new_descriptor.selector()) {
-                // If model is already registered, validate permission to update.
-                Resource::Model((
-                    model_hash, model_address
-                )) => {
-                    if !self.is_owner(new_descriptor.selector(), caller) {
-                        panic_with_byte_array(
-                            @errors::not_owner_upgrade(caller, new_descriptor.selector())
-                        );
-                    }
-
-                    prev_class_hash = model_hash;
-                    prev_address = model_address;
-                },
+                Resource::Model((model_address, _)) => { prev_address = model_address; },
                 Resource::Unregistered => {
                     panic_with_byte_array(
                         @errors::model_not_registered(
@@ -600,7 +618,8 @@ pub mod world {
             self
                 .resources
                 .write(
-                    new_descriptor.selector(), Resource::Model((class_hash, new_contract_address))
+                    new_descriptor.selector(),
+                    Resource::Model((new_contract_address, new_descriptor.namespace_hash()))
                 );
 
             EventEmitter::emit(
@@ -611,7 +630,6 @@ pub mod world {
                     prev_address,
                     address: new_contract_address,
                     class_hash,
-                    prev_class_hash
                 }
             );
         }
@@ -631,7 +649,7 @@ pub mod world {
                     @errors::namespace_already_registered(@namespace)
                 ),
                 Resource::Unregistered => {
-                    self.resources.write(hash, Resource::Namespace);
+                    self.resources.write(hash, Resource::Namespace(namespace.clone()));
                     self.owners.write((hash, caller), true);
 
                     EventEmitter::emit(ref self, NamespaceRegistered { namespace, hash });
@@ -681,15 +699,15 @@ pub mod world {
                 panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
             }
 
-            self
-                .assert_caller_namespace_write_access(
-                    descriptor.namespace(), descriptor.namespace_hash()
-                );
+            self.assert_caller_permissions(descriptor.namespace_hash(), Permission::Owner);
 
             self.owners.write((descriptor.selector(), caller), true);
             self
                 .resources
-                .write(descriptor.selector(), Resource::Contract((class_hash, contract_address)));
+                .write(
+                    descriptor.selector(),
+                    Resource::Contract((contract_address, descriptor.namespace_hash()))
+                );
 
             EventEmitter::emit(
                 ref self,
@@ -726,10 +744,10 @@ pub mod world {
 
             let new_descriptor = DescriptorTrait::from_contract_assert(check_address);
 
-            if let Resource::Contract((_, contract_address)) = self
+            if let Resource::Contract((contract_address, _)) = self
                 .resources
                 .read(new_descriptor.selector()) {
-                self.assert_caller_is_resource_owner(new_descriptor.selector());
+                self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
 
                 let existing_descriptor = DescriptorTrait::from_contract_assert(contract_address);
 
@@ -755,18 +773,12 @@ pub mod world {
         /// * `selector` - The selector of the contract to initialize.
         /// * `init_calldata` - Calldata used to initialize the contract.
         fn init_contract(ref self: ContractState, selector: felt252, init_calldata: Span<felt252>) {
-            if let Resource::Contract((_, contract_address)) = self.resources.read(selector) {
-                let caller = get_caller_address();
-
-                let dispatcher = IContractDispatcher { contract_address };
-                let tag = dispatcher.tag();
-
+            if let Resource::Contract((contract_address, _)) = self.resources.read(selector) {
                 if self.initialized_contract.read(selector) {
-                    panic_with_byte_array(@errors::contract_already_initialized(@tag));
+                    let dispatcher = IContractDispatcher { contract_address };
+                    panic_with_byte_array(@errors::contract_already_initialized(@dispatcher.tag()));
                 } else {
-                    if !self.is_owner(selector, caller) {
-                        panic_with_byte_array(@errors::not_owner_init(@tag, caller));
-                    }
+                    self.assert_caller_permissions(selector, Permission::Owner);
 
                     // For the init, to ensure only the world can call the init function,
                     // the verification is done in the init function of the contract:
@@ -857,8 +869,14 @@ pub mod world {
             values: Span<felt252>,
             layout: Layout
         ) {
-            self.assert_caller_model_write_access(model_selector);
-            self.set_entity_internal(model_selector, index, values, layout);
+            if let Resource::Model((_, _)) = self.resources.read(model_selector) {
+                self.assert_caller_permissions(model_selector, Permission::Writer);
+                self.set_entity_internal(model_selector, index, values, layout);
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{model_selector}"), @"model")
+                );
+            }
         }
 
         /// Deletes a record/entity of a model..
@@ -872,8 +890,14 @@ pub mod world {
         fn delete_entity(
             ref self: ContractState, model_selector: felt252, index: ModelIndex, layout: Layout
         ) {
-            self.assert_caller_model_write_access(model_selector);
-            self.delete_entity_internal(model_selector, index, layout);
+            if let Resource::Model((_, _)) = self.resources.read(model_selector) {
+                self.assert_caller_permissions(model_selector, Permission::Writer);
+                self.delete_entity_internal(model_selector, index, layout);
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{model_selector}"), @"model")
+                );
+            }
         }
 
         /// Gets the base contract class hash.
@@ -996,13 +1020,36 @@ pub mod world {
             self.is_owner(WORLD, get_caller_address())
         }
 
-        /// Panics if the caller is NOT an owner of the resource.
+        /// Asserts the caller has the required permissions for a resource, following the
+        /// permissions hierarchy:
+        /// 1. World Owner
+        /// 2. Namespace Owner
+        /// 3. Resource Owner
+        /// [if writer]
+        /// 4. Namespace Writer
+        /// 5. Resource Writer
+        ///
+        /// This function is expected to be called very often as it's used to check permissions
+        /// for all the resource access in the system.
+        /// For this reason, here are the following optimizations:
+        ///     * Use several single `if` because it seems more efficient than a big one with
+        ///       several conditions based on how cairo is lowered to sierra.
+        ///     * Sort conditions by order of probability so once a condition is met, the function
+        ///       returns.
         ///
         /// # Arguments
         ///   * `resource_selector` - the selector of the resource.
-        #[inline(always)]
-        fn assert_caller_is_resource_owner(self: @ContractState, resource_selector: felt252) {
+        ///   * `permission` - the required permission.
+        fn assert_caller_permissions(
+            self: @ContractState, resource_selector: felt252, permission: Permission
+        ) {
             let caller = get_caller_address();
+
+            if permission == Permission::Writer {
+                if self.is_writer(resource_selector, caller) {
+                    return;
+                }
+            }
 
             if self.is_owner(resource_selector, caller) {
                 return;
@@ -1012,120 +1059,78 @@ pub mod world {
                 return;
             }
 
-            panic_with_byte_array(@errors::not_owner(caller, resource_selector));
-        }
-
-        /// Panics if the caller has NOT the writer role on the model.
-        ///
-        /// # Arguments
-        ///   * `model_selector` - the selector of the model.
-        #[inline(always)]
-        fn assert_caller_model_write_access(self: @ContractState, model_selector: felt252) {
-            let caller = get_caller_address();
-
-            // Must have owner or writer role on the namespace or on the model.
-            match self.resources.read(model_selector) {
-                Resource::Model((
-                    _, model_address
-                )) => {
-                    let model = IModelDispatcher { contract_address: model_address };
-                    let namespace_selector = model.namespace_hash();
-
-                    // - use several single if because it seems more efficient than a big one with
-                    // several conditions.
-                    // - sort conditions by order of probability so once a condition is met, the
-                    // function returns.
-                    if self.is_writer(namespace_selector, caller) {
-                        return;
-                    }
-                    if self.is_writer(model_selector, caller) {
-                        return;
-                    }
-                    if self.is_owner(namespace_selector, caller) {
-                        return;
-                    }
-                    if self.is_owner(model_selector, caller) {
-                        return;
-                    }
-                    if self.is_caller_world_owner() {
-                        return;
-                    }
-
-                    let model_tag = model.tag();
-                    let d = IContractDispatcher { contract_address: caller };
-
-                    // If the caller is not a dojo contract, the `d.selector()` will fail. In the
-                    // future use the SRC5 to first query the contract to see if it implements the
-                    // `IContract` interface.
-                    // For now, we just assume that the caller is a dojo contract as it's 100% of
-                    // the dojo use cases at the moment.
-                    if let Resource::Contract((_, contract_address)) = self
-                        .resources
-                        .read(d.selector()) {
-                        let d = IContractDispatcher { contract_address };
-                        panic_with_byte_array(
-                            @errors::no_write_access_with_tags(
-                                @d.tag(), @"model (or it's namespace)", @model_tag
-                            )
-                        );
-                    } else {
-                        panic_with_byte_array(@errors::no_model_write_access(@model_tag, caller));
-                    }
-                },
+            // At this point, [`Resource::Contract`] and [`Resource::Model`] requires extra checks
+            // by switching to the namespace hash being the resource selector.
+            let namespace_hash = match self.resources.read(resource_selector) {
+                Resource::Contract((_, namespace_hash)) => { namespace_hash },
+                Resource::Model((_, namespace_hash)) => { namespace_hash },
                 Resource::Unregistered => {
-                    panic_with_byte_array(@errors::resource_not_registered(model_selector));
+                    panic_with_byte_array(@errors::resource_not_registered(resource_selector))
                 },
-                _ => panic_with_byte_array(
-                    @errors::resource_conflict(@format!("{}", model_selector), @"model")
-                )
-            }
-        }
+                _ => self.panic_with_details(caller, resource_selector, permission)
+            };
 
-        /// Panics if the caller has NOT the writer role on the namespace.
-        ///
-        /// # Arguments
-        ///   * `namespace` - the namespace name.
-        ///   * `namespace_hash` - the hash of the namespace.
-        #[inline(always)]
-        fn assert_caller_namespace_write_access(
-            self: @ContractState, namespace: @ByteArray, namespace_hash: felt252
-        ) {
-            let caller = get_caller_address();
-
-            if self.is_writer(namespace_hash, caller) {
-                return;
+            if permission == Permission::Writer {
+                if self.is_writer(namespace_hash, caller) {
+                    return;
+                }
             }
+
             if self.is_owner(namespace_hash, caller) {
                 return;
             }
-            if self.is_caller_world_owner() {
-                return;
-            }
 
-            // We know it's an account and return the explicit error message as no tag will match
-            // the account.
-            if caller == get_tx_info().account_contract_address {
-                panic_with_byte_array(@errors::no_namespace_write_access(caller, namespace));
-            }
+            self.panic_with_details(caller, resource_selector, permission)
+        }
 
-            // If the caller is not a dojo contract, the `d.selector()` will fail. In the future use
-            // the SRC5 to first query the contract to see if it implements the `IContract`
-            // interface.
-            // For now, we just assume that the caller is a dojo contract as it's 100% of the dojo
-            // use cases at the moment.
-            let d = IContractDispatcher { contract_address: caller };
+        /// Panics with the caller details.
+        ///
+        /// # Arguments
+        ///   * `caller` - the address of the caller.
+        ///   * `resource_selector` - the selector of the resource.
+        ///   * `permission` - the required permission.
+        fn panic_with_details(
+            self: @ContractState,
+            caller: ContractAddress,
+            resource_selector: felt252,
+            permission: Permission
+        ) -> core::never {
+            let resource_name = match self.resources.read(resource_selector) {
+                Resource::Contract((
+                    contract_address, _
+                )) => {
+                    let d = IDescriptorDispatcher { contract_address };
+                    format!("contract (or its namespace) `{}`", d.tag())
+                },
+                Resource::Model((
+                    contract_address, _
+                )) => {
+                    let d = IDescriptorDispatcher { contract_address };
+                    format!("model (or its namespace) `{}`", d.tag())
+                },
+                Resource::Namespace(ns) => { format!("namespace `{}`", ns) },
+                Resource::World => { format!("world") },
+                Resource::Unregistered => { panic!("Unreachable") }
+            };
 
-            if let Resource::Contract((_, contract_address)) = self.resources.read(d.selector()) {
-                let d = IContractDispatcher { contract_address };
-                panic_with_byte_array(
-                    @errors::no_write_access_with_tags(@d.tag(), @"namespace", namespace)
-                );
+            let caller_name = if caller == get_tx_info().account_contract_address {
+                format!("Account `{:?}`", caller)
             } else {
-                // This is in theory unreachable code as the contract call syscall made by the
-                // dispatcher will panic. Which may lead to a bad user experience in testing as the
-                // error will be something like "CONTRACT_NOT_DEPLOYED".
-                panic_with_byte_array(@errors::no_namespace_write_access(caller, namespace));
-            }
+                // If the caller is not a dojo contract, the `d.selector()` will fail. In the
+                // future we should use the SRC5 to first query the contract to see if
+                // it implements the `IDescriptor` interface.
+                // For now, we just assume that the caller is a dojo contract as it's 100% of
+                // the dojo use cases at the moment.
+                // If the contract is not an account or a dojo contract, tests will display
+                // "CONTRACT_NOT_DEPLOYED" as the error message. In production, the error message
+                // will display "ENTRYPOINT_NOT_FOUND".
+                let d = IDescriptorDispatcher { contract_address: caller };
+                format!("Contract `{}`", d.tag())
+            };
+
+            panic_with_byte_array(
+                @format!("{} does NOT have {} role on {}", caller_name, permission, resource_name)
+            )
         }
 
         /// Indicates if the provided namespace is already registered
