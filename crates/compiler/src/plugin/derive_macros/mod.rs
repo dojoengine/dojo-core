@@ -147,9 +147,9 @@ pub fn handle_derive_attrs(
 ///
 /// Derive usage should look like this:
 ///
-/// ```no_run
+/// ```no_run,ignore
 /// #[derive(Introspect)]
-/// struct MyStruct {...}
+/// struct MyStruct {}
 /// ```
 ///
 /// And this function will return `["Introspect"]`.

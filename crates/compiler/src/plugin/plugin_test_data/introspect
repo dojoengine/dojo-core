@@ -2914,24 +2914,24 @@ error: Option<T> cannot be used with tuples. Prefer using a struct.
          ^*****************^
 
 error: Introspect and IntrospectPacked attributes cannot be used at a same time.
- --> /tmp/plugin_test/introspect/src/lib.cairo:180:6
-enum EnumIncompatibleAttrs {}
-     ^*******************^
+ --> /tmp/plugin_test/introspect/src/lib.cairo:179:1
+#[derive(Introspect, IntrospectPacked)]
+^*************************************^
 
 error: Introspect and IntrospectPacked attributes cannot be used at a same time.
- --> /tmp/plugin_test/introspect/src/lib.cairo:183:8
-struct StructIncompatibleAttrs {}
-       ^*********************^
+ --> /tmp/plugin_test/introspect/src/lib.cairo:182:1
+#[derive(Introspect, IntrospectPacked)]
+^*************************************^
 
 error: Introspect and IntrospectPacked attributes cannot be used at a same time.
- --> /tmp/plugin_test/introspect/src/lib.cairo:187:8
-struct StructIncompatibleAttrs2 {}
-       ^**********************^
+ --> /tmp/plugin_test/introspect/src/lib.cairo:185:1
+#[derive(Introspect)]
+^*******************^
 
 error: Introspect and IntrospectPacked attributes cannot be used at a same time.
- --> /tmp/plugin_test/introspect/src/lib.cairo:191:6
-enum EnumIncompatibleAttrs2 {}
-     ^********************^
+ --> /tmp/plugin_test/introspect/src/lib.cairo:189:1
+#[derive(Introspect)]
+^*******************^
 
 error: Array field cannot be packed.
  --> /tmp/plugin_test/introspect/src/lib.cairo:213:6
