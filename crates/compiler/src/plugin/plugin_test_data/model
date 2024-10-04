@@ -315,47 +315,6 @@ struct ModelWithTupleNoPrimitives {
     x: u16,
     y: (u8, Vec3, u32)
 }
-impl BadModelMultipleAttrIntrospect<> of dojo::model::introspect::Introspect<BadModelMultipleAttr<>> {
-    #[inline(always)]
-    fn size() -> Option<usize> {
-        dojo::model::introspect::Introspect::<Vec3>::size()
-    }
-
-    fn layout() -> dojo::model::Layout {
-        dojo::model::Layout::Struct(
-            array![
-            dojo::model::FieldLayout {
-                    selector: 578691550836206188651404750433984985630363913126316857592149308417275000080,
-                    layout: dojo::model::introspect::Introspect::<Vec3>::layout()
-                }
-            ].span()
-        )
-    }
-
-    #[inline(always)]
-    fn ty() -> dojo::model::introspect::Ty {
-        dojo::model::introspect::Ty::Struct(
-            dojo::model::introspect::Struct {
-                name: 'BadModelMultipleAttr',
-                attrs: array![].span(),
-                children: array![
-                dojo::model::introspect::Member {
-            name: 'id',
-            attrs: array!['key'].span(),
-            ty: dojo::model::introspect::Introspect::<felt252>::ty()
-        },
-dojo::model::introspect::Member {
-            name: 'v',
-            attrs: array![].span(),
-            ty: dojo::model::introspect::Introspect::<Vec3>::ty()
-        }
-
-                ].span()
-            }
-        )
-    }
-}
-
 impl BadModelMultipleVersionsIntrospect<> of dojo::model::introspect::Introspect<BadModelMultipleVersions<>> {
     #[inline(always)]
     fn size() -> Option<usize> {
@@ -26657,11 +26616,6 @@ impl Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersMutDrop of core::tr
 impl Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersMutCopy of core::traits::Copy::<Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersMut>;
 
 //! > expected_diagnostics
-error: A Dojo model must have zero or one dojo::model attribute.
- --> /tmp/plugin_test/model/src/lib.cairo:1:1
-#[dojo::model(version: 0)]
-^************************^
-
 error: Too many 'version' attributes for dojo::model
  --> /tmp/plugin_test/model/src/lib.cairo:9:1
 #[dojo::model(version: 0, version: 0)]

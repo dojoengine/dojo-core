@@ -703,40 +703,40 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
         return ();
     }
 
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
             }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -751,12 +751,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -770,18 +770,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -797,12 +797,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -1528,40 +1528,40 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
         return ();
     }
 
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
             }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -1576,12 +1576,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -1595,18 +1595,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -1622,12 +1622,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -2350,40 +2350,40 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
         value
     }
 
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
             }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -2398,12 +2398,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -2417,18 +2417,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -2444,12 +2444,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -3175,40 +3175,40 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
         return ();
     }
 
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
             }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -3223,12 +3223,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -3242,18 +3242,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -3269,12 +3269,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -4006,23 +4006,23 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
         address: ContractAddress,
     }
 
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -4088,17 +4088,17 @@ impl TestEventIsEvent of starknet::Event<TestEvent> {
         Option::Some(TestEvent {address, })
     }
 }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -4113,12 +4113,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -4132,18 +4132,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -4159,12 +4159,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -4860,23 +4860,23 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
         testcomponent2_event: testcomponent2::Event
             }
             
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
 
 
 #[phantom]
@@ -5287,17 +5287,17 @@ impl Eventtestcomponent2_eventIntoEvent of Into<testcomponent2::Event, Event> {
         Event::testcomponent2_event(self)
     }
 }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -5312,12 +5312,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -5331,18 +5331,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -5358,12 +5358,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -5716,7 +5716,7 @@ impl IDojoInitSafeDispatcherSubPointersDrop of core::traits::Drop::<IDojoInitSaf
 impl IDojoInitSafeDispatcherSubPointersCopy of core::traits::Copy::<IDojoInitSafeDispatcherSubPointers>;
 impl IDojoInitSafeDispatcherSubPointersMutDrop of core::traits::Drop::<IDojoInitSafeDispatcherSubPointersMut>;
 impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInitSafeDispatcherSubPointersMut>;
-                
+
                 }
 
                 #[starknet::interface]
@@ -5801,24 +5801,24 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
     #[generate_trait]
  impl InternalImplBad  of InternalUtils<ContractState>  {fn bad_func_using_generate(self: @ContractState) -> felt252  {let world = self.world_dispatcher.read();            'land'
 }}
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
@@ -5826,17 +5826,17 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
             }
     trait InternalUtils{fn bad_func_using_generate(self: @ContractState) -> felt252;
 }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -5851,12 +5851,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -5870,18 +5870,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -5897,12 +5897,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -6805,24 +6805,24 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
         }
     }
 
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
@@ -6832,17 +6832,17 @@ impl ActionDrop of core::traits::Drop::<Action>;
     trait InternalNoContractState {
         fn func1(world: IWorldDispatcher) -> felt252;
     }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -6857,12 +6857,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -6876,18 +6876,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -6903,12 +6903,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -8651,40 +8651,40 @@ impl IDojoInitSafeDispatcherSubPointersMutCopy of core::traits::Copy::<IDojoInit
                     impl UpgradableImpl = dojo::contract::upgradeable::upgradeable::UpgradableImpl<ContractState>;
 
                     
-                    #[starknet::interface]
-                    pub trait IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState);
-                    }
+#[starknet::interface]
+pub trait IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState);
+}
 
-                    #[abi(embed_v0)]
-                    pub impl IDojoInitImpl of IDojoInit<ContractState> {
-                        fn dojo_init(self: @ContractState) {
-                            if starknet::get_caller_address() != self.world().contract_address {
-                                core::panics::panic_with_byte_array(
-                                    @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                                    self.tag(),
-                                    starknet::get_caller_address(),
-                                ));
-                            }
-                        }
-                    }
-                
+#[abi(embed_v0)]
+pub impl IDojoInitImpl of IDojoInit<ContractState> {
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
             }
-                    pub trait IDojoInitDispatcherTrait<T> {
-                        fn dojo_init(self: T);
+pub trait IDojoInitDispatcherTrait<T> {
+    fn dojo_init(self: T);
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitDispatcher {
+pub struct IDojoInitDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
-                        fn dojo_init(self: IDojoInitDispatcher) {
+    fn dojo_init(self: IDojoInitDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(
@@ -8699,12 +8699,12 @@ impl IDojoInitDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitDispatcher> {
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitLibraryDispatcher {
+pub struct IDojoInitLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitLibraryDispatcher) {
+    fn dojo_init(self: IDojoInitLibraryDispatcher) {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -8718,18 +8718,18 @@ impl IDojoInitLibraryDispatcherImpl of IDojoInitDispatcherTrait<IDojoInitLibrary
 
 }
 
-                    pub trait IDojoInitSafeDispatcherTrait<T> {
+pub trait IDojoInitSafeDispatcherTrait<T> {
     #[unstable(feature: "safe_dispatcher")]
-                        fn dojo_init(self: T) -> starknet::SyscallResult<()>;
+    fn dojo_init(self: T) -> starknet::SyscallResult<()>;
 }
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeLibraryDispatcher {
+pub struct IDojoInitSafeLibraryDispatcher {
     pub class_hash: starknet::ClassHash,
 }
 
 impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeLibraryDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeLibraryDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::library_call_syscall(
@@ -8745,12 +8745,12 @@ impl IDojoInitSafeLibraryDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoIni
 
 
 #[derive(Copy, Drop, starknet::Store, Serde)]
-                    pub struct IDojoInitSafeDispatcher {
+pub struct IDojoInitSafeDispatcher {
     pub contract_address: starknet::ContractAddress,
 }
 
 impl IDojoInitSafeDispatcherImpl of IDojoInitSafeDispatcherTrait<IDojoInitSafeDispatcher> {
-                        fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
+    fn dojo_init(self: IDojoInitSafeDispatcher) -> starknet::SyscallResult<()> {
         let mut __calldata__ = core::traits::Default::default();
 
         let mut __dispatcher_return_data__ = starknet::syscalls::call_contract_syscall(

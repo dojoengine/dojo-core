@@ -52,7 +52,7 @@ mod resource_metadata_malicious {
 }
 
 #[test]
-#[available_gas(2000000)]
+#[available_gas(20000000)]
 fn test_model() {
     let world = deploy_world();
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());

@@ -151,10 +151,10 @@ Block(
 )
 
 //! > semantic_diagnostics
-error: Plugin diagnostic: The namespace '' can only contain characters (a-z/A-Z), digits (0-9) and underscore (_).
- --> lib.cairo:5:8
-struct Health {
-       ^****^
+error: Plugin diagnostic: The model namespace '' can only contain characters (a-z/A-Z), digits (0-9) and underscore (_).
+ --> lib.cairo:3:1
+#[derive(Copy, Drop, Serde)]
+^**************************^
 
 warning[E0001]: Unused variable. Consider ignoring by prefixing with `_`.
  --> lib.cairo:10:22

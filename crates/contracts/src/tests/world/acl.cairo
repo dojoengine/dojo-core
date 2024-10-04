@@ -7,6 +7,7 @@ use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, world};
 use dojo::tests::helpers::{
     deploy_world, Foo, foo, foo_setter, IFooSetterDispatcher, IFooSetterDispatcherTrait
 };
+use dojo::tests::expanded::selector_attack::{attacker_contract, attacker_model};
 
 #[test]
 fn test_owner() {
@@ -277,4 +278,72 @@ fn test_not_writer_with_known_contract() {
         .deploy_contract('salt1', foo_setter::TEST_CLASS_HASH.try_into().unwrap());
     let d = IFooSetterDispatcher { contract_address };
     d.set_foo(1, 2);
+}
+
+/// Test that an attacker can't control the hashes of resources in other namespaces
+/// by registering a model in an other namespace.
+#[test]
+#[should_panic(
+    expected: (
+        "Descriptor: `selector` mismatch, expected `131865267188622158278053964160834676621529874568090955194814616371745985007` but found `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        'ENTRYPOINT_FAILED',
+    )
+)]
+fn test_attacker_control_hashes_model_registration() {
+    let owner = starknet::contract_address_const::<'owner'>();
+    let attacker = starknet::contract_address_const::<'attacker'>();
+
+    starknet::testing::set_account_contract_address(owner);
+    starknet::testing::set_contract_address(owner);
+
+    // Owner deploys the world and register Foo model.
+    let world = deploy_world();
+    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
+
+    let foo_selector = Model::<Foo>::selector();
+
+    assert(world.is_owner(foo_selector, owner), 'should be owner');
+
+    starknet::testing::set_contract_address(attacker);
+    starknet::testing::set_account_contract_address(attacker);
+
+    // Attacker has control over the this namespace.
+    world.register_namespace("atk");
+
+    // Attacker can't take ownership of the Foo model.
+    world.register_model(attacker_model::TEST_CLASS_HASH.try_into().unwrap());
+}
+
+/// Test that an attacker can't control the hashes of resources in other namespaces
+/// by deploying a contract in an other namespace.
+#[test]
+#[should_panic(
+    expected: (
+        "Descriptor: `selector` mismatch, expected `2256968028355087182573300510211413559640627226911800172611266486245255986230` but found `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        'ENTRYPOINT_FAILED',
+    )
+)]
+fn test_attacker_control_hashes_contract_deployment() {
+    let owner = starknet::contract_address_const::<'owner'>();
+    let attacker = starknet::contract_address_const::<'attacker'>();
+
+    starknet::testing::set_account_contract_address(owner);
+    starknet::testing::set_contract_address(owner);
+
+    // Owner deploys the world and register Foo model.
+    let world = deploy_world();
+    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
+
+    let foo_selector = Model::<Foo>::selector();
+
+    assert(world.is_owner(foo_selector, owner), 'should be owner');
+
+    starknet::testing::set_contract_address(attacker);
+    starknet::testing::set_account_contract_address(attacker);
+
+    // Attacker has control over the this namespace.
+    world.register_namespace("atk");
+
+    // Attacker can't take ownership of the Foo model.
+    world.deploy_contract('salt1', attacker_contract::TEST_CLASS_HASH.try_into().unwrap());
 }
