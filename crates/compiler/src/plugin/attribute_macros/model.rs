@@ -25,7 +25,11 @@ use crate::plugin::derive_macros::{
     extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
 };
 
-use super::patches::MODEL_PATCH;
+const MODEL_CODE_STRING: &str = include_str!("./templates/model_store.generate.cairo");
+const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");
+const ENTITY_FIELD_CODE_STRING: &str =
+    include_str!("./templates/entity_field_store.generate.cairo");
+
 use super::DOJO_MODEL_ATTR;
 
 const DEFAULT_MODEL_VERSION: u8 = 1;
@@ -376,7 +380,7 @@ impl DojoModel {
         diagnostics.extend(derive_diagnostics);
 
         let node = RewriteNode::interpolate_patched(
-            MODEL_PATCH,
+            MODEL_CODE_STRING,
             &UnorderedHashMap::from([
                 (
                     "contract_name".to_string(),
@@ -526,40 +530,7 @@ fn generate_field_accessors(
     member: &Member,
 ) -> RewriteNode {
     RewriteNode::interpolate_patched(
-        "
-    fn get_$field_name$(world: dojo::world::IWorldDispatcher, $param_keys$) -> $field_type$ {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_param_keys$
-
-        let mut values = dojo::model::Model::<$model_name$>::get_member(
-            world,
-            serialized.span(),
-            $field_selector$
-        );
-
-        let field_value = core::serde::Serde::<$field_type$>::deserialize(ref values);
-
-        if core::option::OptionTrait::<$field_type$>::is_none(@field_value) {
-            panic!(
-                \"Field `$model_name$::$field_name$`: deserialization failed.\"
-            );
-        }
-
-        core::option::OptionTrait::<$field_type$>::unwrap(field_value)
-    }
-
-    fn set_$field_name$(self: @$model_name$, world: dojo::world::IWorldDispatcher, value: \
-         $field_type$) {
-        let mut serialized = core::array::ArrayTrait::new();
-        core::serde::Serde::serialize(@value, ref serialized);
-
-        self.set_member(
-            world,
-            $field_selector$,
-            serialized.span()
-        );
-    }
-            ",
+        MODEL_FIELD_CODE_STRING,
         &UnorderedHashMap::from([
             ("model_name".to_string(), RewriteNode::Text(model_name)),
             (
@@ -599,37 +570,7 @@ fn generate_field_accessors(
 /// A [`RewriteNode`] containing accessors code.
 fn generate_entity_field_accessors(model_name: String, member: &Member) -> RewriteNode {
     RewriteNode::interpolate_patched(
-        "
-    fn get_$field_name$(world: dojo::world::IWorldDispatcher, entity_id: felt252) -> $field_type$ \
-         {
-        let mut values = dojo::model::ModelEntity::<$model_name$Entity>::get_member(
-            world,
-            entity_id,
-            $field_selector$
-        );
-        let field_value = core::serde::Serde::<$field_type$>::deserialize(ref values);
-
-        if core::option::OptionTrait::<$field_type$>::is_none(@field_value) {
-            panic!(
-                \"Field `$model_name$::$field_name$`: deserialization failed.\"
-            );
-        }
-
-        core::option::OptionTrait::<$field_type$>::unwrap(field_value)
-    }
-
-    fn set_$field_name$(self: @$model_name$Entity, world: dojo::world::IWorldDispatcher, value: \
-         $field_type$) {
-        let mut serialized = core::array::ArrayTrait::new();
-        core::serde::Serde::serialize(@value, ref serialized);
-
-        self.set_member(
-            world,
-            $field_selector$,
-            serialized.span()
-        );
-    }
-",
+        ENTITY_FIELD_CODE_STRING,
         &UnorderedHashMap::from([
             ("model_name".to_string(), RewriteNode::Text(model_name)),
             (
