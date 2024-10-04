@@ -1,0 +1,9 @@
+[package]
+name = "armory"
+version = "0.1.0"
+description = "An armory of epic weapons."
+
+[dependencies]
+dojo.workspace = true
+
+[lib]
