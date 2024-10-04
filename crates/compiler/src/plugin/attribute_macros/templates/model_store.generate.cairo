@@ -1,3 +1,27 @@
+impl $type_name$Attributes of dojo::model::ModelAttributes<$type_name$>{
+    const VERSION: u8 = $model_version$;
+    const SELECTOR: felt252 = $model_selector$;
+    const NAME_HASH: felt252 = $model_name_hash$;
+    const NAMESPACE_HASH: felt252 = $model_namespace_hash$;
+
+    #[inline(always)]
+    fn name() -> ByteArray {
+        "$type_name$"
+    }
+    
+    #[inline(always)]
+    fn namespace() -> ByteArray {
+        "$model_namespace$"
+    }
+    
+    #[inline(always)]
+    fn tag() -> ByteArray {
+        "$model_tag$"
+    }
+}
+
+
+
 #[derive(Drop, Serde)]
 pub struct $type_name$Entity {
     __id: felt252, // private field

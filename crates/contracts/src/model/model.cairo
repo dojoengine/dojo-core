@@ -90,6 +90,17 @@ pub trait IModel<T> {
     fn schema(self: @T) -> Ty;
 }
 
+pub trait ModelAttributes<T> {
+    const VERSION: u8;
+    const SELECTOR: felt252;
+    const NAME_HASH: felt252;
+    const NAMESPACE_HASH: felt252;
+
+    fn name() -> ByteArray;
+    fn namespace() -> ByteArray;
+    fn tag() -> ByteArray;
+}
+
 #[cfg(target: "test")]
 pub trait ModelTest<T> {
     fn set_test(self: @T, world: IWorldDispatcher);
