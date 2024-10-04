@@ -1,0 +1,13 @@
+[package]
+cairo-version = "=2.7.1"
+name = "dojo_simple"
+version = "0.1.0"
+edition = "2024_07"
+
+[dependencies]
+dojo = { path = "../../crates/contracts" }
+
+[[target.dojo]]
+
+[features]
+default = []

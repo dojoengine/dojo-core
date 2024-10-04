@@ -3,6 +3,7 @@ use starknet::SyscallResult;
 use dojo::model::Layout;
 use dojo::model::introspect::Ty;
 use dojo::world::IWorldDispatcher;
+use dojo::utils::{Descriptor, DescriptorTrait};
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub enum ModelIndex {
@@ -87,27 +88,6 @@ pub trait IModel<T> {
     fn packed_size(self: @T) -> Option<usize>;
     fn layout(self: @T) -> Layout;
     fn schema(self: @T) -> Ty;
-}
-
-/// Deploys a model with the given [`ClassHash`] and retrieves it's name.
-/// Currently, the model is expected to already be declared by `sozo`.
-///
-/// # Arguments
-///
-/// * `salt` - A salt used to uniquely deploy the model.
-/// * `class_hash` - Class Hash of the model.
-pub fn deploy_and_get_metadata(
-    salt: felt252, class_hash: starknet::ClassHash
-) -> SyscallResult<(starknet::ContractAddress, ByteArray, felt252, ByteArray, felt252)> {
-    let (contract_address, _) = starknet::syscalls::deploy_syscall(
-        class_hash, salt, [].span(), false,
-    )?;
-    let model = IModelDispatcher { contract_address };
-    let name = model.name();
-    let selector = model.selector();
-    let namespace = model.namespace();
-    let namespace_hash = model.namespace_hash();
-    Result::Ok((contract_address, name, selector, namespace, namespace_hash))
 }
 
 #[cfg(target: "test")]

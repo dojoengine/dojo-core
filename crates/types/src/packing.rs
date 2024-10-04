@@ -10,10 +10,7 @@ pub enum ParseError {
     #[error("Invalid schema: {0}")]
     InvalidSchema(String),
     #[error("Value out of range")]
-    ValueOutOfRange {
-        r#type: String,
-        value: Felt,
-    },
+    ValueOutOfRange { r#type: String, value: Felt },
     #[error("Error when parsing felt: {0}")]
     FromStr(#[from] FromStrError),
     #[error(transparent)]
@@ -62,12 +59,10 @@ pub fn unpack(mut packed: Vec<Felt>, layout: Vec<Felt>) -> Result<Vec<Felt>, Pac
     let mut offset = 0;
     // Iterate over the layout.
     for size in layout {
-        let size: u8 = size
-            .to_u8()
-            .ok_or_else(|| ParseError::ValueOutOfRange {
-                r#type: type_name::<u8>().to_string(),
-                value: size,
-            })?;
+        let size: u8 = size.to_u8().ok_or_else(|| ParseError::ValueOutOfRange {
+            r#type: type_name::<u8>().to_string(),
+            value: size,
+        })?;
 
         let size: usize = size.into();
         let remaining_bits = 251 - offset;
