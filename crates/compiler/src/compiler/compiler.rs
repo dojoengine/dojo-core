@@ -1,3 +1,4 @@
+use std::fs;
 use std::rc::Rc;
 
 use anyhow::{anyhow, Context, Result};
@@ -29,7 +30,7 @@ use crate::aux_data::DojoAuxData;
 use crate::compiler::manifest::{
     AbstractBaseManifest, ContractManifest, ModelManifest, StarknetContractManifest,
 };
-use crate::scarb_extensions::WorkspaceExt;
+use crate::scarb_extensions::{ProfileSpec, WorkspaceExt};
 use crate::{
     BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, MODELS_DIR,
     RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
@@ -81,9 +82,7 @@ impl DojoCompiler {
         // Manifest path is always a file, we can unwrap safely to get the parent folder.
         let _manifest_dir = ws.manifest_path().parent().unwrap().to_path_buf();
 
-        // TODO: clean base manifests dir.
-        //let profile_dir = manifest_dir.join(MANIFESTS_DIR).join(profile_name);
-        //CleanArgs::clean_manifests(&profile_dir)?;
+        DojoCompiler::clean(config, ProfileSpec::WorkspaceCurrent, true)?;
 
         trace!(?packages);
 
@@ -99,6 +98,50 @@ impl DojoCompiler {
         )?;
 
         trace!(?compile_info, "Compiled workspace.");
+
+        Ok(())
+    }
+
+    pub fn clean(
+        config: &Config,
+        profile_spec: ProfileSpec,
+        remove_base_manifests: bool,
+    ) -> Result<()> {
+        let ws = scarb::ops::read_workspace(config.manifest_path(), config)?;
+
+        let profile_name = ws
+            .current_profile()
+            .expect("Scarb profile is expected.")
+            .to_string();
+
+        trace!(
+            profile = profile_name,
+            ?profile_spec,
+            remove_base_manifests,
+            "Cleaning dojo compiler artifacts."
+        );
+
+        // Ignore fails to remove the directories as it might not exist.
+        match profile_spec {
+            ProfileSpec::All => {
+                let target_dir = ws.target_dir();
+                let _ = fs::remove_dir_all(target_dir.to_string());
+
+                if remove_base_manifests {
+                    let manifest_dir = ws.dojo_manifests_dir();
+                    let _ = fs::remove_dir_all(manifest_dir.to_string());
+                }
+            }
+            ProfileSpec::WorkspaceCurrent => {
+                let target_dir_profile = ws.target_dir_profile();
+                let _ = fs::remove_dir_all(target_dir_profile.to_string());
+
+                if remove_base_manifests {
+                    let manifest_dir_profile = ws.dojo_base_manfiests_dir_profile();
+                    let _ = fs::remove_dir_all(manifest_dir_profile.to_string());
+                }
+            }
+        }
 
         Ok(())
     }
@@ -158,73 +201,16 @@ impl Compiler for DojoCompiler {
 
         // Combine the aux data info about the contracts with the artifact data
         // to create the manifests.
-        for (qualified_path, contract_aux_data) in aux_data.contracts.iter() {
-            let tag = naming::get_tag(&contract_aux_data.namespace, &contract_aux_data.name);
-            let filename = naming::get_filename_from_tag(&tag);
+        let contracts = write_dojo_contracts_artifacts(&artifact_manager, &aux_data)?;
+        let models = write_dojo_models_artifacts(&artifact_manager, &aux_data)?;
+        let (world, base, sn_contracts) =
+            write_sn_contract_artifacts(&artifact_manager, &aux_data)?;
 
-            let target_dir = ws.target_dir_profile().child(CONTRACTS_DIR);
-
-            artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-            base_manifest.contracts.push(ContractManifest {
-                class_hash: artifact_manager.get_class_hash(qualified_path)?,
-                qualified_path: qualified_path.to_string(),
-                tag,
-                systems: contract_aux_data.systems.clone(),
-            });
-        }
-
-        for (qualified_path, model_aux_data) in aux_data.models.iter() {
-            let tag = naming::get_tag(&model_aux_data.namespace, &model_aux_data.name);
-            let filename = naming::get_filename_from_tag(&tag);
-
-            let target_dir = ws.target_dir_profile().child(MODELS_DIR);
-
-            artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-            base_manifest.models.push(ModelManifest {
-                class_hash: artifact_manager.get_class_hash(qualified_path)?,
-                qualified_path: qualified_path.to_string(),
-                tag,
-                members: model_aux_data.members.clone(),
-            });
-        }
-
-        for (qualified_path, name) in aux_data.sn_contracts.iter() {
-            println!("qualified_path: {}", qualified_path);
-            let filename = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
-
-            let target_dir = ws.target_dir_profile();
-
-            artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-            match qualified_path.as_str() {
-                WORLD_QUALIFIED_PATH => {
-                    base_manifest.world = StarknetContractManifest {
-                        class_hash: artifact_manager.get_class_hash(qualified_path)?,
-                        qualified_path: qualified_path.to_string(),
-                        name: WORLD_CONTRACT_TAG.to_string(),
-                    };
-                }
-                BASE_QUALIFIED_PATH => {
-                    base_manifest.base = StarknetContractManifest {
-                        class_hash: artifact_manager.get_class_hash(qualified_path)?,
-                        qualified_path: qualified_path.to_string(),
-                        name: BASE_CONTRACT_TAG.to_string(),
-                    };
-                }
-                RESOURCE_METADATA_QUALIFIED_PATH => {
-                    // Skip this dojo contract as not used in the migration process.
-                }
-                _ => {
-                    base_manifest.sn_contracts.push(StarknetContractManifest {
-                        class_hash: artifact_manager.get_class_hash(qualified_path)?,
-                        qualified_path: qualified_path.to_string(),
-                        name: name.clone(),
-                    });
-                }
-            }
-        }
+        base_manifest.world = world;
+        base_manifest.base = base;
+        base_manifest.contracts.extend(contracts);
+        base_manifest.models.extend(models);
+        base_manifest.sn_contracts.extend(sn_contracts);
 
         base_manifest.write()?;
 
@@ -427,4 +413,115 @@ pub fn collect_crates_ids_from_selectors(
         .unique()
         .map(|package_name: SmolStr| db.intern_crate(CrateLongId::Real(package_name)))
         .collect::<Vec<_>>()
+}
+
+/// Writes the dojo contracts artifacts to the target directory and returns the contract manifests.
+fn write_dojo_contracts_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<Vec<ContractManifest>> {
+    let mut contracts = Vec::new();
+
+    for (qualified_path, contract_aux_data) in aux_data.contracts.iter() {
+        let tag = naming::get_tag(&contract_aux_data.namespace, &contract_aux_data.name);
+        let filename = naming::get_filename_from_tag(&tag);
+
+        let target_dir = artifact_manager
+            .workspace()
+            .target_dir_profile()
+            .child(CONTRACTS_DIR);
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
+
+        contracts.push(ContractManifest {
+            class_hash: artifact_manager.get_class_hash(qualified_path)?,
+            qualified_path: qualified_path.to_string(),
+            tag,
+            systems: contract_aux_data.systems.clone(),
+        });
+    }
+
+    Ok(contracts)
+}
+
+/// Writes the dojo models artifacts to the target directory and returns the model manifests.
+fn write_dojo_models_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<Vec<ModelManifest>> {
+    let mut models = Vec::new();
+
+    for (qualified_path, model_aux_data) in aux_data.models.iter() {
+        let tag = naming::get_tag(&model_aux_data.namespace, &model_aux_data.name);
+        let filename = naming::get_filename_from_tag(&tag);
+
+        let target_dir = artifact_manager
+            .workspace()
+            .target_dir_profile()
+            .child(MODELS_DIR);
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
+
+        models.push(ModelManifest {
+            class_hash: artifact_manager.get_class_hash(qualified_path)?,
+            qualified_path: qualified_path.to_string(),
+            tag,
+            members: model_aux_data.members.clone(),
+        });
+    }
+
+    Ok(models)
+}
+
+/// Writes the starknet contracts artifacts to the target directory and returns the starknet contract manifests.
+///
+/// Returns a tuple with the world contract manifest, the base contract manifest and the other starknet contract manifests.
+fn write_sn_contract_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<(
+    StarknetContractManifest,
+    StarknetContractManifest,
+    Vec<StarknetContractManifest>,
+)> {
+    let mut contracts = Vec::new();
+    let mut world = StarknetContractManifest::default();
+    let mut base = StarknetContractManifest::default();
+
+    for (qualified_path, name) in aux_data.sn_contracts.iter() {
+        let filename = qualified_path.replace(CAIRO_PATH_SEPARATOR, "_");
+
+        let target_dir = artifact_manager.workspace().target_dir_profile();
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
+
+        match qualified_path.as_str() {
+            WORLD_QUALIFIED_PATH => {
+                world = StarknetContractManifest {
+                    class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                    qualified_path: qualified_path.to_string(),
+                    name: WORLD_CONTRACT_TAG.to_string(),
+                };
+            }
+            BASE_QUALIFIED_PATH => {
+                base = StarknetContractManifest {
+                    class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                    qualified_path: qualified_path.to_string(),
+                    name: BASE_CONTRACT_TAG.to_string(),
+                };
+            }
+            RESOURCE_METADATA_QUALIFIED_PATH => {
+                // Skip this dojo contract as not used in the migration process.
+            }
+            _ => {
+                contracts.push(StarknetContractManifest {
+                    class_hash: artifact_manager.get_class_hash(qualified_path)?,
+                    qualified_path: qualified_path.to_string(),
+                    name: name.clone(),
+                });
+            }
+        }
+    }
+
+    Ok((world, base, contracts))
 }

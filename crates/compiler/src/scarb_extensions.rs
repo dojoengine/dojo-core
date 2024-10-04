@@ -1,7 +1,14 @@
 use camino::Utf8Path;
 use scarb::{core::Workspace, flock::Filesystem};
 
-use crate::MANIFESTS_DIR;
+use crate::{MANIFESTS_BASE_DIR, MANIFESTS_DIR};
+
+/// Handy enum for selecting the current profile or all profiles.
+#[derive(Debug)]
+pub enum ProfileSpec {
+    WorkspaceCurrent,
+    All,
+}
 
 /// Extension trait for the [`Filesystem`] type.
 pub trait FilesystemExt {
@@ -32,7 +39,9 @@ pub trait WorkspaceExt {
     /// Returns the target directory for the current profile.
     fn target_dir_profile(&self) -> Filesystem;
     /// Returns the manifests directory for the current profile.
-    fn manfiests_dir_profile(&self) -> Filesystem;
+    fn dojo_base_manfiests_dir_profile(&self) -> Filesystem;
+    /// Returns the base manifests directory.
+    fn dojo_manifests_dir(&self) -> Filesystem;
 }
 
 impl WorkspaceExt for Workspace<'_> {
@@ -44,14 +53,19 @@ impl WorkspaceExt for Workspace<'_> {
         )
     }
 
-    fn manfiests_dir_profile(&self) -> Filesystem {
-        let base_dir = self.manifest_path().parent().unwrap();
-        let fs = Filesystem::new(base_dir.to_path_buf()).child(MANIFESTS_DIR);
+    fn dojo_base_manfiests_dir_profile(&self) -> Filesystem {
+        let manifests_dir = self.dojo_manifests_dir();
 
-        fs.child(
+        manifests_dir.children(&[
             self.current_profile()
                 .expect("Current profile always exists")
                 .as_str(),
-        )
+            MANIFESTS_BASE_DIR,
+        ])
+    }
+
+    fn dojo_manifests_dir(&self) -> Filesystem {
+        let base_dir = self.manifest_path().parent().unwrap();
+        Filesystem::new(base_dir.to_path_buf()).child(MANIFESTS_DIR)
     }
 }

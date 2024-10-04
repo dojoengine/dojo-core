@@ -104,7 +104,7 @@ impl<'w> AbstractBaseManifest<'w> {
     ///
     /// * `path` - The path to write the manifest files to.
     pub fn write(&self) -> Result<()> {
-        let base_dir = self.workspace.manfiests_dir_profile();
+        let base_dir = self.workspace.dojo_base_manfiests_dir_profile();
 
         let world = toml::to_string(&self.world)?;
 

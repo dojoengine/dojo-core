@@ -17,3 +17,4 @@ pub const RESOURCE_METADATA_QUALIFIED_PATH: &str = "dojo::model::metadata::resou
 pub const CONTRACTS_DIR: &str = "contracts";
 pub const MODELS_DIR: &str = "models";
 pub const MANIFESTS_DIR: &str = "manifests";
+pub const MANIFESTS_BASE_DIR: &str = "base";

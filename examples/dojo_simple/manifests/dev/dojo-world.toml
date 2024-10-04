@@ -1,4 +1,0 @@
-kind = "StarknetContract"
-class_hash = "0x13c25f948368add83c25a6c1bbd5cd7f26ce700b7f4bb6d69cdcb208a5d9c67"
-qualified_path = "dojo::world::world_contract::world"
-name = "dojo-world"

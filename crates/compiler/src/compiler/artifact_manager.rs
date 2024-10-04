@@ -51,6 +51,11 @@ impl<'w> ArtifactManager<'w> {
         }
     }
 
+    /// Returns the workspace of the current compilation.
+    pub fn workspace(&self) -> &Workspace {
+        self.workspace
+    }
+
     /// Returns an iterator over the compiled artifacts.
     pub fn iter(&self) -> impl Iterator<Item = (&String, &CompiledArtifact)> {
         self.compiled_artifacts.iter()
