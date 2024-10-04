@@ -74,13 +74,7 @@ impl DojoCompiler {
             check_package_dojo_version(&ws, p)?;
         }
 
-        let _profile_name = ws
-            .current_profile()
-            .expect("Scarb profile is expected.")
-            .to_string();
-
-        // Manifest path is always a file, we can unwrap safely to get the parent folder.
-        let _manifest_dir = ws.manifest_path().parent().unwrap().to_path_buf();
+        ws.profile_check()?;
 
         DojoCompiler::clean(config, ProfileSpec::WorkspaceCurrent, true)?;
 
@@ -108,6 +102,8 @@ impl DojoCompiler {
         remove_base_manifests: bool,
     ) -> Result<()> {
         let ws = scarb::ops::read_workspace(config.manifest_path(), config)?;
+
+        ws.profile_check()?;
 
         let profile_name = ws
             .current_profile()
