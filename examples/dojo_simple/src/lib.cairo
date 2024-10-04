@@ -54,3 +54,12 @@ pub mod sn_actions {
     struct Storage {}
 
 }
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn test_spawn_world_full() {
+        let _world = spawn_test_world!();
+    }
+}

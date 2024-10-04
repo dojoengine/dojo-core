@@ -165,7 +165,7 @@ impl TestArgs {
             }
 
             let mut main_crate_ids = collect_all_crate_ids(&unit, &db);
-            let test_crate_ids = collect_main_crate_ids(&unit, &db);
+            let test_crate_ids = collect_main_crate_ids(&unit, &db, false);
 
             if let Some(external_contracts) = props.build_external_contracts {
                 main_crate_ids.extend(collect_crates_ids_from_selectors(&db, &external_contracts));

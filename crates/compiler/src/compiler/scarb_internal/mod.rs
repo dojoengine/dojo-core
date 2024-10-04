@@ -26,8 +26,10 @@ use tracing::trace;
 use crate::compiler::config::{CompilerConfig, DojoConfigLoader};
 use crate::namespace_config::{
     NamespaceConfig, DEFAULT_NAMESPACE_CFG_KEY, DOJO_MANIFESTS_DIR_CFG_KEY, NAMESPACE_CFG_PREFIX,
+    WORKSPACE_CURRENT_PROFILE_CFG_KEY,
 };
 use crate::plugin::plugin::dojo_plugin_suite;
+use crate::scarb_extensions::WorkspaceExt;
 
 pub mod debug;
 
@@ -243,18 +245,6 @@ pub fn cfg_set_from_component(
     let cname = c.cairo_package_name().clone();
     let package_compiler_config: CompilerConfig = DojoConfigLoader::from_package(&c.package, ws)?;
 
-    let dojo_manifests_dir = ws
-        .config()
-        .manifest_path()
-        .parent()
-        .expect("Scarb.toml manifest should always have parent")
-        .join("manifests")
-        .join(
-            ws.current_profile()
-                .expect("profile should be set")
-                .to_string(),
-        );
-
     ui.verbose(format!(
         "component: {} ({})",
         cname,
@@ -282,12 +272,22 @@ pub fn cfg_set_from_component(
 
     cfg_set.insert(Cfg {
         key: DOJO_MANIFESTS_DIR_CFG_KEY.into(),
-        value: Some(dojo_manifests_dir.to_string().into()),
+        value: Some(ws.dojo_manifests_dir_profile().to_string().into()),
     });
 
     cfg_set.insert(Cfg {
         key: DEFAULT_NAMESPACE_CFG_KEY.into(),
         value: Some(package_compiler_config.namespace.default.into()),
+    });
+
+    cfg_set.insert(Cfg {
+        key: WORKSPACE_CURRENT_PROFILE_CFG_KEY.into(),
+        value: Some(
+            ws.current_profile()
+                .expect("Current profile always exists")
+                .to_string()
+                .into(),
+        ),
     });
 
     // We ignore mappings for dependencies as the [[target.dojo]] package is

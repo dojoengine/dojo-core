@@ -6,9 +6,10 @@ use cairo_lang_defs::plugin::{
 use cairo_lang_defs::plugin_utils::unsupported_bracket_diagnostic;
 use cairo_lang_diagnostics::Severity;
 use cairo_lang_syntax::node::{ast, TypedStablePtr, TypedSyntaxNode};
+use tracing::trace;
 
 use super::unsupported_arg_diagnostic;
-use super::utils::extract_namespaces;
+use super::utils::{extract_namespaces, load_manifest_models_and_namespaces};
 
 #[derive(Debug, Default)]
 pub struct SpawnTestWorld;
@@ -22,7 +23,7 @@ impl InlineMacroExprPlugin for SpawnTestWorld {
         &self,
         db: &dyn cairo_lang_syntax::node::db::SyntaxGroup,
         syntax: &ast::ExprInlineMacro,
-        _metadata: &MacroPluginMetadata<'_>,
+        metadata: &MacroPluginMetadata<'_>,
     ) -> InlinePluginResult {
         let ast::WrappedArgList::ParenthesizedArgList(arg_list) = syntax.arguments(db) else {
             return unsupported_bracket_diagnostic(db, syntax);
@@ -43,7 +44,7 @@ impl InlineMacroExprPlugin for SpawnTestWorld {
             };
         }
 
-        let _whitelisted_namespaces = if args.len() == 1 {
+        let whitelisted_namespaces = if args.len() == 1 {
             let ast::ArgClause::Unnamed(expected_array) = args[0].arg_clause(db) else {
                 return unsupported_arg_diagnostic(db, syntax);
             };
@@ -61,24 +62,24 @@ impl InlineMacroExprPlugin for SpawnTestWorld {
             vec![]
         };
 
-        let namespaces: &[String] = &[];
-        let models: &[String] = &[];
-        /*         let (namespaces, models) =
-        match load_manifest_models_and_namespaces(metadata.cfg_set, &whitelisted_namespaces) {
-            ok((namespaces, models)) => (namespaces, models),
-            err(_e) => {
-                return inlinepluginresult {
-                    code: none,
-                    diagnostics: vec![plugindiagnostic {
-                        stable_ptr: syntax.stable_ptr().untyped(),
-                        message: "failed to load models and namespaces, ensure you have run \
+        let (namespaces, models) =
+            match load_manifest_models_and_namespaces(metadata.cfg_set, &whitelisted_namespaces) {
+                Ok((namespaces, models)) => (namespaces, models),
+                Err(_e) => {
+                    return InlinePluginResult {
+                        code: None,
+                        diagnostics: vec![PluginDiagnostic {
+                            stable_ptr: syntax.stable_ptr().untyped(),
+                            message: "failed to load models and namespaces, ensure you have run \
                                   `sozo build` first."
-                            .to_string(),
-                        severity: severity::error,
-                    }],
-                };
-            }
-        }; */
+                                .to_string(),
+                            severity: Severity::Error,
+                        }],
+                    };
+                }
+            };
+
+        trace!(?namespaces, ?models, "Spawning test world from macro.");
 
         let mut builder = PatchBuilder::new(db, syntax);
 
