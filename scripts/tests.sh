@@ -9,5 +9,6 @@ cargo test -p dojo-compiler
 # Testing with the demo compiler.
 cargo build -r --bin demo-compiler
 ./target/release/demo-compiler test --manifest-path crates/contracts/Scarb.toml
+
 ./target/release/demo-compiler build --manifest-path examples/dojo_simple/Scarb.toml
 ./target/release/demo-compiler test --manifest-path examples/dojo_simple/Scarb.toml

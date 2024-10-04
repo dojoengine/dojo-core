@@ -38,6 +38,27 @@ impl GeneratedFileAuxData for ModelAuxData {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
+pub struct EventAuxData {
+    pub name: String,
+    pub namespace: String,
+    pub members: Vec<Member>,
+}
+
+impl GeneratedFileAuxData for EventAuxData {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+
+    fn eq(&self, other: &dyn GeneratedFileAuxData) -> bool {
+        if let Some(other) = other.as_any().downcast_ref::<Self>() {
+            self == other
+        } else {
+            false
+        }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ContractAuxData {
     pub name: SmolStr,
@@ -66,6 +87,8 @@ impl GeneratedFileAuxData for ContractAuxData {
 /// as keys.
 #[derive(Debug, Default, PartialEq)]
 pub struct DojoAuxData {
+    /// A list of events that were processed by the plugin.
+    pub events: HashMap<String, EventAuxData>,
     /// A list of models that were processed by the plugin.
     pub models: HashMap<String, ModelAuxData>,
     /// A list of contracts that were processed by the plugin.
@@ -143,6 +166,31 @@ impl DojoAuxData {
                         dojo_aux_data
                             .models
                             .insert(model_contract_path, model_aux_data.clone());
+                        continue;
+                    }
+
+                    if let Some(event_aux_data) = aux_data.downcast_ref::<EventAuxData>() {
+                        // As events are defined from a struct (usually Pascal case), we have converted
+                        // the underlying starknet contract name to snake case in the `#[dojo::event]` attribute
+                        // macro processing.
+                        // Same thing as for contracts, we need to add the event name to the module path
+                        // to get the fully qualified path of the contract.
+                        let event_contract_path = format!(
+                            "{}{}{}",
+                            module_path,
+                            CAIRO_PATH_SEPARATOR,
+                            event_aux_data.name.to_case(Case::Snake)
+                        );
+
+                        trace!(
+                            event_contract_path,
+                            ?event_aux_data,
+                            "Adding dojo event to aux data."
+                        );
+
+                        dojo_aux_data
+                            .events
+                            .insert(event_contract_path, event_aux_data.clone());
                         continue;
                     }
 

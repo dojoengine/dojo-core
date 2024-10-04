@@ -8,7 +8,7 @@ use std::io::{Read, Write};
 
 use anyhow::Result;
 use dojo_types::naming;
-use scarb::core::Workspace;
+use scarb::core::{Config, Workspace};
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use starknet::core::serde::unsigned_field_element::UfeHex;
@@ -16,7 +16,8 @@ use starknet::core::types::Felt;
 
 use crate::scarb_extensions::{FilesystemExt, WorkspaceExt};
 use crate::{
-    BASE_CONTRACT_TAG, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, MODELS_DIR, WORLD_CONTRACT_TAG,
+    BASE_CONTRACT_TAG, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, EVENTS_DIR, MODELS_DIR,
+    WORLD_CONTRACT_TAG,
 };
 
 const TOML_EXTENSION: &str = "toml";
@@ -33,6 +34,13 @@ pub struct Member {
     pub key: bool,
 }
 
+pub trait ManifestMethods {
+    fn type_name(&self) -> String;
+    fn tag(&self) -> String;
+    fn qualified_path(&self) -> String;
+    fn to_toml_string(&self) -> Result<String, toml::ser::Error>;
+}
+
 /// Represents the contract of a dojo contract.
 #[serde_as]
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
@@ -46,6 +54,22 @@ pub struct ContractManifest {
     pub systems: Vec<String>,
 }
 
+impl ManifestMethods for ContractManifest {
+    fn type_name(&self) -> String {
+        "contract".to_string()
+    }
+
+    fn tag(&self) -> String {
+        self.tag.clone()
+    }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn to_toml_string(&self) -> Result<String, toml::ser::Error> {
+        toml::to_string(self)
+    }
+}
+
 /// Represents the contract of a dojo model.
 #[serde_as]
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
@@ -57,6 +81,51 @@ pub struct ModelManifest {
     pub qualified_path: String,
     pub tag: String,
     pub members: Vec<Member>,
+}
+
+impl ManifestMethods for ModelManifest {
+    fn type_name(&self) -> String {
+        "model".to_string()
+    }
+
+    fn tag(&self) -> String {
+        self.tag.clone()
+    }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn to_toml_string(&self) -> Result<String, toml::ser::Error> {
+        toml::to_string(self)
+    }
+}
+
+/// Represents the contract of a dojo event.
+#[serde_as]
+#[derive(Clone, Default, Debug, Serialize, Deserialize)]
+#[cfg_attr(test, derive(PartialEq))]
+#[serde(tag = "kind", rename = "DojoEvent")]
+pub struct EventManifest {
+    #[serde_as(as = "UfeHex")]
+    pub class_hash: Felt,
+    pub qualified_path: String,
+    pub tag: String,
+    pub members: Vec<Member>,
+}
+
+impl ManifestMethods for EventManifest {
+    fn type_name(&self) -> String {
+        "event".to_string()
+    }
+
+    fn tag(&self) -> String {
+        self.tag.clone()
+    }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn to_toml_string(&self) -> Result<String, toml::ser::Error> {
+        toml::to_string(self)
+    }
 }
 
 /// Represents a starknet contract.
@@ -83,6 +152,7 @@ pub struct AbstractBaseManifest<'w> {
     pub base: StarknetContractManifest,
     pub contracts: Vec<ContractManifest>,
     pub models: Vec<ModelManifest>,
+    pub events: Vec<EventManifest>,
     pub sn_contracts: Vec<StarknetContractManifest>,
 }
 
@@ -95,36 +165,55 @@ impl<'w> AbstractBaseManifest<'w> {
             base: StarknetContractManifest::default(),
             contracts: vec![],
             models: vec![],
+            events: vec![],
             sn_contracts: vec![],
         }
     }
 
     pub fn read(&mut self) -> Result<()> {
+        fn read_elements<T>(
+            config: &Config,
+            name: &str,
+            dir: scarb::flock::Filesystem,
+            vec: &mut Vec<T>,
+        ) -> Result<()>
+        where
+            T: serde::de::DeserializeOwned,
+        {
+            for file_name in dir.list_files()? {
+                let mut file = dir.open_ro(
+                    &file_name,
+                    &format!("{name} manifest for `{}`", &file_name),
+                    config,
+                )?;
+                let mut s = String::new();
+                file.read_to_string(&mut s)?;
+                vec.push(toml::from_str(&s)?);
+            }
+
+            Ok(())
+        }
+
         let base_dir = self.workspace.dojo_base_manfiests_dir_profile();
 
-        let contracts_dir = base_dir.child(CONTRACTS_DIR);
-        for file_name in contracts_dir.list_files()? {
-            let mut file = contracts_dir.open_ro(
-                &file_name,
-                &format!("contract manifest for `{}`", &file_name),
-                self.workspace.config(),
-            )?;
-            let mut contract_str = String::new();
-            file.read_to_string(&mut contract_str)?;
-            self.contracts.push(toml::from_str(&contract_str)?);
-        }
-
-        let models_dir = base_dir.child(MODELS_DIR);
-        for file_name in models_dir.list_files()? {
-            let mut file = models_dir.open_ro(
-                &file_name,
-                &format!("model manifest for `{}`", &file_name),
-                self.workspace.config(),
-            )?;
-            let mut model_str = String::new();
-            file.read_to_string(&mut model_str)?;
-            self.models.push(toml::from_str(&model_str)?);
-        }
+        read_elements(
+            self.workspace.config(),
+            "contract",
+            base_dir.child(CONTRACTS_DIR),
+            &mut self.contracts,
+        )?;
+        read_elements(
+            self.workspace.config(),
+            "model",
+            base_dir.child(MODELS_DIR),
+            &mut self.models,
+        )?;
+        read_elements(
+            self.workspace.config(),
+            "event",
+            base_dir.child(EVENTS_DIR),
+            &mut self.events,
+        )?;
 
         for file_name in base_dir.list_files()? {
             let mut file = base_dir.open_ro(
@@ -155,6 +244,37 @@ impl<'w> AbstractBaseManifest<'w> {
     ///
     /// * `path` - The path to write the manifest files to.
     pub fn write(&self) -> Result<()> {
+        fn write_element<T>(
+            config: &Config,
+            dir: scarb::flock::Filesystem,
+            elements: &Vec<T>,
+        ) -> Result<()>
+        where
+            T: ManifestMethods,
+        {
+            for element in elements {
+                let name = format!(
+                    "{}.{}",
+                    naming::get_filename_from_tag(&element.tag()),
+                    TOML_EXTENSION
+                );
+
+                let mut file = dir.open_rw(
+                    name,
+                    &format!(
+                        "{} manifest for `{}`",
+                        element.type_name(),
+                        element.qualified_path()
+                    ),
+                    config,
+                )?;
+
+                file.write(element.to_toml_string()?.as_bytes())?;
+            }
+
+            Ok(())
+        }
+
         let base_dir = self.workspace.dojo_base_manfiests_dir_profile();
 
         let world = toml::to_string(&self.world)?;
@@ -177,40 +297,10 @@ impl<'w> AbstractBaseManifest<'w> {
 
         file.write(base.as_bytes())?;
 
-        let contracts_dir = base_dir.child(CONTRACTS_DIR);
-        let models_dir = base_dir.child(MODELS_DIR);
-
-        for contract in &self.contracts {
-            let name = format!(
-                "{}.{}",
-                naming::get_filename_from_tag(&contract.tag),
-                TOML_EXTENSION
-            );
-
-            let mut file = contracts_dir.open_rw(
-                name,
-                &format!("contract manifest for `{}`", contract.qualified_path),
-                self.workspace.config(),
-            )?;
-
-            file.write(toml::to_string(contract)?.as_bytes())?;
-        }
-
-        for model in &self.models {
-            let name = format!(
-                "{}.{}",
-                naming::get_filename_from_tag(&model.tag),
-                TOML_EXTENSION
-            );
-
-            let mut file = models_dir.open_rw(
-                name,
-                &format!("model manifest for `{}`", model.qualified_path),
-                self.workspace.config(),
-            )?;
-
-            file.write(toml::to_string(model)?.as_bytes())?;
-        }
+        let config = self.workspace.config();
+        write_element(config, base_dir.child(CONTRACTS_DIR), &self.contracts)?;
+        write_element(config, base_dir.child(MODELS_DIR), &self.models)?;
+        write_element(config, base_dir.child(EVENTS_DIR), &self.events)?;
 
         for sn_contract in &self.sn_contracts {
             let name = format!(

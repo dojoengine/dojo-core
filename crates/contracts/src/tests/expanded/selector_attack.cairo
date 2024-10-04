@@ -98,12 +98,12 @@ pub mod attacker_model {
             Option::None
         }
 
-        fn layout(self: @ContractState) -> dojo::model::Layout {
-            dojo::model::Layout::Fixed([].span())
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::meta::Layout::Fixed([].span())
         }
 
-        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
-            dojo::model::introspect::Ty::Primitive('felt252')
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
+            dojo::meta::introspect::Ty::Primitive('felt252')
         }
     }
 }

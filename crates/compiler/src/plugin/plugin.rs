@@ -15,7 +15,7 @@ use semver::Version;
 use url::Url;
 
 use super::attribute_macros::{
-    DojoContract, DojoInterface, DojoModel, DOJO_CONTRACT_ATTR, DOJO_EVENT_ATTR,
+    DojoContract, DojoEvent, DojoInterface, DojoModel, DOJO_CONTRACT_ATTR, DOJO_EVENT_ATTR,
     DOJO_INTERFACE_ATTR, DOJO_MODEL_ATTR,
 };
 use super::derive_macros::{dojo_derive_all, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE};
@@ -141,14 +141,7 @@ impl MacroPlugin for BuiltinDojoPlugin {
                 } else if n_model_attrs == 1 {
                     return DojoModel::from_struct(db, struct_ast.clone(), &namespace_config);
                 } else if n_event_attrs == 1 {
-                    // TODO: when event will be separated from model, we need to check for conflicts.
-                    // The same struct can't be used for both `#[dojo::model]` and `#[dojo::event]`.
-                    //
-                    // Events will be reworked to be similar to models, and emitted via a World's event
-                    // instead of using the syscall.
-                    //
-                    // `#[dojo::event]` for now does nothing.
-                    return PluginResult::default();
+                    return DojoEvent::from_struct(db, struct_ast.clone(), &namespace_config);
                 }
 
                 // Not a model or event, but has derives.

@@ -3,6 +3,7 @@ use starknet::{contract_address_const, ContractAddress, get_caller_address};
 use dojo::world::Resource;
 use dojo::world::config::Config::{DifferProgramHashUpdate, FactsRegistryUpdate};
 use dojo::world::config::{IConfigDispatcher, IConfigDispatcherTrait};
+use dojo::world::world::{Event, EventEmitted};
 use dojo::model::{Model, ResourceMetadata};
 use dojo::utils::bytearray_hash;
 use dojo::world::{
@@ -106,14 +107,29 @@ fn test_contract_getter() {
 #[test]
 #[available_gas(6000000)]
 fn test_emit() {
+    let bob = starknet::contract_address_const::<0xb0b>();
+
     let world = deploy_world();
 
-    let mut keys = ArrayTrait::new();
-    keys.append('MyEvent');
-    let mut values = ArrayTrait::new();
-    values.append(1);
-    values.append(2);
-    world.emit(keys, values.span());
+    drop_all_events(world.contract_address);
+
+    starknet::testing::set_contract_address(bob);
+
+    world.emit(selector!("MyEvent"), [1, 2].span(), [3, 4].span(), true);
+
+    let event = starknet::testing::pop_log::<Event>(world.contract_address);
+
+    assert(event.is_some(), 'no event');
+
+    if let Event::EventEmitted(event) = event.unwrap() {
+        assert(event.event_selector == selector!("MyEvent"), 'bad event selector');
+        assert(event.system_address == bob, 'bad system address');
+        assert(event.historical, 'bad historical value');
+        assert(event.keys == [1, 2].span(), 'bad keys');
+        assert(event.values == [3, 4].span(), 'bad keys');
+    } else {
+        core::panic_with_felt252('no EventEmitted event');
+    }
 }
 
 

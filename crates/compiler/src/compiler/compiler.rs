@@ -28,7 +28,7 @@ use tracing::{trace, trace_span};
 
 use crate::aux_data::DojoAuxData;
 use crate::compiler::manifest::{
-    AbstractBaseManifest, ContractManifest, ModelManifest, StarknetContractManifest,
+    AbstractBaseManifest, ContractManifest, EventManifest, ModelManifest, StarknetContractManifest,
 };
 use crate::scarb_extensions::{ProfileSpec, WorkspaceExt};
 use crate::{
@@ -199,6 +199,7 @@ impl Compiler for DojoCompiler {
         // to create the manifests.
         let contracts = write_dojo_contracts_artifacts(&artifact_manager, &aux_data)?;
         let models = write_dojo_models_artifacts(&artifact_manager, &aux_data)?;
+        let events = write_dojo_events_artifacts(&artifact_manager, &aux_data)?;
         let (world, base, sn_contracts) =
             write_sn_contract_artifacts(&artifact_manager, &aux_data)?;
 
@@ -206,6 +207,7 @@ impl Compiler for DojoCompiler {
         base_manifest.base = base;
         base_manifest.contracts.extend(contracts);
         base_manifest.models.extend(models);
+        base_manifest.events.extend(events);
         base_manifest.sn_contracts.extend(sn_contracts);
 
         base_manifest.write()?;
@@ -471,6 +473,35 @@ fn write_dojo_models_artifacts(
     }
 
     Ok(models)
+}
+
+/// Writes the dojo event artifacts to the target directory and returns the event manifests.
+fn write_dojo_events_artifacts(
+    artifact_manager: &ArtifactManager,
+    aux_data: &DojoAuxData,
+) -> Result<Vec<EventManifest>> {
+    let mut events = Vec::new();
+
+    for (qualified_path, event_aux_data) in aux_data.events.iter() {
+        let tag = naming::get_tag(&event_aux_data.namespace, &event_aux_data.name);
+        let filename = naming::get_filename_from_tag(&tag);
+
+        let target_dir = artifact_manager
+            .workspace()
+            .target_dir_profile()
+            .child(MODELS_DIR);
+
+        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
+
+        events.push(EventManifest {
+            class_hash: artifact_manager.get_class_hash(qualified_path)?,
+            qualified_path: qualified_path.to_string(),
+            tag,
+            members: event_aux_data.members.clone(),
+        });
+    }
+
+    Ok(events)
 }
 
 /// Writes the starknet contracts artifacts to the target directory and returns the starknet contract manifests.
