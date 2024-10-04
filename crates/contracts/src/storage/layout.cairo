@@ -167,21 +167,28 @@ pub fn write_enum_layout(
     ref offset: u32,
     variant_layouts: Span<FieldLayout>
 ) {
-    // first, get the variant value from `values``
-    let variant = *values.at(offset);
-    assert(variant.into() < 256_u256, 'invalid variant value');
+    if let Option::Some(variant) = values.get(offset) {
+        // TODO: when Cairo 2.8 support is added, unboxing should be implicit.
+        let variant: felt252 = *variant.unbox();
+        // first, get the variant value from `values`
+        assert(variant.into() < 256_u256, 'invalid variant value');
 
-    // and write it
-    database::set(model, key, values, offset, [251].span());
-    offset += 1;
+        // and write it
+        database::set(model, key, values, offset, [251].span());
+        offset += 1;
 
-    // find the corresponding layout and then write the full variant
-    let variant_data_key = combine_key(key, variant);
+        // find the corresponding layout and then write the full variant
+        let variant_data_key = combine_key(key, variant);
 
-    match find_field_layout(variant, variant_layouts) {
-        Option::Some(layout) => write_layout(model, variant_data_key, values, ref offset, layout),
-        Option::None => panic!("Unable to find the variant layout")
-    };
+        match find_field_layout(variant, variant_layouts) {
+            Option::Some(layout) => write_layout(
+                model, variant_data_key, values, ref offset, layout
+            ),
+            Option::None => panic!("Unable to find the variant layout")
+        };
+    } else {
+        panic!("offset is out of bounds for enum layout variant");
+    }
 }
 
 /// Delete a fixed layout model record from the world storage.
