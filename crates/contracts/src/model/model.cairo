@@ -45,7 +45,7 @@ pub trait Model<T> {
         world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252,
     ) -> Span<felt252>;
 
-    fn set_member(self: @T, world: IWorldDispatcher, member_id: felt252, values: Span<felt252>,);
+    fn set_member(world: IWorldDispatcher, entity_id: felt252, member_id: felt252, values: Span<felt252>,);
 
     /// Returns the name of the model as it was written in Cairo code.
     fn name() -> ByteArray;

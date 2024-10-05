@@ -58,7 +58,7 @@ pub struct $type_name$Entity {
     $members_values$
 }
 
-pub impl $type_name$ModelImpl of dojo::model::model_impl::ModelImpl<$type_name$>;
+pub impl $type_name$ModelImpl = dojo::model::model_impl::ModelImpl<$type_name$>;
 
 #[generate_trait]
 pub impl $type_name$EntityStoreImpl of $type_name$EntityStore {
