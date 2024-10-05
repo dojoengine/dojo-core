@@ -26,6 +26,7 @@
         $model_name$ModelImpl::set_member(
             self,
             world,
+            $model_name$ModelImpl::entity_id(self),
             $field_selector$,
             serialized.span()
         );

@@ -78,8 +78,8 @@ pub impl ModelImpl<
     }
 
     fn set_member(
-        self: @T,
         world: IWorldDispatcher,
+        entity_id: felt252,
         member_id: felt252,
         values: Span<felt252>
     ) {
@@ -88,7 +88,7 @@ pub impl ModelImpl<
                 IWorldDispatcherTrait::set_entity(
                     world,
                     ModelAttributes::<T>::SELECTOR,
-                    ModelIndex::MemberId((Self::entity_id(self), member_id)),
+                    ModelIndex::MemberId((entity_id, member_id)),
                     values,
                     field_layout
                 )
