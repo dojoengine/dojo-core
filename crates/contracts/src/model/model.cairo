@@ -104,6 +104,7 @@ pub trait ModelAttributes<T> {
 pub trait ModelKeyValueTrait<T> {
     fn keys(self: @T) -> Span<felt252>;
     fn values(self: @T) -> Span<felt252>;
+    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> T;
 }
 
 #[cfg(target: "test")]

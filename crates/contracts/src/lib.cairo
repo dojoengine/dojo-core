@@ -14,7 +14,7 @@ pub mod model {
     pub mod model;
     pub use model::{
         Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
-        ModelAttributes, ModelKeyValueTrait
+        ModelAttributes
     };
 
     #[cfg(target: "test")]
@@ -24,7 +24,7 @@ pub mod model {
     pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
     pub(crate) use metadata::{initial_address, initial_class_hash};
 
-    // pub mod model_impl;
+    pub mod model_impl;
 }
 
 pub(crate) mod storage {

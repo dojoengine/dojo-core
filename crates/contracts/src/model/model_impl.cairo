@@ -6,6 +6,7 @@ use dojo::{
         ModelAttributes, 
         Layout,
         introspect::{Introspect, Ty},
+        layout::compute_packed_size,
     },
     world::{IWorldDispatcher, IWorldDispatcherTrait},
 };
@@ -13,42 +14,47 @@ use dojo::{
 
 
 pub impl ModelImpl<
-    M, +Serde<M>, +Drop<M>, +ModelAttributes<M>, +Introspect<M>
-> of Model<M> {
-    fn get(world: dojo::world::, keys: Span<felt252>) -> M {
+    T, 
+    +Serde<T>, 
+    +Drop<T>, 
+    +ModelAttributes<T>, 
+    +Introspect<T>, 
+    +dojo::model::model::ModelKeyValueTrait<T>
+> of Model<T> {
+    fn get(world: IWorldDispatcher, keys: Span<felt252>) -> T {
         let mut values = IWorldDispatcherTrait::entity(
             world,
-            ModelAttributes::<M>::SELECTOR,
+            ModelAttributes::<T>::SELECTOR,
             ModelIndex::Keys(keys),
-            Introspect::<M>::layout()
+            Introspect::<T>::layout()
         );
         let mut _keys = keys;
 
-        $type_name$Store::from_values(ref _keys, ref values)
+        dojo::model::model::ModelKeyValueTrait::<T>::from_values(ref _keys, ref values)
     }
 
    fn set_model(
-        self: @M,
+        self: @T,
         world: IWorldDispatcher
     ) {
         IWorldDispatcherTrait::set_entity(
             world,
-            ModelAttributes::<M>::SELECTOR,
-            ModelIndex::Keys(ModelImpl::<T>::keys(self)),
-            ModelImpl::<T>::values(self),
-            Introspect::<M>::layout()
+            ModelAttributes::<T>::SELECTOR,
+            ModelIndex::Keys(Self::keys(self)),
+            Self::values(self),
+            Introspect::<T>::layout()
         );
     }
 
     fn delete_model(
-        self: @M,
+        self: @T,
         world: IWorldDispatcher
     ) {
         IWorldDispatcherTrait::delete_entity(
             world,
-            ModelAttributes::<M>::SELECTOR,
-            ModelIndex::Keys(ModelImpl::<T>::keys(self)),
-            Introspect::<M>::layout()
+            ModelAttributes::<T>::SELECTOR,
+            ModelIndex::Keys(Self::keys(self)),
+            Introspect::<T>::layout()
         );
     }
 
@@ -57,12 +63,12 @@ pub impl ModelImpl<
         keys: Span<felt252>,
         member_id: felt252
     ) -> Span<felt252> {
-        match dojo::utils::find_model_field_layout(Introspect::<M>::layout(), member_id) {
+        match dojo::utils::find_model_field_layout(Introspect::<T>::layout(), member_id) {
             Option::Some(field_layout) => {
                 let entity_id = dojo::utils::entity_id_from_keys(keys);
                 IWorldDispatcherTrait::entity(
                     world,
-                    ModelAttributes::<M>::SELECTOR,
+                    ModelAttributes::<T>::SELECTOR,
                     ModelIndex::MemberId((entity_id, member_id)),
                     field_layout
                 )
@@ -72,17 +78,17 @@ pub impl ModelImpl<
     }
 
     fn set_member(
-        self: @M,
+        self: @T,
         world: IWorldDispatcher,
         member_id: felt252,
         values: Span<felt252>
     ) {
-        match dojo::utils::find_model_field_layout(Introspect::<M>::layout(), member_id) {
+        match dojo::utils::find_model_field_layout(Introspect::<T>::layout(), member_id) {
             Option::Some(field_layout) => {
                 IWorldDispatcherTrait::set_entity(
                     world,
-                    ModelAttributes::<M>::SELECTOR,
-                    ModelIndex::MemberId((self.entity_id(), member_id)),
+                    ModelAttributes::<T>::SELECTOR,
+                    ModelIndex::MemberId((Self::entity_id(self), member_id)),
                     values,
                     field_layout
                 )
@@ -93,75 +99,71 @@ pub impl ModelImpl<
 
     #[inline(always)]
     fn name() -> ByteArray {
-        ModelAttributes::<M>::name()
+        ModelAttributes::<T>::name()
     }
 
     #[inline(always)]
     fn namespace() -> ByteArray {
-        ModelAttributes::<M>::namespace()
+        ModelAttributes::<T>::namespace()
     }
 
     #[inline(always)]
     fn tag() -> ByteArray {
-        ModelAttributes::<M>::tag()
+        ModelAttributes::<T>::tag()
     }
 
     #[inline(always)]
     fn version() -> u8 {
-        ModelAttributes::<M>::VERSION
+        ModelAttributes::<T>::VERSION
     }
 
     #[inline(always)]
     fn selector() -> felt252 {
-        ModelAttributes::<M>::SELECTOR
+        ModelAttributes::<T>::SELECTOR
     }
 
     #[inline(always)]
-    fn instance_selector() -> felt252 {
-        ModelAttributes::<M>::SELECTOR
+    fn instance_selector(self: @T) -> felt252 {
+        ModelAttributes::<T>::SELECTOR
     }
 
     #[inline(always)]
     fn name_hash() -> felt252 {
-        ModelAttributes::<M>::NAME_HASH
+        ModelAttributes::<T>::NAME_HASH
     }
 
     #[inline(always)]
     fn namespace_hash() -> felt252 {
-        ModelAttributes::<M>::NAMESPACE_HASH
+        ModelAttributes::<T>::NAMESPACE_HASH
     }
 
     #[inline(always)]
-    fn entity_id(self: @$type_name$) -> felt252 {
-        core::poseidon::poseidon_hash_span(self.keys())
+    fn entity_id(self: @T) -> felt252 {
+        core::poseidon::poseidon_hash_span(Self::keys(self))
     }
 
     #[inline(always)]
-    fn keys(self: @$type_name$) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_keys$
-        core::array::ArrayTrait::span(@serialized)
+    fn keys(self: @T) -> Span<felt252> {
+        dojo::model::model::ModelKeyValueTrait::<T>::keys(self)
     }
 
     #[inline(always)]
-    fn values(self: @$type_name$) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_values$
-        core::array::ArrayTrait::span(@serialized)
+    fn values(self: @T) -> Span<felt252> {
+        dojo::model::model::ModelKeyValueTrait::<T>::values(self)
     }
 
     #[inline(always)]
     fn layout() -> Layout {
-        Introspect::<M>::layout()
+        Introspect::<T>::layout()
     }
 
     #[inline(always)]
-    fn instance_layout() -> Layout {
-        Introspect::<M>::layout()
+    fn instance_layout(self: @T) -> Layout {
+        Introspect::<T>::layout()
     }
 
     #[inline(always)]
     fn packed_size() -> Option<usize> {
-        layout::compute_packed_size(Introspect::<M>::layout())
+        compute_packed_size(Introspect::<T>::layout())
     }
 }

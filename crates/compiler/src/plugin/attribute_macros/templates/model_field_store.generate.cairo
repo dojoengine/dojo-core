@@ -2,7 +2,7 @@
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_param_keys$
 
-        let mut values = dojo::model::Model::<$model_name$>::get_member(
+        let mut values = $model_name$ModelImpl::get_member(
             world,
             serialized.span(),
             $field_selector$
@@ -23,7 +23,7 @@
         let mut serialized = core::array::ArrayTrait::new();
         core::serde::Serde::serialize(@value, ref serialized);
 
-        self.set_member(
+        $model_name$ModelImpl::set_member(
             world,
             $field_selector$,
             serialized.span()
