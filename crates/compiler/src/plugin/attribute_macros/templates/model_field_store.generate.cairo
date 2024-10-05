@@ -24,7 +24,6 @@
         core::serde::Serde::serialize(@value, ref serialized);
 
         $model_name$ModelImpl::set_member(
-            self,
             world,
             $model_name$ModelImpl::entity_id(self),
             $field_selector$,

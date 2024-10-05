@@ -9,7 +9,7 @@ use core::poseidon::poseidon_hash_span;
 use core::serde::Serde;
 
 use dojo::model::introspect::{Introspect, Ty, Struct, Member};
-use dojo::model::{Model, ModelIndex, Layout, FieldLayout, model_impl::ModelImpl};
+use dojo::model::{Model, ModelIndex, Layout, FieldLayout, impls::ModelImpl};
 use dojo::utils;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 

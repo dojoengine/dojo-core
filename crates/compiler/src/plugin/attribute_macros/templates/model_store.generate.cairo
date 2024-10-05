@@ -1,24 +1,38 @@
-pub impl $type_name$Attributes of dojo::model::ModelAttributes<$type_name$>{
-    const VERSION: u8 = $model_version$;
-    const SELECTOR: felt252 = $model_selector$;
-    const NAME_HASH: felt252 = $model_name_hash$;
-    const NAMESPACE_HASH: felt252 = $model_namespace_hash$;
 
-    #[inline(always)]
-    fn name() -> ByteArray {
-        "$type_name$"
-    }
-    
-    #[inline(always)]
-    fn namespace() -> ByteArray {
-        "$model_namespace$"
-    }
-    
-    #[inline(always)]
-    fn tag() -> ByteArray {
-        "$model_tag$"
-    }
+#[derive(Drop, Serde)]
+pub struct $type_name$Entity {
+    __id: felt252, // private field
+    $members_values$
 }
+
+mod $contract_name$_attributes {
+    use super::{$type_name$, $type_name$Entity};   
+    pub impl $type_name$AttributesImpl<M> of dojo::model::ModelAttributes<M>{
+        const VERSION: u8 = $model_version$;
+        const SELECTOR: felt252 = $model_selector$;
+        const NAME_HASH: felt252 = $model_name_hash$;
+        const NAMESPACE_HASH: felt252 = $model_namespace_hash$;
+
+        #[inline(always)]
+        fn name() -> ByteArray {
+            "$type_name$"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "$model_namespace$"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "$model_tag$"
+        }
+    }
+    pub impl $type_name$Attributes = $type_name$AttributesImpl<$type_name$>;
+    pub impl $type_name$EntityAttributes = $type_name$AttributesImpl<$type_name$Entity>;
+}
+
+pub use $contract_name$_attributes::{$type_name$Attributes, $type_name$EntityAttributes};
 
 pub impl $type_name$ModelKeyValue of dojo::model::model::ModelKeyValueTrait<$type_name$> {
     fn keys(self: @$type_name$) -> Span<felt252> {
@@ -52,11 +66,7 @@ pub impl $type_name$ModelKeyValue of dojo::model::model::ModelKeyValueTrait<$typ
 }
 
 
-#[derive(Drop, Serde)]
-pub struct $type_name$Entity {
-    __id: felt252, // private field
-    $members_values$
-}
+
 
 pub impl $type_name$ModelImpl = dojo::model::model_impl::ModelImpl<$type_name$>;
 
