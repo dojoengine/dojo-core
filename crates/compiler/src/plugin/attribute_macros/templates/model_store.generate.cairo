@@ -21,6 +21,20 @@ impl $type_name$Attributes of dojo::model::ModelAttributes<$type_name$>{
 }
 
 
+// impl $type_name$Store of dojo::model::ModelKeyValueTrait<$type_name$> {
+//     fn keys(self: @$type_name$) -> Span<felt252> {
+//         let mut serialized = core::array::ArrayTrait::new();
+//         $serialized_keys$
+//         core::array::ArrayTrait::span(@serialized)
+//     }
+
+//     fn values(self: @$type_name$) -> Span<felt252> {
+//         let mut serialized = core::array::ArrayTrait::new();
+//         $serialized_values$
+//         core::array::ArrayTrait::span(@serialized)
+//     }
+// }
+
 
 #[derive(Drop, Serde)]
 pub struct $type_name$Entity {

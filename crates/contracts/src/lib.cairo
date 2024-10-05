@@ -23,6 +23,8 @@ pub mod model {
     pub mod metadata;
     pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
     pub(crate) use metadata::{initial_address, initial_class_hash};
+
+    // pub mod model_impl;
 }
 
 pub(crate) mod storage {
