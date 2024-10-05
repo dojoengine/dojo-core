@@ -101,10 +101,10 @@ pub trait ModelAttributes<T> {
     fn tag() -> ByteArray;
 }
 
-// pub trait ModelKeyValueTrait<T> {
-//     fn keys(self: @T) -> Span<felt252>;
-//     fn values(self: @T) -> Span<felt252>;
-// }
+pub trait ModelKeyValueTrait<T> {
+    fn keys(self: @T) -> Span<felt252>;
+    fn values(self: @T) -> Span<felt252>;
+}
 
 #[cfg(target: "test")]
 pub trait ModelTest<T> {

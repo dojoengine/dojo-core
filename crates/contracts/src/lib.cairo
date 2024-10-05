@@ -14,7 +14,7 @@ pub mod model {
     pub mod model;
     pub use model::{
         Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
-        ModelAttributes
+        ModelAttributes, ModelKeyValueTrait
     };
 
     #[cfg(target: "test")]
