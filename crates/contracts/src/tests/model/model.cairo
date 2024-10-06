@@ -34,7 +34,7 @@ fn test_values() {
 fn test_from_values() {
     let mut values = [3, 4].span();
 
-    let model_entity = ModelEntity::<FooEntity>::from_values(1, ref values);
+    let model_entity = ModelEntity::<FooEntity>::from_values(1, values);
     assert!(model_entity.__id == 1 && model_entity.v1 == 3 && model_entity.v2 == 4);
 }
 
@@ -42,7 +42,7 @@ fn test_from_values() {
 #[should_panic(expected: "ModelEntity `FooEntity`: deserialization failed.")]
 fn test_from_values_bad_data() {
     let mut values = [3].span();
-    let _ = ModelEntity::<FooEntity>::from_values(1, ref values);
+    let _ = ModelEntity::<FooEntity>::from_values(1, values);
 }
 
 #[test]
@@ -75,7 +75,7 @@ fn test_delete_entity() {
     foo.set(world);
 
     let entity_id = foo.entity_id();
-    let mut entity = FooEntityStore::get(world, entity_id);
+    let mut entity: FooEntity = ModelEntity::get(world, entity_id);
     entity.delete(world);
 
     let read_values = FooEntityStore::get(world, entity_id);
@@ -97,10 +97,10 @@ fn test_get_and_set_member_from_entity() {
     assert!(v1_raw_value.len() == 1);
     assert!(*v1_raw_value.at(0) == 3);
 
-    let entity = FooEntityStore::get(world, foo.entity_id());
-    entity.set_member(world, selector!("v1"), [42].span());
+    let entity: FooEntity = ModelEntity::get(world, foo.entity_id());
+    FooModelEntityImpl::set_member(world, entity.__id, selector!("v1"), [42].span());
 
-    let entity = FooEntityStore::get(world, foo.entity_id());
+    let entity: FooEntity = ModelEntity::get(world, foo.entity_id());
     assert!(entity.v1 == 42);
 }
 
@@ -115,8 +115,9 @@ fn test_get_and_set_field_name() {
     let v1 = FooEntityStore::get_v1(world, foo.entity_id());
     assert!(foo.v1 == v1);
 
-    let entity = FooEntityStore::get(world, foo.entity_id());
-    entity.set_v1(world, 42);
+    let entity: FooEntity = ModelEntity::get(world, foo.entity_id());
+
+    FooEntityStore::set_v1(world, foo.entity_id(), 42);
 
     let v1 = FooEntityStore::get_v1(world, foo.entity_id());
     assert!(v1 == 42);
@@ -172,7 +173,7 @@ fn test_get_and_set_member_from_model() {
     assert!(v1_raw_value.len() == 1);
     assert!(*v1_raw_value.at(0) == 3);
 
-    foo.set_member(world, selector!("v1"), [42].span());
+    FooModelImpl::set_member(world, keys,selector!("v1"), [42].span());
     let foo = FooStore::get(world, foo.k1, foo.k2);
     assert!(foo.v1 == 42);
 }
@@ -188,7 +189,7 @@ fn test_get_and_set_field_name_from_model() {
     let v1 = FooStore::get_v1(world, foo.k1, foo.k2);
     assert!(v1 == 3);
 
-    foo.set_v1(world, 42);
+    FooStore::set_v1(world, foo.k1, foo.k2, 42);
 
     let v1 = FooStore::get_v1(world, foo.k1, foo.k2);
     assert!(v1 == 42);

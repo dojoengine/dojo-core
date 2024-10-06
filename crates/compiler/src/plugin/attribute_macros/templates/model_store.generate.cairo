@@ -1,12 +1,10 @@
-
-#[derive(Drop, Serde)]
-pub struct $type_name$Entity {
-    __id: felt252, // private field
-    $members_values$
-}
-
-mod $contract_name$_attributes {
-    use super::{$type_name$, $type_name$Entity};   
+mod $contract_name$_generated {
+    use super::$type_name$;
+    #[derive(Drop, Serde)]
+    pub struct $type_name$Entity {
+        pub __id: felt252, // private field
+        $members_values$
+    } 
     pub impl $type_name$AttributesImpl<M> of dojo::model::ModelAttributes<M>{
         const VERSION: u8 = $model_version$;
         const SELECTOR: felt252 = $model_selector$;
@@ -32,75 +30,75 @@ mod $contract_name$_attributes {
             dojo::model::introspect::Introspect::<$type_name$>::layout()
         }
     }
-    pub impl $type_name$Attributes = $type_name$AttributesImpl<$type_name$>;
-    pub impl $type_name$EntityAttributes = $type_name$AttributesImpl<$type_name$Entity>;
-}
 
-pub use $contract_name$_attributes::{$type_name$Attributes, $type_name$EntityAttributes};
-
-pub impl $type_name$ModelKeyValue of dojo::model::model::ModelKeyValueTrait<$type_name$> {
-    fn entity_id(self: @$type_name$) -> felt252 {
-        core::poseidon::poseidon_hash_span(Self::serialized_keys(self))
-    }
-
-    fn serialized_keys(self: @$type_name$) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_keys$
-        core::array::ArrayTrait::span(@serialized)
-    }
-
-    fn serialized_values(self: @$type_name$) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_values$
-        core::array::ArrayTrait::span(@serialized)
-    }
-
-    fn from_serialized_values(keys: Span<felt252>, values: Span<felt252>) -> $type_name$ {
-        let mut serialized = core::array::ArrayTrait::new();
-        serialized.append_span(keys);
-        serialized.append_span(values);
-        let mut serialized = core::array::ArrayTrait::span(@serialized);
-
-        let entity = core::serde::Serde::<$type_name$>::deserialize(ref serialized);
-
-        if core::option::OptionTrait::<$type_name$>::is_none(@entity) {
-            panic!(
-                "Model `$type_name$`: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
-            );
+    pub impl $type_name$ModelKeyValue of dojo::model::model::ModelKeyValueTrait<$type_name$> {
+        fn entity_id(self: @$type_name$) -> felt252 {
+            core::poseidon::poseidon_hash_span(Self::serialized_keys(self))
         }
-
-        core::option::OptionTrait::<$type_name$>::unwrap(entity)
-    }
-}
-
-pub impl $type_name$EntityIdValueTrait of dojo::model::model::EntityIdValueTrait<$type_name$Entity>{
-    fn id(self: @$type_name$Entity) -> felt252 {
-        *self.__id
-    }
-    fn serialized_values(self: @$type_name$Entity) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_values$
-        core::array::ArrayTrait::span(@serialized)
-    }
-    fn from_serialized_values(entity_id: felt252, values: Span<felt252>) -> $type_name$Entity {
-        let mut serialized = array![entity_id];
-        serialized.append_span(values);
-        let mut serialized = core::array::ArrayTrait::span(@serialized);
-
-        let entity_values = core::serde::Serde::<$type_name$Entity>::deserialize(ref serialized);
-        if core::option::OptionTrait::<$type_name$Entity>::is_none(@entity_values) {
-            panic!(
-                "ModelEntity `$type_name$Entity`: deserialization failed."
-            );
+    
+        fn serialized_keys(self: @$type_name$) -> Span<felt252> {
+            let mut serialized = core::array::ArrayTrait::new();
+            $serialized_keys$
+            core::array::ArrayTrait::span(@serialized)
         }
-        core::option::OptionTrait::<$type_name$Entity>::unwrap(entity_values)
+    
+        fn serialized_values(self: @$type_name$) -> Span<felt252> {
+            let mut serialized = core::array::ArrayTrait::new();
+            $serialized_values$
+            core::array::ArrayTrait::span(@serialized)
+        }
+    
+        fn from_serialized_values(keys: Span<felt252>, values: Span<felt252>) -> $type_name$ {
+            let mut serialized = core::array::ArrayTrait::new();
+            serialized.append_span(keys);
+            serialized.append_span(values);
+            let mut serialized = core::array::ArrayTrait::span(@serialized);
+    
+            let entity = core::serde::Serde::<$type_name$>::deserialize(ref serialized);
+    
+            if core::option::OptionTrait::<$type_name$>::is_none(@entity) {
+                panic!(
+                    "Model `$type_name$`: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
+                );
+            }
+    
+            core::option::OptionTrait::<$type_name$>::unwrap(entity)
+        }
     }
+    
+    pub impl $type_name$EntityIdValue of dojo::model::model::EntityIdValueTrait<$type_name$Entity>{
+        fn id(self: @$type_name$Entity) -> felt252 {
+            *self.__id
+        }
+        fn serialized_values(self: @$type_name$Entity) -> Span<felt252> {
+            let mut serialized = core::array::ArrayTrait::new();
+            $serialized_values$
+            core::array::ArrayTrait::span(@serialized)
+        }
+        fn from_serialized_values(entity_id: felt252, values: Span<felt252>) -> $type_name$Entity {
+            let mut serialized = array![entity_id];
+            serialized.append_span(values);
+            let mut serialized = core::array::ArrayTrait::span(@serialized);
+    
+            let entity_values = core::serde::Serde::<$type_name$Entity>::deserialize(ref serialized);
+            if core::option::OptionTrait::<$type_name$Entity>::is_none(@entity_values) {
+                panic!(
+                    "ModelEntity `$type_name$Entity`: deserialization failed."
+                );
+            }
+            core::option::OptionTrait::<$type_name$Entity>::unwrap(entity_values)
+        }
+    }
+
+    pub impl $type_name$ModelImpl = dojo::model::model::ModelImpl<$type_name$>;
+    pub impl $type_name$ModelEntityImpl = dojo::model::model::ModelEntityImpl<$type_name$Entity>;
 }
+pub use $contract_name$_generated::{$type_name$Entity, $type_name$ModelImpl, $type_name$ModelEntityImpl};
+
+pub impl $type_name$Attributes = $contract_name$_generated::$type_name$AttributesImpl<$type_name$>;
+pub impl $type_name$EntityAttributes = $contract_name$_generated::$type_name$AttributesImpl<$type_name$Entity>;
 
 
-
-pub impl $type_name$ModelImpl = dojo::model::impls::ModelImpl<$type_name$>;
-pub impl $type_name$ModelEntityImpl = dojo::model::impls::ModelEntityImpl<$type_name$Entity>;
 
 #[generate_trait]
 pub impl $type_name$EntityStoreImpl of $type_name$EntityStore {
@@ -172,8 +170,8 @@ pub impl $type_name$ModelEntityTestImpl of dojo::model::ModelEntityTest<$type_na
         dojo::world::IWorldTestDispatcherTrait::set_entity_test(
             world_test,
             $type_name$ModelImpl::selector(),
-            dojo::model::ModelIndex::Id(self.id()),
-            self.values(),
+            dojo::model::ModelIndex::Id($type_name$ModelEntityImpl::id(self)),
+            $type_name$ModelEntityImpl::values(self),
             $type_name$ModelImpl::layout()
         );
     }
@@ -185,7 +183,7 @@ pub impl $type_name$ModelEntityTestImpl of dojo::model::ModelEntityTest<$type_na
         dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
             world_test,
             $type_name$ModelImpl::selector(),
-            dojo::model::ModelIndex::Id(self.id()),
+            dojo::model::ModelIndex::Id($type_name$ModelEntityImpl::id(self)),
             $type_name$ModelImpl::layout()
         );
     }
