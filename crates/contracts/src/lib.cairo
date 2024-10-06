@@ -27,7 +27,6 @@ pub mod model {
     pub mod impls;
 
     pub mod members;
-    pub use members::set_member;
 }
 
 pub(crate) mod storage {
