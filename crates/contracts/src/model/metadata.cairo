@@ -79,14 +79,14 @@ pub impl ResourceMetadataModel of Model<ResourceMetadata> {
     }
 
     fn set_member(
-        world: IWorldDispatcher, entity_id: felt252, member_id: felt252, values: Span<felt252>
+        world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252, values: Span<felt252>
     ) {
         match utils::find_model_field_layout(Self::layout(), member_id) {
             Option::Some(field_layout) => {
                 world
                     .set_entity(
                         Self::selector(),
-                        ModelIndex::MemberId((entity_id, member_id)),
+                        ModelIndex::MemberId((utils::entity_id_from_keys(keys), member_id)),
                         values,
                         field_layout
                     )

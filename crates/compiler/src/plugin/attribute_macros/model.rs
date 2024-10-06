@@ -293,6 +293,7 @@ impl DojoModel {
         let mut members: Vec<Member> = vec![];
         let mut members_values: Vec<RewriteNode> = vec![];
         let mut param_keys: Vec<String> = vec![];
+        let mut keys: Vec<String> = vec![];
         let mut serialized_keys: Vec<RewriteNode> = vec![];
         let mut serialized_param_keys: Vec<RewriteNode> = vec![];
         let mut serialized_values: Vec<RewriteNode> = vec![];
@@ -318,6 +319,7 @@ impl DojoModel {
                 serialized_keys.push(serialize_member_ty(&member, true));
                 serialized_param_keys.push(serialize_member_ty(&member, false));
                 param_keys.push(format!("{}: {}", member.name, member.ty));
+                keys.push(format!("{}", member.name));
             } else {
                 serialized_values.push(serialize_member_ty(&member, true));
                 members_values.push(RewriteNode::Text(format!(
@@ -329,11 +331,13 @@ impl DojoModel {
             members.push(member);
         });
         let param_keys = param_keys.join(", ");
+        let keys = keys.join(", ");
 
         members.iter().filter(|m| !m.key).for_each(|member| {
             field_accessors.push(generate_field_accessors(
                 model_name.clone(),
                 param_keys.clone(),
+                keys.clone(),
                 serialized_param_keys.clone(),
                 member,
             ));
@@ -425,6 +429,7 @@ impl DojoModel {
                     RewriteNode::new_modified(members_values),
                 ),
                 ("param_keys".to_string(), RewriteNode::Text(param_keys)),
+                ("keys".to_string(), RewriteNode::Text(keys)),
                 (
                     "serialized_param_keys".to_string(),
                     RewriteNode::new_modified(serialized_param_keys),
@@ -526,6 +531,7 @@ fn serialize_member_ty(member: &Member, with_self: bool) -> RewriteNode {
 fn generate_field_accessors(
     model_name: String,
     param_keys: String,
+    keys: String,
     serialized_param_keys: Vec<RewriteNode>,
     member: &Member,
 ) -> RewriteNode {
@@ -550,6 +556,7 @@ fn generate_field_accessors(
                 RewriteNode::Text(member.ty.clone()),
             ),
             ("param_keys".to_string(), RewriteNode::Text(param_keys)),
+            ("keys".to_string(), RewriteNode::Text(keys)),
             (
                 "serialized_param_keys".to_string(),
                 RewriteNode::new_modified(serialized_param_keys),

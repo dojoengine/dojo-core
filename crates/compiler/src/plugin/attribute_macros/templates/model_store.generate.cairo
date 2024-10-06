@@ -12,7 +12,6 @@ mod $contract_name$_attributes {
         const SELECTOR: felt252 = $model_selector$;
         const NAME_HASH: felt252 = $model_name_hash$;
         const NAMESPACE_HASH: felt252 = $model_namespace_hash$;
-
         #[inline(always)]
         fn name() -> ByteArray {
             "$type_name$"
@@ -27,6 +26,11 @@ mod $contract_name$_attributes {
         fn tag() -> ByteArray {
             "$model_tag$"
         }
+
+        #[inline(always)]
+        fn layout() -> dojo::model::Layout {
+            dojo::model::introspect::Introspect::<$type_name$>::layout()
+        }
     }
     pub impl $type_name$Attributes = $type_name$AttributesImpl<$type_name$>;
     pub impl $type_name$EntityAttributes = $type_name$AttributesImpl<$type_name$Entity>;
@@ -35,19 +39,23 @@ mod $contract_name$_attributes {
 pub use $contract_name$_attributes::{$type_name$Attributes, $type_name$EntityAttributes};
 
 pub impl $type_name$ModelKeyValue of dojo::model::model::ModelKeyValueTrait<$type_name$> {
-    fn keys(self: @$type_name$) -> Span<felt252> {
+    fn entity_id(self: @$type_name$) -> felt252 {
+        core::poseidon::poseidon_hash_span(Self::serialized_keys(self))
+    }
+
+    fn serialized_keys(self: @$type_name$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_keys$
         core::array::ArrayTrait::span(@serialized)
     }
 
-    fn values(self: @$type_name$) -> Span<felt252> {
+    fn serialized_values(self: @$type_name$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
     }
 
-    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> $type_name$ {
+    fn from_serialized_values(keys: Span<felt252>, values: Span<felt252>) -> $type_name$ {
         let mut serialized = core::array::ArrayTrait::new();
         serialized.append_span(keys);
         serialized.append_span(values);
@@ -65,10 +73,34 @@ pub impl $type_name$ModelKeyValue of dojo::model::model::ModelKeyValueTrait<$typ
     }
 }
 
+pub impl $type_name$EntityIdValueTrait of dojo::model::model::EntityIdValueTrait<$type_name$Entity>{
+    fn id(self: @$type_name$Entity) -> felt252 {
+        *self.__id
+    }
+    fn serialized_values(self: @$type_name$Entity) -> Span<felt252> {
+        let mut serialized = core::array::ArrayTrait::new();
+        $serialized_values$
+        core::array::ArrayTrait::span(@serialized)
+    }
+    fn from_serialized_values(entity_id: felt252, values: Span<felt252>) -> $type_name$Entity {
+        let mut serialized = array![entity_id];
+        serialized.append_span(values);
+        let mut serialized = core::array::ArrayTrait::span(@serialized);
+
+        let entity_values = core::serde::Serde::<$type_name$Entity>::deserialize(ref serialized);
+        if core::option::OptionTrait::<$type_name$Entity>::is_none(@entity_values) {
+            panic!(
+                "ModelEntity `$type_name$Entity`: deserialization failed."
+            );
+        }
+        core::option::OptionTrait::<$type_name$Entity>::unwrap(entity_values)
+    }
+}
 
 
 
-pub impl $type_name$ModelImpl = dojo::model::model_impl::ModelImpl<$type_name$>;
+pub impl $type_name$ModelImpl = dojo::model::impls::ModelImpl<$type_name$>;
+pub impl $type_name$ModelEntityImpl = dojo::model::impls::ModelEntityImpl<$type_name$Entity>;
 
 #[generate_trait]
 pub impl $type_name$EntityStoreImpl of $type_name$EntityStore {
@@ -89,10 +121,14 @@ pub impl $type_name$EntityStoreImpl of $type_name$EntityStore {
 
 #[generate_trait]
 pub impl $type_name$StoreImpl of $type_name$Store {
-    fn entity_id_from_keys($param_keys$) -> felt252 {
+    fn serialize_keys($param_keys$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_param_keys$
-        core::poseidon::poseidon_hash_span(serialized.span())
+        serialized.span()
+    }
+
+    fn entity_id_from_keys($param_keys$) -> felt252 {
+        core::poseidon::poseidon_hash_span(Self::serialize_keys($keys$))
     }
 
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> $type_name$ {
@@ -113,10 +149,7 @@ pub impl $type_name$StoreImpl of $type_name$Store {
     }
 
     fn get(world: dojo::world::IWorldDispatcher, $param_keys$) -> $type_name$ {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_param_keys$
-
-        $type_name$ModelImpl::get(world, serialized.span())
+        $type_name$ModelImpl::get(world, Self::serialize_keys($keys$))
     }
 
     fn set(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
@@ -128,101 +161,6 @@ pub impl $type_name$StoreImpl of $type_name$Store {
     }
 
     $field_accessors$
-}
-
-pub impl $type_name$ModelEntityImpl of dojo::model::ModelEntity<$type_name$Entity> {
-    fn id(self: @$type_name$Entity) -> felt252 {
-        *self.__id
-    }
-
-    fn values(self: @$type_name$Entity) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_values$
-        core::array::ArrayTrait::span(@serialized)
-    }
-
-    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> $type_name$Entity {
-        let mut serialized = array![entity_id];
-        serialized.append_span(values);
-        let mut serialized = core::array::ArrayTrait::span(@serialized);
-
-        let entity_values = core::serde::Serde::<$type_name$Entity>::deserialize(ref serialized);
-        if core::option::OptionTrait::<$type_name$Entity>::is_none(@entity_values) {
-            panic!(
-                "ModelEntity `$type_name$Entity`: deserialization failed."
-            );
-        }
-        core::option::OptionTrait::<$type_name$Entity>::unwrap(entity_values)
-    }
-
-    fn get(world: dojo::world::IWorldDispatcher, entity_id: felt252) -> $type_name$Entity {
-        let mut values = dojo::world::IWorldDispatcherTrait::entity(
-            world,
-            $type_name$ModelImpl::selector(),
-            dojo::model::ModelIndex::Id(entity_id),
-            $type_name$ModelImpl::layout()
-        );
-        Self::from_values(entity_id, ref values)
-    }
-
-    fn update_entity(self: @$type_name$Entity, world: dojo::world::IWorldDispatcher) {
-        dojo::world::IWorldDispatcherTrait::set_entity(
-            world,
-            $type_name$ModelImpl::selector(),
-            dojo::model::ModelIndex::Id(self.id()),
-            self.values(),
-            $type_name$ModelImpl::layout()
-        );
-    }
-
-    fn delete_entity(self: @$type_name$Entity, world: dojo::world::IWorldDispatcher) {
-        dojo::world::IWorldDispatcherTrait::delete_entity(
-            world,
-            $type_name$ModelImpl::selector(),
-            dojo::model::ModelIndex::Id(self.id()),
-            $type_name$ModelImpl::layout()
-        );
-    }
-
-    fn get_member(
-        world: dojo::world::IWorldDispatcher,
-        entity_id: felt252,
-        member_id: felt252,
-    ) -> Span<felt252> {
-        match dojo::utils::find_model_field_layout($type_name$ModelImpl::layout(), 
-             member_id) {
-            Option::Some(field_layout) => {
-                dojo::world::IWorldDispatcherTrait::entity(
-                    world,
-                    $type_name$ModelImpl::selector(),
-                    dojo::model::ModelIndex::MemberId((entity_id, member_id)),
-                    field_layout
-                )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
-    }
-
-    fn set_member(
-        self: @$type_name$Entity,
-        world: dojo::world::IWorldDispatcher,
-        member_id: felt252,
-        values: Span<felt252>,
-    ) {
-        match dojo::utils::find_model_field_layout($type_name$ModelImpl::layout(), 
-             member_id) {
-            Option::Some(field_layout) => {
-                dojo::world::IWorldDispatcherTrait::set_entity(
-                    world,
-                    $type_name$ModelImpl::selector(),
-                    dojo::model::ModelIndex::MemberId((self.id(), member_id)),
-                    values,
-                    field_layout
-                )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
-    }
 }
 
 #[cfg(target: "test")]

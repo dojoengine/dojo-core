@@ -17,17 +17,19 @@ pub enum ModelIndex {
 pub trait ModelEntity<T> {
     fn id(self: @T) -> felt252;
     fn values(self: @T) -> Span<felt252>;
-    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> T;
+    fn from_values(entity_id: felt252, values: Span<felt252>) -> T;
     // Get is always used with the trait path, which results in no ambiguity for the compiler.
     fn get(world: IWorldDispatcher, entity_id: felt252) -> T;
     // Update and delete can be used directly on the entity, which results in ambiguity.
     // Therefore, they are implemented with the `update_entity` and `delete_entity` names.
     fn update_entity(self: @T, world: IWorldDispatcher);
     fn delete_entity(self: @T, world: IWorldDispatcher);
+
     fn get_member(
         world: IWorldDispatcher, entity_id: felt252, member_id: felt252,
     ) -> Span<felt252>;
-    fn set_member(self: @T, world: IWorldDispatcher, member_id: felt252, values: Span<felt252>);
+
+    fn set_member(world: IWorldDispatcher, entity_id: felt252, member_id: felt252, values: Span<felt252>);
 }
 
 pub trait Model<T> {
@@ -45,7 +47,7 @@ pub trait Model<T> {
         world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252,
     ) -> Span<felt252>;
 
-    fn set_member(world: IWorldDispatcher, entity_id: felt252, member_id: felt252, values: Span<felt252>,);
+    fn set_member(world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252, values: Span<felt252>);
 
     /// Returns the name of the model as it was written in Cairo code.
     fn name() -> ByteArray;
@@ -99,12 +101,20 @@ pub trait ModelAttributes<T> {
     fn name() -> ByteArray;
     fn namespace() -> ByteArray;
     fn tag() -> ByteArray;
+    fn layout() -> Layout;
 }
 
 pub trait ModelKeyValueTrait<T> {
-    fn keys(self: @T) -> Span<felt252>;
-    fn values(self: @T) -> Span<felt252>;
-    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> T;
+    fn entity_id(self: @T) -> felt252;
+    fn serialized_keys(self: @T) -> Span<felt252>;
+    fn serialized_values(self: @T) -> Span<felt252>;
+    fn from_serialized_values(keys: Span<felt252>, values: Span<felt252>) -> T;
+}
+
+pub trait EntityIdValueTrait<T> {
+    fn id(self: @T) -> felt252;
+    fn serialized_values(self: @T) -> Span<felt252>;
+    fn from_serialized_values(entity_id: felt252, values: Span<felt252>) -> T;
 }
 
 #[cfg(target: "test")]

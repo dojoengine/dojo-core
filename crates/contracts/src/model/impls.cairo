@@ -1,12 +1,16 @@
 use dojo::{
-        model::{
+    utils::entity_id_from_keys,
+    model::{
         Model, 
+        ModelEntity,
         IModel,
         ModelIndex, 
         ModelAttributes, 
         Layout,
+        model::{ModelKeyValueTrait, EntityIdValueTrait},
         introspect::{Introspect, Ty},
         layout::compute_packed_size,
+        members::{set_serialized_member, get_serialized_member},
     },
     world::{IWorldDispatcher, IWorldDispatcherTrait},
 };
@@ -19,18 +23,16 @@ pub impl ModelImpl<
     +Drop<T>, 
     +ModelAttributes<T>, 
     +Introspect<T>, 
-    +dojo::model::model::ModelKeyValueTrait<T>
+    +ModelKeyValueTrait<T>
 > of Model<T> {
     fn get(world: IWorldDispatcher, keys: Span<felt252>) -> T {
         let mut values = IWorldDispatcherTrait::entity(
             world,
             ModelAttributes::<T>::SELECTOR,
             ModelIndex::Keys(keys),
-            Introspect::<T>::layout()
+            ModelAttributes::<T>::layout()
         );
-        let mut _keys = keys;
-
-        dojo::model::model::ModelKeyValueTrait::<T>::from_values(ref _keys, ref values)
+        ModelKeyValueTrait::<T>::from_serialized_values(keys, values)
     }
 
    fn set_model(
@@ -41,8 +43,8 @@ pub impl ModelImpl<
             world,
             ModelAttributes::<T>::SELECTOR,
             ModelIndex::Keys(Self::keys(self)),
-            Self::values(self),
-            Introspect::<T>::layout()
+            ModelKeyValueTrait::<T>::serialized_values(self),
+            ModelAttributes::<T>::layout()
         );
     }
 
@@ -53,8 +55,8 @@ pub impl ModelImpl<
         IWorldDispatcherTrait::delete_entity(
             world,
             ModelAttributes::<T>::SELECTOR,
-            ModelIndex::Keys(Self::keys(self)),
-            Introspect::<T>::layout()
+            ModelIndex::Keys(ModelKeyValueTrait::<T>::serialized_keys(self)),
+            ModelAttributes::<T>::layout()
         );
     }
 
@@ -63,38 +65,28 @@ pub impl ModelImpl<
         keys: Span<felt252>,
         member_id: felt252
     ) -> Span<felt252> {
-        match dojo::utils::find_model_field_layout(Introspect::<T>::layout(), member_id) {
-            Option::Some(field_layout) => {
-                let entity_id = dojo::utils::entity_id_from_keys(keys);
-                IWorldDispatcherTrait::entity(
-                    world,
-                    ModelAttributes::<T>::SELECTOR,
-                    ModelIndex::MemberId((entity_id, member_id)),
-                    field_layout
-                )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
+        get_serialized_member(
+            world, 
+            entity_id_from_keys(keys), 
+            ModelAttributes::<T>::SELECTOR, 
+            member_id, 
+            ModelAttributes::<T>::layout()
+        )
     }
 
     fn set_member(
         world: IWorldDispatcher,
-        entity_id: felt252,
+        keys: Span<felt252>,
         member_id: felt252,
         values: Span<felt252>
     ) {
-        match dojo::utils::find_model_field_layout(Introspect::<T>::layout(), member_id) {
-            Option::Some(field_layout) => {
-                IWorldDispatcherTrait::set_entity(
-                    world,
-                    ModelAttributes::<T>::SELECTOR,
-                    ModelIndex::MemberId((entity_id, member_id)),
-                    values,
-                    field_layout
-                )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
+        set_serialized_member(
+            world, entity_id_from_keys(keys), 
+            ModelAttributes::<T>::SELECTOR,  
+            member_id, 
+            ModelAttributes::<T>::layout(), 
+            values
+        )
     }
 
     #[inline(always)]
@@ -139,31 +131,111 @@ pub impl ModelImpl<
 
     #[inline(always)]
     fn entity_id(self: @T) -> felt252 {
-        core::poseidon::poseidon_hash_span(Self::keys(self))
+        ModelKeyValueTrait::<T>::entity_id(self)
     }
 
     #[inline(always)]
     fn keys(self: @T) -> Span<felt252> {
-        dojo::model::model::ModelKeyValueTrait::<T>::keys(self)
+        ModelKeyValueTrait::<T>::serialized_keys(self)
     }
 
     #[inline(always)]
     fn values(self: @T) -> Span<felt252> {
-        dojo::model::model::ModelKeyValueTrait::<T>::values(self)
+        ModelKeyValueTrait::<T>::serialized_values(self)
     }
 
     #[inline(always)]
     fn layout() -> Layout {
-        Introspect::<T>::layout()
+        ModelAttributes::<T>::layout()
     }
 
     #[inline(always)]
     fn instance_layout(self: @T) -> Layout {
-        Introspect::<T>::layout()
+        ModelAttributes::<T>::layout()
     }
 
     #[inline(always)]
     fn packed_size() -> Option<usize> {
-        compute_packed_size(Introspect::<T>::layout())
+        compute_packed_size(ModelAttributes::<T>::layout())
+    }
+}
+
+
+pub impl ModelEntityImpl<
+    T, 
+    +Serde<T>, 
+    +Drop<T>, 
+    +ModelAttributes<T>, 
+    +EntityIdValueTrait<T>
+> of ModelEntity<T> {
+    fn id(self: @T) -> felt252 {
+        EntityIdValueTrait::<T>::id(self)
+    }
+
+    fn values(self: @T) -> Span<felt252> {
+        EntityIdValueTrait::<T>::serialized_values(self)
+    }
+
+    fn from_values(entity_id: felt252, values: Span<felt252>) -> T {
+        EntityIdValueTrait::<T>::from_serialized_values(entity_id, values)
+    }
+
+    fn get(world: dojo::world::IWorldDispatcher, entity_id: felt252) -> T {
+        let mut values = IWorldDispatcherTrait::entity(
+            world,
+            ModelAttributes::<T>::SELECTOR,
+            ModelIndex::Id(entity_id),
+            ModelAttributes::<T>::layout()
+        );
+        Self::from_values(entity_id, values)
+    }
+
+    fn update_entity(self: @T, world: dojo::world::IWorldDispatcher) {
+        IWorldDispatcherTrait::set_entity(
+            world,
+            ModelAttributes::<T>::SELECTOR,
+            ModelIndex::Id(Self::id(self)),
+            Self::values(self),
+            ModelAttributes::<T>::layout()
+        );
+    }
+
+    fn delete_entity(self: @T, world: dojo::world::IWorldDispatcher) {
+        IWorldDispatcherTrait::delete_entity(
+            world,
+            ModelAttributes::<T>::SELECTOR,
+            ModelIndex::Id(Self::id(self)),
+            ModelAttributes::<T>::layout()
+        );
+    }
+
+    fn get_member(
+        world: IWorldDispatcher,
+        entity_id: felt252,
+        member_id: felt252
+    ) -> Span<felt252> {
+        get_serialized_member(
+            world, 
+            entity_id, 
+            ModelAttributes::<T>::SELECTOR, 
+            member_id, 
+            ModelAttributes::<T>::layout()
+        )
+    }
+
+    fn set_member(
+        world: IWorldDispatcher,
+        entity_id: felt252,
+        member_id: felt252,
+        values: Span<felt252>
+    ) {
+        set_serialized_member(
+            world, 
+            entity_id, 
+            ModelAttributes::<T>::SELECTOR, 
+            member_id, 
+            ModelAttributes::<T>::layout(), 
+            values
+        )
     }
 }
