@@ -115,7 +115,7 @@ fn test_get_and_set_field_name() {
     let v1 = FooEntityStore::get_v1(world, foo.entity_id());
     assert!(foo.v1 == v1);
 
-    let entity: FooEntity = ModelEntity::get(world, foo.entity_id());
+    let _entity: FooEntity = ModelEntity::get(world, foo.entity_id());
 
     FooEntityStore::set_v1(world, foo.entity_id(), 42);
 

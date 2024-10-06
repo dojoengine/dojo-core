@@ -1,10 +1,12 @@
+#[derive(Drop, Serde)]
+pub struct $type_name$Entity {
+    pub __id: felt252, // private field
+    $members_values$
+} 
+
 mod $contract_name$_generated {
-    use super::$type_name$;
-    #[derive(Drop, Serde)]
-    pub struct $type_name$Entity {
-        pub __id: felt252, // private field
-        $members_values$
-    } 
+    use super::{$type_name$, $type_name$Entity};
+    
     pub impl $type_name$AttributesImpl<M> of dojo::model::ModelAttributes<M>{
         const VERSION: u8 = $model_version$;
         const SELECTOR: felt252 = $model_selector$;
@@ -93,7 +95,7 @@ mod $contract_name$_generated {
     pub impl $type_name$ModelImpl = dojo::model::model::ModelImpl<$type_name$>;
     pub impl $type_name$ModelEntityImpl = dojo::model::model::ModelEntityImpl<$type_name$Entity>;
 }
-pub use $contract_name$_generated::{$type_name$Entity, $type_name$ModelImpl, $type_name$ModelEntityImpl};
+pub use $contract_name$_generated::{$type_name$ModelImpl, $type_name$ModelEntityImpl};
 
 pub impl $type_name$Attributes = $contract_name$_generated::$type_name$AttributesImpl<$type_name$>;
 pub impl $type_name$EntityAttributes = $contract_name$_generated::$type_name$AttributesImpl<$type_name$Entity>;
