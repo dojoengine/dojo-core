@@ -1,0 +1,19 @@
+kind = "DojoModel"
+class_hash = "0x695ce952e29befb6ce168366e487df69f35a84bbb4962b7f9ededa8da666d28"
+qualified_path = "dojo_simple::models::position"
+tag = "ds-Position"
+
+[[members]]
+name = "player"
+type = "ContractAddress"
+key = true
+
+[[members]]
+name = "x"
+type = "u32"
+key = false
+
+[[members]]
+name = "y"
+type = "u32"
+key = false

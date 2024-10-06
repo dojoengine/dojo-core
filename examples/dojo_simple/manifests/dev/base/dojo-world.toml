@@ -1,0 +1,4 @@
+kind = "StarknetContract"
+class_hash = "0x369113ea783e60bd9d999bd512c8b1abeac924b52b421a4d3a2c57107a4103"
+qualified_path = "dojo::world::world_contract::world"
+name = "dojo-world"

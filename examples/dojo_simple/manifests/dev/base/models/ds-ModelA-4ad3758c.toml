@@ -1,0 +1,14 @@
+kind = "DojoModel"
+class_hash = "0x4c6b3712362989cba53415131a7618ab9f84445809f2d10c7055be77a030d7b"
+qualified_path = "dojo_simple::models::model_a"
+tag = "ds-ModelA"
+
+[[members]]
+name = "id"
+type = "u32"
+key = true
+
+[[members]]
+name = "a"
+type = "felt252"
+key = false

@@ -1,0 +1,4 @@
+kind = "StarknetContract"
+class_hash = "0x28741e01b1567c243219a1fc8414d68a0b31602079e86c6ea715f306372e20f"
+qualified_path = "dojo_simple::sn_actions"
+name = "sn_actions"

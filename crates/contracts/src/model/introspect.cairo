@@ -6,7 +6,7 @@ pub enum Ty {
     Struct: Struct,
     Enum: Enum,
     Tuple: Span<Ty>,
-    // We can't have `Ty` here as it will cause infinite recursion.
+    // We cant have `Ty` here as it will cause infinite recursion.
     // And `Box` is not serializable. So using a Span, even if it's to have
     // one element, does the trick.
     Array: Span<Ty>,

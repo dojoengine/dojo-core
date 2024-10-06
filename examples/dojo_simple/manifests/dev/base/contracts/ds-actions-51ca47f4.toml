@@ -1,0 +1,5 @@
+kind = "DojoContract"
+class_hash = "0x2dc5fa0113442b1bdbc2cfaea2668f109645fbdadbc72eb599085ef7a30fc10"
+qualified_path = "dojo_simple::actions"
+tag = "ds-actions"
+systems = ["spawn"]

@@ -1,0 +1,14 @@
+kind = "DojoModel"
+class_hash = "0x399b563d0646bee144de9c1d05ebe9fb394cf980544cca85730a302765e1aa6"
+qualified_path = "dojo_simple::actions::model_in_contract"
+tag = "ds-ModelInContract"
+
+[[members]]
+name = "id"
+type = "u32"
+key = true
+
+[[members]]
+name = "a"
+type = "u8"
+key = false
