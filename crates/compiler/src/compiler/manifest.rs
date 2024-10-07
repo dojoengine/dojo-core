@@ -159,7 +159,7 @@ impl<'w> AbstractBaseManifest<'w> {
 
         let world = toml::to_string(&self.world)?;
 
-        let mut file = base_dir.open_rw(
+        let mut file = base_dir.create_rw(
             format!("{}.toml", naming::get_filename_from_tag(WORLD_CONTRACT_TAG)),
             &format!("world manifest"),
             self.workspace.config(),
@@ -169,7 +169,7 @@ impl<'w> AbstractBaseManifest<'w> {
 
         let base = toml::to_string(&self.base)?;
 
-        let mut file = base_dir.open_rw(
+        let mut file = base_dir.create_rw(
             format!("{}.toml", naming::get_filename_from_tag(BASE_CONTRACT_TAG)),
             &format!("base manifest"),
             self.workspace.config(),
@@ -187,7 +187,7 @@ impl<'w> AbstractBaseManifest<'w> {
                 TOML_EXTENSION
             );
 
-            let mut file = contracts_dir.open_rw(
+            let mut file = contracts_dir.create_rw(
                 name,
                 &format!("contract manifest for `{}`", contract.qualified_path),
                 self.workspace.config(),
@@ -203,7 +203,7 @@ impl<'w> AbstractBaseManifest<'w> {
                 TOML_EXTENSION
             );
 
-            let mut file = models_dir.open_rw(
+            let mut file = models_dir.create_rw(
                 name,
                 &format!("model manifest for `{}`", model.qualified_path),
                 self.workspace.config(),
@@ -221,7 +221,7 @@ impl<'w> AbstractBaseManifest<'w> {
                 TOML_EXTENSION
             );
 
-            let mut file = base_dir.open_rw(
+            let mut file = base_dir.create_rw(
                 name,
                 &format!("starknet contract manifest for `{}`", sn_contract.name),
                 self.workspace.config(),

@@ -1,3 +1,4 @@
+use cairo_lang_syntax::node::ast::OptionTypeClause;
 use cairo_lang_syntax::node::db::SyntaxGroup;
 use cairo_lang_syntax::node::{ast, Terminal, TypedSyntaxNode};
 
@@ -20,13 +21,11 @@ pub fn get_parameter_info(db: &dyn SyntaxGroup, param: ast::Param) -> (String, S
         .trim()
         .to_string();
 
-    let param_type = param
-        .type_clause(db)
-        .ty(db)
-        .as_syntax_node()
-        .get_text(db)
-        .trim()
-        .to_string();
+    let param_type = if let OptionTypeClause::TypeClause(ty) = param.type_clause(db) {
+        ty.ty(db).as_syntax_node().get_text(db).trim().to_string()
+    } else {
+        "()".to_string()
+    };
 
     (name, modifiers, param_type)
 }
