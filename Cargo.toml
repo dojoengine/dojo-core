@@ -4,6 +4,7 @@ resolver = "2"
 members = [
     "bins/abigen",
     "bins/demo-compiler",
+    "bins/language-server",
     "crates/contracts",
     "crates/compiler",
     "crates/types",
