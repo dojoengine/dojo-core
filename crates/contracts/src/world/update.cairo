@@ -1,5 +1,3 @@
-use starknet::ContractAddress;
-
 #[derive(Drop, Serde)]
 pub struct StorageUpdate {
     pub key: felt252,

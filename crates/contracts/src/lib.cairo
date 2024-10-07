@@ -21,7 +21,6 @@ pub mod model {
 
     pub mod metadata;
     pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
-    pub(crate) use metadata::{initial_address, initial_class_hash};
 }
 
 pub(crate) mod storage {
@@ -65,9 +64,6 @@ pub mod world {
     pub use world_contract::{
         world, IWorld, IWorldDispatcher, IWorldDispatcherTrait, IWorldProvider,
         IWorldProviderDispatcher, IWorldProviderDispatcherTrait, Resource,
-    };
-    pub(crate) use world_contract::{
-        IUpgradeableWorld, IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait
     };
 
     #[cfg(target: "test")]

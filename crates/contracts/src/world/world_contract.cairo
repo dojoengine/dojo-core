@@ -1,7 +1,5 @@
 use core::fmt::{Display, Formatter, Error};
-use core::option::OptionTrait;
-use core::traits::{Into, TryInto};
-use starknet::{ContractAddress, ClassHash, storage_access::StorageBaseAddress, SyscallResult};
+use starknet::{ContractAddress, ClassHash};
 
 use dojo::model::{ModelIndex, ResourceMetadata};
 use dojo::model::{Layout};
@@ -116,22 +114,19 @@ pub trait IWorldProvider<T> {
 pub mod world {
     use core::array::{ArrayTrait, SpanTrait};
     use core::box::BoxTrait;
-    use core::hash::{HashStateExTrait, HashStateTrait};
+    use core::hash::HashStateTrait;
     use core::num::traits::Zero;
-    use core::option::OptionTrait;
     use core::pedersen::PedersenTrait;
     use core::serde::Serde;
-    use core::to_byte_array::FormatAsByteArray;
-    use core::traits::TryInto;
     use core::traits::Into;
     use core::panic_with_felt252;
     use core::panics::panic_with_byte_array;
 
     use starknet::event::EventEmitter;
     use starknet::{
-        contract_address_const, get_caller_address, get_contract_address, get_tx_info, ClassHash,
+        get_caller_address, get_contract_address, get_tx_info, ClassHash,
         ContractAddress, syscalls::{deploy_syscall, emit_event_syscall, replace_class_syscall},
-        SyscallResult, SyscallResultTrait, storage::Map,
+        SyscallResultTrait, storage::Map,
     };
     pub use starknet::storage::{
         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
@@ -147,17 +142,17 @@ pub mod world {
         ProgramOutput
     };
     use dojo::model::{
-        Model, IModelDispatcher, IModelDispatcherTrait, Layout, ResourceMetadata,
+        Model, Layout, ResourceMetadata,
         ResourceMetadataTrait, metadata
     };
     use dojo::storage;
     use dojo::utils::{
-        entity_id_from_keys, bytearray_hash, Descriptor, DescriptorTrait, IDescriptorDispatcher,
+        entity_id_from_keys, bytearray_hash, DescriptorTrait, IDescriptorDispatcher,
         IDescriptorDispatcherTrait
     };
 
     use super::{
-        ModelIndex, IWorldDispatcher, IWorldDispatcherTrait, IWorld, IUpgradeableWorld, Resource,
+        ModelIndex, IWorld, IUpgradeableWorld, Resource,
         Permission
     };
 

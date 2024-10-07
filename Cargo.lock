@@ -779,7 +779,7 @@ dependencies = [
 [[package]]
 name = "cairo-lang-macro"
 version = "0.1.0"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "cairo-lang-macro-attributes",
  "cairo-lang-macro-stable",
@@ -1483,7 +1483,7 @@ dependencies = [
 [[package]]
 name = "create-output-dir"
 version = "1.0.0"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "anyhow",
  "core-foundation 0.10.0",
@@ -1639,6 +1639,7 @@ dependencies = [
  "clap-verbosity-flag",
  "clap_complete",
  "dojo-compiler",
+ "itertools 0.12.1",
  "notify",
  "scarb",
  "scarb-ui",
@@ -4944,8 +4945,8 @@ dependencies = [
 
 [[package]]
 name = "scarb"
-version = "2.8.3"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+version = "2.8.4"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -4995,7 +4996,7 @@ dependencies = [
  "reqwest",
  "scarb-build-metadata",
  "scarb-metadata",
- "scarb-stable-hash 1.0.0 (git+https://github.com/software-mansion/scarb?tag=v2.8.3)",
+ "scarb-stable-hash 1.0.0 (git+https://github.com/software-mansion/scarb?tag=v2.8.4)",
  "scarb-ui",
  "semver",
  "serde",
@@ -5024,8 +5025,8 @@ dependencies = [
 
 [[package]]
 name = "scarb-build-metadata"
-version = "2.8.3"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+version = "2.8.4"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "cargo_metadata",
 ]
@@ -5033,7 +5034,7 @@ dependencies = [
 [[package]]
 name = "scarb-metadata"
 version = "1.12.0"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "camino",
  "derive_builder",
@@ -5056,7 +5057,7 @@ dependencies = [
 [[package]]
 name = "scarb-stable-hash"
 version = "1.0.0"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "data-encoding",
  "xxhash-rust",
@@ -5065,7 +5066,7 @@ dependencies = [
 [[package]]
 name = "scarb-ui"
 version = "0.1.5"
-source = "git+https://github.com/software-mansion/scarb?tag=v2.8.3#54938ce3b01f81959e6e0114b080cc5e1a73935b"
+source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "anyhow",
  "camino",

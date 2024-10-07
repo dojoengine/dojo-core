@@ -18,7 +18,6 @@ use dojo_compiler::compiler::scarb_internal::{
 };
 use dojo_compiler::compiler::version::check_package_dojo_version;
 use dojo_compiler::plugin::dojo_plugin_suite;
-use scarb::compiler::helpers::collect_all_crate_ids;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnit, CompilationUnitAttributes};
 use scarb::core::{Config, Package, TargetKind};
 use scarb::ops::{self, CompileOpts};
@@ -164,8 +163,9 @@ impl TestArgs {
                 bail!("failed to compile");
             }
 
-            let mut main_crate_ids = collect_all_crate_ids(&unit, &db);
             let test_crate_ids = collect_main_crate_ids(&unit, &db, false);
+
+            let mut main_crate_ids = test_crate_ids.clone();
 
             if let Some(external_contracts) = props.build_external_contracts {
                 main_crate_ids.extend(collect_crates_ids_from_selectors(&db, &external_contracts));
