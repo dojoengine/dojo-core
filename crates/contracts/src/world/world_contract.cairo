@@ -572,8 +572,7 @@ pub mod world {
             EventEmitter::emit(ref self, WriterUpdated { resource, contract, value: false });
         }
 
-        /// Registers an event in the world. If the event is already registered,
-        /// the implementation will be updated.
+        /// Registers an event in the world.
         ///
         /// # Arguments
         ///
@@ -682,8 +681,7 @@ pub mod world {
             );
         }
 
-        /// Registers a model in the world. If the model is already registered,
-        /// the implementation will be updated.
+        /// Registers a model in the world.
         ///
         /// # Arguments
         ///

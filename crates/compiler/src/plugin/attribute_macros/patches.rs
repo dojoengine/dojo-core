@@ -582,16 +582,6 @@ pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
     }
 
     #[inline(always)]
-    fn packed_size() -> Option<usize> {
-        dojo::meta::layout::compute_packed_size(Self::layout())
-    }
-
-    #[inline(always)]
-    fn unpacked_size() -> Option<usize> {
-        dojo::meta::introspect::Introspect::<$type_name$>::size()
-    }
-
-    #[inline(always)]
     fn schema(self: @$type_name$) -> dojo::meta::introspect::Ty {
         dojo::meta::introspect::Introspect::<$type_name$>::ty()
     }
@@ -651,14 +641,6 @@ pub mod $contract_name$ {
 
         fn namespace_hash(self: @ContractState) -> felt252 {
             $event_namespace_hash$
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::introspect::Introspect::<$type_name$>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::event::Event::<$type_name$>::packed_size()
         }
 
         fn layout(self: @ContractState) -> dojo::meta::Layout {

@@ -199,17 +199,17 @@ impl Compiler for DojoCompiler {
 
         // Combine the aux data info about the contracts with the artifact data
         // to create the manifests.
-        let contracts = write_dojo_element_artifacts::<ContractAuxData, ContractManifest>(
+        let contracts = write_dojo_resource_artifacts::<ContractAuxData, ContractManifest>(
             &artifact_manager,
             &aux_data.contracts,
             CONTRACTS_DIR,
         )?;
-        let models = write_dojo_element_artifacts::<ModelAuxData, ModelManifest>(
+        let models = write_dojo_resource_artifacts::<ModelAuxData, ModelManifest>(
             &artifact_manager,
             &aux_data.models,
             MODELS_DIR,
         )?;
-        let events = write_dojo_element_artifacts::<EventAuxData, EventManifest>(
+        let events = write_dojo_resource_artifacts::<EventAuxData, EventManifest>(
             &artifact_manager,
             &aux_data.events,
             EVENTS_DIR,
@@ -431,8 +431,8 @@ pub fn collect_crates_ids_from_selectors(
         .collect::<Vec<_>>()
 }
 
-/// Writes the dojo elements artifacts to the target directory and returns the element manifests.
-fn write_dojo_element_artifacts<T: AuxDataTrait, U: FromAuxDataTrait<T>>(
+/// Writes the dojo resource artifacts to the target directory and returns the resource manifests.
+fn write_dojo_resource_artifacts<T: AuxDataTrait, U: FromAuxDataTrait<T>>(
     artifact_manager: &ArtifactManager,
     aux_data: &HashMap<String, T>,
     element_dir: &str,

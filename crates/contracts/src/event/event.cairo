@@ -20,9 +20,6 @@ pub trait Event<T> {
     fn layout() -> Layout;
     fn schema(self: @T) -> Ty;
 
-    fn packed_size() -> Option<usize>;
-    fn unpacked_size() -> Option<usize>;
-
     fn historical() -> bool;
     fn keys(self: @T) -> Span<felt252>;
     fn values(self: @T) -> Span<felt252>;
@@ -39,9 +36,6 @@ pub trait IEvent<T> {
     fn selector(self: @T) -> felt252;
     fn name_hash(self: @T) -> felt252;
     fn namespace_hash(self: @T) -> felt252;
-
-    fn packed_size(self: @T) -> Option<usize>;
-    fn unpacked_size(self: @T) -> Option<usize>;
 
     fn layout(self: @T) -> Layout;
     fn schema(self: @T) -> Ty;
