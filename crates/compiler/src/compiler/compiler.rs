@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs;
 use std::rc::Rc;
 
@@ -26,18 +27,19 @@ use starknet::core::types::contract::SierraClass;
 use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
-use crate::aux_data::DojoAuxData;
+use crate::aux_data::{AuxDataTrait, ContractAuxData, DojoAuxData, EventAuxData, ModelAuxData};
 use crate::compiler::manifest::{
     AbstractBaseManifest, ContractManifest, EventManifest, ModelManifest, StarknetContractManifest,
 };
 use crate::scarb_extensions::{ProfileSpec, WorkspaceExt};
 use crate::{
-    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, MODELS_DIR,
-    RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
+    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, EVENTS_DIR,
+    MODELS_DIR, RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
 };
 
 use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
+use super::manifest::FromAuxDataTrait;
 use super::scarb_internal;
 use super::scarb_internal::debug::SierraToCairoDebugInfo;
 use super::version::check_package_dojo_version;
@@ -197,9 +199,21 @@ impl Compiler for DojoCompiler {
 
         // Combine the aux data info about the contracts with the artifact data
         // to create the manifests.
-        let contracts = write_dojo_contracts_artifacts(&artifact_manager, &aux_data)?;
-        let models = write_dojo_models_artifacts(&artifact_manager, &aux_data)?;
-        let events = write_dojo_events_artifacts(&artifact_manager, &aux_data)?;
+        let contracts = write_dojo_element_artifacts::<ContractAuxData, ContractManifest>(
+            &artifact_manager,
+            &aux_data.contracts,
+            CONTRACTS_DIR,
+        )?;
+        let models = write_dojo_element_artifacts::<ModelAuxData, ModelManifest>(
+            &artifact_manager,
+            &aux_data.models,
+            MODELS_DIR,
+        )?;
+        let events = write_dojo_element_artifacts::<EventAuxData, EventManifest>(
+            &artifact_manager,
+            &aux_data.events,
+            EVENTS_DIR,
+        )?;
         let (world, base, sn_contracts) =
             write_sn_contract_artifacts(&artifact_manager, &aux_data)?;
 
@@ -417,91 +431,31 @@ pub fn collect_crates_ids_from_selectors(
         .collect::<Vec<_>>()
 }
 
-/// Writes the dojo contracts artifacts to the target directory and returns the contract manifests.
-fn write_dojo_contracts_artifacts(
+/// Writes the dojo elements artifacts to the target directory and returns the element manifests.
+fn write_dojo_element_artifacts<T: AuxDataTrait, U: FromAuxDataTrait<T>>(
     artifact_manager: &ArtifactManager,
-    aux_data: &DojoAuxData,
-) -> Result<Vec<ContractManifest>> {
-    let mut contracts = Vec::new();
+    aux_data: &HashMap<String, T>,
+    element_dir: &str,
+) -> Result<Vec<U>> {
+    let mut elements = Vec::new();
 
-    for (qualified_path, contract_aux_data) in aux_data.contracts.iter() {
-        let tag = naming::get_tag(&contract_aux_data.namespace, &contract_aux_data.name);
-        let filename = naming::get_filename_from_tag(&tag);
+    for (qualified_path, aux_data) in aux_data.iter() {
+        let filename = naming::get_filename_from_tag(&aux_data.tag());
 
         let target_dir = artifact_manager
             .workspace()
             .target_dir_profile()
-            .child(CONTRACTS_DIR);
+            .child(element_dir);
 
         artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-        contracts.push(ContractManifest {
-            class_hash: artifact_manager.get_class_hash(qualified_path)?,
-            qualified_path: qualified_path.to_string(),
-            tag,
-            systems: contract_aux_data.systems.clone(),
-        });
+        elements.push(U::from_aux_data(
+            aux_data,
+            artifact_manager.get_class_hash(qualified_path)?,
+            qualified_path,
+        ));
     }
 
-    Ok(contracts)
-}
-
-/// Writes the dojo models artifacts to the target directory and returns the model manifests.
-fn write_dojo_models_artifacts(
-    artifact_manager: &ArtifactManager,
-    aux_data: &DojoAuxData,
-) -> Result<Vec<ModelManifest>> {
-    let mut models = Vec::new();
-
-    for (qualified_path, model_aux_data) in aux_data.models.iter() {
-        let tag = naming::get_tag(&model_aux_data.namespace, &model_aux_data.name);
-        let filename = naming::get_filename_from_tag(&tag);
-
-        let target_dir = artifact_manager
-            .workspace()
-            .target_dir_profile()
-            .child(MODELS_DIR);
-
-        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-        models.push(ModelManifest {
-            class_hash: artifact_manager.get_class_hash(qualified_path)?,
-            qualified_path: qualified_path.to_string(),
-            tag,
-            members: model_aux_data.members.clone(),
-        });
-    }
-
-    Ok(models)
-}
-
-/// Writes the dojo event artifacts to the target directory and returns the event manifests.
-fn write_dojo_events_artifacts(
-    artifact_manager: &ArtifactManager,
-    aux_data: &DojoAuxData,
-) -> Result<Vec<EventManifest>> {
-    let mut events = Vec::new();
-
-    for (qualified_path, event_aux_data) in aux_data.events.iter() {
-        let tag = naming::get_tag(&event_aux_data.namespace, &event_aux_data.name);
-        let filename = naming::get_filename_from_tag(&tag);
-
-        let target_dir = artifact_manager
-            .workspace()
-            .target_dir_profile()
-            .child(MODELS_DIR);
-
-        artifact_manager.write_sierra_class(qualified_path, &target_dir, &filename)?;
-
-        events.push(EventManifest {
-            class_hash: artifact_manager.get_class_hash(qualified_path)?,
-            qualified_path: qualified_path.to_string(),
-            tag,
-            members: event_aux_data.members.clone(),
-        });
-    }
-
-    Ok(events)
+    Ok(elements)
 }
 
 /// Writes the starknet contracts artifacts to the target directory and returns the starknet contract manifests.

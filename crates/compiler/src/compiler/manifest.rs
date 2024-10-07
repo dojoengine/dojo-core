@@ -14,6 +14,7 @@ use serde_with::serde_as;
 use starknet::core::serde::unsigned_field_element::UfeHex;
 use starknet::core::types::Felt;
 
+use crate::aux_data::{AuxDataTrait, ContractAuxData, EventAuxData, ModelAuxData};
 use crate::scarb_extensions::{FilesystemExt, WorkspaceExt};
 use crate::{
     BASE_CONTRACT_TAG, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, EVENTS_DIR, MODELS_DIR,
@@ -39,6 +40,10 @@ pub trait ManifestMethods {
     fn tag(&self) -> String;
     fn qualified_path(&self) -> String;
     fn to_toml_string(&self) -> Result<String, toml::ser::Error>;
+}
+
+pub trait FromAuxDataTrait<T> {
+    fn from_aux_data(aux_data: &T, class_hash: Felt, qualified_path: &String) -> Self;
 }
 
 /// Represents the contract of a dojo contract.
@@ -67,6 +72,21 @@ impl ManifestMethods for ContractManifest {
     }
     fn to_toml_string(&self) -> Result<String, toml::ser::Error> {
         toml::to_string(self)
+    }
+}
+
+impl FromAuxDataTrait<ContractAuxData> for ContractManifest {
+    fn from_aux_data(
+        aux_data: &ContractAuxData,
+        class_hash: Felt,
+        qualified_path: &String,
+    ) -> Self {
+        Self {
+            class_hash,
+            qualified_path: qualified_path.clone(),
+            tag: aux_data.tag(),
+            systems: aux_data.systems.clone(),
+        }
     }
 }
 
@@ -99,6 +119,17 @@ impl ManifestMethods for ModelManifest {
     }
 }
 
+impl FromAuxDataTrait<ModelAuxData> for ModelManifest {
+    fn from_aux_data(aux_data: &ModelAuxData, class_hash: Felt, qualified_path: &String) -> Self {
+        Self {
+            class_hash,
+            qualified_path: qualified_path.clone(),
+            tag: aux_data.tag(),
+            members: aux_data.members.clone(),
+        }
+    }
+}
+
 /// Represents the contract of a dojo event.
 #[serde_as]
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
@@ -125,6 +156,17 @@ impl ManifestMethods for EventManifest {
     }
     fn to_toml_string(&self) -> Result<String, toml::ser::Error> {
         toml::to_string(self)
+    }
+}
+
+impl FromAuxDataTrait<EventAuxData> for EventManifest {
+    fn from_aux_data(aux_data: &EventAuxData, class_hash: Felt, qualified_path: &String) -> Self {
+        Self {
+            class_hash,
+            qualified_path: qualified_path.clone(),
+            tag: aux_data.tag(),
+            members: aux_data.members.clone(),
+        }
     }
 }
 
