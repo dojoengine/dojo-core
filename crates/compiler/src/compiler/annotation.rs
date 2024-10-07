@@ -35,6 +35,8 @@ const DOJO_ANNOTATION_FILE_NAME: &str = "annotations";
 
 pub trait AnnotationInfo {
     fn filename(&self) -> String;
+    fn qualified_path(&self) -> String;
+    fn tag(&self) -> String;
 }
 
 /// Represents a member of a struct.
@@ -115,11 +117,23 @@ impl AnnotationInfo for ModelAnnotation {
     fn filename(&self) -> String {
         naming::get_filename_from_tag(&self.tag)
     }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn tag(&self) -> String {
+        self.tag.clone()
+    }
 }
 
 impl AnnotationInfo for EventAnnotation {
     fn filename(&self) -> String {
         naming::get_filename_from_tag(&self.tag)
+    }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn tag(&self) -> String {
+        self.tag.clone()
     }
 }
 
@@ -127,17 +141,35 @@ impl AnnotationInfo for ContractAnnotation {
     fn filename(&self) -> String {
         naming::get_filename_from_tag(&self.tag)
     }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn tag(&self) -> String {
+        self.tag.clone()
+    }
 }
 
 impl AnnotationInfo for StarknetContractAnnotation {
     fn filename(&self) -> String {
         self.qualified_path.replace(CAIRO_PATH_SEPARATOR, "_")
     }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn tag(&self) -> String {
+        self.name.clone()
+    }
 }
 
 impl AnnotationInfo for WorldAnnotation {
     fn filename(&self) -> String {
         WORLD_CONTRACT_TAG.to_string()
+    }
+    fn qualified_path(&self) -> String {
+        self.qualified_path.clone()
+    }
+    fn tag(&self) -> String {
+        self.tag.clone()
     }
 }
 

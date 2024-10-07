@@ -140,13 +140,13 @@ fn test_emit() {
 
 // Utils
 fn deploy_world() -> IWorldDispatcher {
-    spawn_test_world(["dojo"].span(), [].span())
+    spawn_test_world(["dojo"].span(), [].span(), [].span())
 }
 
 #[test]
 fn test_execute_multiple_worlds() {
     // Deploy world contract
-    let world1 = spawn_test_world(["dojo"].span(), [foo::TEST_CLASS_HASH].span(),);
+    let world1 = spawn_test_world(["dojo"].span(), [foo::TEST_CLASS_HASH].span(), [].span());
     let contract_address = deploy_with_world_address(bar::TEST_CLASS_HASH, world1);
 
     world1.grant_writer(Model::<Foo>::selector(), contract_address);
@@ -154,7 +154,7 @@ fn test_execute_multiple_worlds() {
     let bar1_contract = IbarDispatcher { contract_address };
 
     // Deploy another world contract
-    let world2 = spawn_test_world(["dojo"].span(), [foo::TEST_CLASS_HASH].span(),);
+    let world2 = spawn_test_world(["dojo"].span(), [foo::TEST_CLASS_HASH].span(), [].span());
     let contract_address = deploy_with_world_address(bar::TEST_CLASS_HASH, world2);
 
     world2.grant_writer(Model::<Foo>::selector(), contract_address);
@@ -196,7 +196,7 @@ fn bench_execute() {
 
 #[test]
 fn bench_execute_complex() {
-    let world = spawn_test_world(["dojo"].span(), [character::TEST_CLASS_HASH].span(),);
+    let world = spawn_test_world(["dojo"].span(), [character::TEST_CLASS_HASH].span(), [].span());
     let contract_address = deploy_with_world_address(bar::TEST_CLASS_HASH, world);
     let bar_contract = IbarDispatcher { contract_address };
 

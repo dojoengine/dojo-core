@@ -1,5 +1,5 @@
 use dojo::meta::Layout;
-use dojo::meta::introspect::Ty;
+use dojo::meta::introspect::{Ty, Struct};
 use dojo::world::IWorldDispatcher;
 
 pub trait Event<T> {
@@ -12,13 +12,12 @@ pub trait Event<T> {
     fn version() -> u8;
 
     fn selector() -> felt252;
-    fn instance_selector(self: @T) -> felt252;
 
     fn name_hash() -> felt252;
     fn namespace_hash() -> felt252;
 
     fn layout() -> Layout;
-    fn schema(self: @T) -> Ty;
+    fn schema() -> Struct;
 
     fn historical() -> bool;
     fn keys(self: @T) -> Span<felt252>;
@@ -38,7 +37,7 @@ pub trait IEvent<T> {
     fn namespace_hash(self: @T) -> felt252;
 
     fn layout(self: @T) -> Layout;
-    fn schema(self: @T) -> Ty;
+    fn schema(self: @T) -> Struct;
 }
 
 #[cfg(target: "test")]

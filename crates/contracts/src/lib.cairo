@@ -19,7 +19,7 @@ pub mod event {
 pub mod meta {
     pub mod introspect;
     pub mod layout;
-    pub use layout::{Layout, FieldLayout};
+    pub use layout::{Layout, FieldLayout, LayoutCompareTrait};
 }
 
 pub mod model {
@@ -110,8 +110,12 @@ mod tests {
     mod helpers;
     mod world {
         mod acl;
+        mod contracts;
         mod entities;
-        mod resources;
+        mod events;
+        mod metadata;
+        mod models;
+        mod namespaces;
         mod world;
     }
     mod utils;

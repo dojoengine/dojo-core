@@ -73,3 +73,19 @@ pub fn no_model_write_access(tag: @ByteArray, caller: ContractAddress) -> ByteAr
 pub fn no_world_owner(caller: ContractAddress, target: @ByteArray) -> ByteArray {
     format!("Caller `{:?}` can't {} (not world owner)", caller, target)
 }
+
+pub fn invalid_class_content(selector: felt252) -> ByteArray {
+    format!("Invalid ClassHash to upgrade the resource `{}`", selector)
+}
+
+pub fn invalid_resource_schema_upgrade(selector: felt252) -> ByteArray {
+    format!("Invalid new schema to upgrade the resource `{}`", selector)
+}
+
+pub fn invalid_resource_layout_upgrade(selector: felt252) -> ByteArray {
+    format!("Invalid new layout to upgrade the resource `{}`", selector)
+}
+
+pub fn invalid_resource_version_upgrade(selector: felt252, expected_version: u8) -> ByteArray {
+    format!("The new resource version of `{}` should be {}", selector, expected_version)
+}

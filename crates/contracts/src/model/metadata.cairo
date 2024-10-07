@@ -161,6 +161,15 @@ pub impl ResourceMetadataModel of Model<ResourceMetadata> {
     }
 
     #[inline(always)]
+    fn schema() -> Struct {
+        if let Ty::Struct(s) = Introspect::<ResourceMetadata>::ty() {
+            s
+        } else {
+            panic!("Model `ResourceMetadata`: invalid schema.")
+        }
+    }
+
+    #[inline(always)]
     fn packed_size() -> Option<usize> {
         Option::None
     }
@@ -199,7 +208,7 @@ pub mod resource_metadata {
     use super::ResourceMetadata;
     use super::ResourceMetadataModel;
 
-    use dojo::meta::introspect::{Introspect, Ty};
+    use dojo::meta::introspect::{Introspect, Ty, Struct};
     use dojo::meta::Layout;
 
     #[storage]
@@ -238,8 +247,8 @@ pub mod resource_metadata {
     }
 
     #[external(v0)]
-    fn schema(self: @ContractState) -> Ty {
-        Introspect::<ResourceMetadata>::ty()
+    fn schema(self: @ContractState) -> Struct {
+        ResourceMetadataModel::schema()
     }
 
     #[external(v0)]

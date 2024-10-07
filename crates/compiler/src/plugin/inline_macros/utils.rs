@@ -12,7 +12,7 @@ use dojo_types::naming;
 use scarb::compiler::Profile;
 use scarb::core::Config;
 
-use crate::compiler::annotation::DojoAnnotation;
+use crate::compiler::annotation::{AnnotationInfo, DojoAnnotation};
 use crate::namespace_config::{DOJO_ANNOTATIONS_DIR_CFG_KEY, WORKSPACE_CURRENT_PROFILE_CFG_KEY};
 
 #[derive(Debug)]
@@ -36,17 +36,38 @@ pub fn parent_of_kind(
     None
 }
 
-/// Reads all the models and namespaces from base manifests files.
-pub fn load_manifest_models_and_namespaces(
+/// Reads all the resources and namespaces from annotations.
+pub fn load_resources_and_namespaces_from_annotations(
     cfg_set: &CfgSet,
     whitelisted_namespaces: &[String],
-) -> anyhow::Result<(Vec<String>, Vec<String>)> {
-    let dojo_manifests_dir = get_dojo_manifests_dir(cfg_set.clone())?;
-    let scarb_toml = dojo_manifests_dir
+) -> anyhow::Result<(Vec<String>, Vec<String>, Vec<String>)> {
+    fn process_annotations<T: AnnotationInfo>(
+        whitelisted_namespaces: &[String],
+        annotations: &Vec<T>,
+        namespaces: &mut HashSet<String>,
+    ) -> anyhow::Result<Vec<String>> {
+        let mut output = HashSet::<String>::new();
+        for annotation in annotations {
+            let qualified_path = annotation.qualified_path();
+            let namespace = naming::split_tag(&annotation.tag())?.0;
+
+            if !whitelisted_namespaces.is_empty() && !whitelisted_namespaces.contains(&namespace) {
+                continue;
+            }
+
+            output.insert(qualified_path);
+            namespaces.insert(namespace);
+        }
+
+        Ok(output.into_iter().collect())
+    }
+
+    let dojo_annotations_dir = get_dojo_annotations_dir(cfg_set.clone())?;
+    let scarb_toml = dojo_annotations_dir
         .parent()
         .expect("Profile dir should have parent")
         .parent()
-        .expect("Manifests dir should have parent")
+        .expect("Annotations dir dir should have parent")
         .join("Scarb.toml");
 
     let config = Config::builder(scarb_toml.clone())
@@ -57,36 +78,27 @@ pub fn load_manifest_models_and_namespaces(
 
     let annotations = DojoAnnotation::read(&ws)?;
 
-    let mut models = HashSet::<String>::new();
     let mut namespaces = HashSet::<String>::new();
 
-    for model in annotations.models {
-        let qualified_path = model.qualified_path;
-        let namespace = naming::split_tag(&model.tag)?.0;
+    let models_vec =
+        process_annotations(whitelisted_namespaces, &annotations.models, &mut namespaces)?;
+    let events_vec =
+        process_annotations(whitelisted_namespaces, &annotations.events, &mut namespaces)?;
 
-        if !whitelisted_namespaces.is_empty() && !whitelisted_namespaces.contains(&namespace) {
-            continue;
-        }
-
-        models.insert(qualified_path);
-        namespaces.insert(namespace);
-    }
-
-    let models_vec: Vec<String> = models.into_iter().collect();
     let namespaces_vec: Vec<String> = namespaces.into_iter().collect();
 
-    Ok((namespaces_vec, models_vec))
+    Ok((namespaces_vec, models_vec, events_vec))
 }
 
-/// Gets the dojo_manifests_dir for the current profile from the cfg_set.
-pub fn get_dojo_manifests_dir(cfg_set: CfgSet) -> anyhow::Result<Utf8PathBuf> {
+/// Gets the Dojo annotations directory for the current profile from the cfg_set.
+pub fn get_dojo_annotations_dir(cfg_set: CfgSet) -> anyhow::Result<Utf8PathBuf> {
     for cfg in cfg_set.into_iter() {
         if cfg.key == DOJO_ANNOTATIONS_DIR_CFG_KEY {
             return Ok(Utf8PathBuf::from(cfg.value.unwrap().as_str().to_string()));
         }
     }
 
-    Err(anyhow::anyhow!("dojo_manifests_dir not found"))
+    Err(anyhow::anyhow!("dojo_annotations_dir not found"))
 }
 
 /// Gets the current profile from the cfg_set.

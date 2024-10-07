@@ -204,7 +204,7 @@ pub mod bar {
 }
 
 pub fn deploy_world() -> IWorldDispatcher {
-    spawn_test_world(["dojo"].span(), [].span())
+    spawn_test_world(["dojo"].span(), [].span(), [].span())
 }
 
 pub fn deploy_world_and_bar() -> (IWorldDispatcher, IbarDispatcher) {
@@ -228,4 +228,178 @@ pub fn drop_all_events(address: ContractAddress) {
             core::option::Option::None => { break; },
         };
     }
+}
+
+/// Note: These models must remain private to be able to redefine them
+/// in `resources.cairo` test file, to test model upgrade.
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooNameChanged {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooBadLayoutType {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooMemberRemoved {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooMemberAddedButRemoved {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooMemberAddedButMoved {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooMemberAddedButSameVersion {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct FooMemberAdded {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128
+}
+
+pub fn deploy_world_for_model_upgrades() -> IWorldDispatcher {
+    spawn_test_world(
+        ["dojo"].span(),
+        [
+            foo::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_name_changed::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_bad_layout_type::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_member_removed::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_member_added_but_moved::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_member_added_but_removed::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_member_added_but_same_version::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_member_added::TEST_CLASS_HASH.try_into().unwrap(),
+        ].span(),
+        [].span()
+    )
+}
+
+/// Note: These events must remain private to be able to redefine them
+/// in `resources.cairo` test file, to test event upgrade.
+
+#[dojo::event]
+pub struct FooEvent {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[dojo::event(namespace: "another_namespace")]
+pub struct BuzzEvent {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[dojo::event]
+struct FooEventNameChanged {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[dojo::event]
+struct FooEventBadLayoutType {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[dojo::event]
+struct FooEventMemberRemoved {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[dojo::event]
+struct FooEventMemberAddedButRemoved {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128
+}
+
+#[dojo::event]
+struct FooEventMemberAddedButMoved {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128,
+}
+
+#[dojo::event]
+struct FooEventMemberButSameVersion {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128
+}
+
+#[dojo::event]
+struct FooEventMemberAdded {
+    #[key]
+    pub caller: ContractAddress,
+    pub a: felt252,
+    pub b: u128
+}
+
+pub fn deploy_world_for_event_upgrades() -> IWorldDispatcher {
+    spawn_test_world(
+        ["dojo"].span(),
+        [].span(),
+        [
+            foo_event::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_name_changed::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_bad_layout_type::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_member_removed::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_member_added_but_moved::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_member_added_but_removed::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_member_but_same_version::TEST_CLASS_HASH.try_into().unwrap(),
+            foo_event_member_added::TEST_CLASS_HASH.try_into().unwrap(),
+        ].span(),
+    )
 }

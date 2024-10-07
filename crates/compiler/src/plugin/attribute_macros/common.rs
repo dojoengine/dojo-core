@@ -258,16 +258,7 @@ fn get_version(
     match arg_value {
         Expr::Literal(ref value) => {
             if let Ok(value) = value.text(db).parse::<u8>() {
-                if value <= DEFAULT_VERSION {
-                    value
-                } else {
-                    diagnostics.push(PluginDiagnostic {
-                        message: format!("{attribute_name} version {} not supported", value),
-                        stable_ptr: arg_value.stable_ptr().untyped(),
-                        severity: Severity::Error,
-                    });
-                    DEFAULT_VERSION
-                }
+                value
             } else {
                 diagnostics.push(PluginDiagnostic {
                     message: format!(

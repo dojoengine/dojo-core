@@ -21,9 +21,9 @@ use crate::plugin::derive_macros::{
     extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
 };
 
-use super::element::{
+use super::common::{
     compute_namespace, deserialize_keys_and_values, parse_members, serialize_keys_and_values,
-    serialize_member_ty, CommonStructParameters, StructParameterParser, DEFAULT_VERSION,
+    serialize_member_ty, CommonStructParameters, StructParameterParser,
 };
 use super::patches::MODEL_PATCH;
 use super::DOJO_MODEL_ATTR;
@@ -86,19 +86,10 @@ impl DojoModel {
         let model_name_hash = naming::compute_bytearray_hash(&model_name);
         let model_namespace_hash = naming::compute_bytearray_hash(&model_namespace);
 
-        let (model_version, model_selector) = match parameters.version {
-            0 => (
-                RewriteNode::Text("0".to_string()),
-                RewriteNode::Text(format!("\"{model_name}\"")),
-            ),
-            _ => (
-                RewriteNode::Text(DEFAULT_VERSION.to_string()),
-                RewriteNode::Text(
-                    naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash)
-                        .to_string(),
-                ),
-            ),
-        };
+        let model_version = RewriteNode::Text(parameters.version.to_string());
+        let model_selector = RewriteNode::Text(
+            naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash).to_string(),
+        );
 
         let members = parse_members(db, &struct_ast.members(db).elements(db), &mut diagnostics);
         let mut serialized_keys: Vec<RewriteNode> = vec![];

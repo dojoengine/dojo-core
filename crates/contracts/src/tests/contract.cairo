@@ -106,7 +106,7 @@ pub mod test_contract_upgrade {
 
 // Utils
 fn deploy_world() -> IWorldDispatcher {
-    spawn_test_world(["dojo"].span(), [].span())
+    spawn_test_world(["dojo"].span(), [].span(), [].span())
 }
 
 #[test]

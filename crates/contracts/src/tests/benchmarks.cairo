@@ -49,7 +49,8 @@ fn deploy_world() -> IWorldDispatcher {
         ["dojo"].span(),
         [
             case::TEST_CLASS_HASH, case_not_packed::TEST_CLASS_HASH, complex_model::TEST_CLASS_HASH
-        ].span()
+        ].span(),
+        [].span()
     )
 }
 

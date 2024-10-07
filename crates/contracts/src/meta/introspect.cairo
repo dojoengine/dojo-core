@@ -1,7 +1,7 @@
 use dojo::meta::{Layout, FieldLayout};
 use dojo::storage::packing;
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, PartialEq, Debug)]
 pub enum Ty {
     Primitive: felt252,
     Struct: Struct,
@@ -14,21 +14,46 @@ pub enum Ty {
     ByteArray,
 }
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, PartialEq, Debug)]
 pub struct Struct {
     pub name: felt252,
     pub attrs: Span<felt252>,
     pub children: Span<Member>
 }
 
-#[derive(Copy, Drop, Serde)]
+#[generate_trait]
+pub impl StructCompareImpl of StructCompareTrait {
+    fn is_an_upgrade_of(self: @Struct, old: @Struct) -> bool {
+        if self.name != old.name
+            || self.attrs != old.attrs
+            || (*self.children).len() <= (*old.children).len() {
+            return false;
+        }
+
+        let mut i = 0;
+
+        loop {
+            if i >= (*old.children).len() {
+                break true;
+            }
+
+            if *old.children[i] != *self.children[i] {
+                break false;
+            }
+
+            i += 1;
+        }
+    }
+}
+
+#[derive(Copy, Drop, Serde, PartialEq, Debug)]
 pub struct Enum {
     pub name: felt252,
     pub attrs: Span<felt252>,
     pub children: Span<(felt252, Ty)>
 }
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, PartialEq, Debug)]
 pub struct Member {
     pub name: felt252,
     pub attrs: Span<felt252>,
