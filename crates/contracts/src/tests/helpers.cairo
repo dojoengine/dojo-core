@@ -22,6 +22,112 @@ pub struct Foo {
     pub b: u128,
 }
 
+#[starknet::contract]
+pub mod foo_invalid_name {
+    use dojo::model::IModel;
+
+    #[storage]
+    struct Storage {}
+
+    #[abi(embed_v0)]
+    pub impl ModelImpl of IModel<ContractState> {
+        fn name(self: @ContractState) -> ByteArray {
+            "foo-bis"
+        }
+
+        fn namespace(self: @ContractState) -> ByteArray {
+            "dojo"
+        }
+        fn tag(self: @ContractState) -> ByteArray {
+            "dojo-foo-bis"
+        }
+        fn version(self: @ContractState) -> u8 {
+            1
+        }
+        fn selector(self: @ContractState) -> felt252 {
+            dojo::utils::selector_from_names(@"dojo", @"foo-bis")
+        }
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@"foo-bis")
+        }
+        fn namespace_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@"dojo")
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            Option::None
+        }
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            Option::None
+        }
+
+        fn layout(self: @ContractState) -> dojo::model::Layout {
+            dojo::model::Layout::Fixed([].span())
+        }
+        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
+            dojo::model::introspect::Ty::Struct(
+                dojo::model::introspect::Struct {
+                    name: 'foo', attrs: [].span(), children: [].span()
+                }
+            )
+        }
+    }
+}
+
+
+#[starknet::contract]
+pub mod foo_invalid_namespace {
+    use dojo::model::IModel;
+
+    #[storage]
+    struct Storage {}
+
+    #[abi(embed_v0)]
+    pub impl ModelImpl of IModel<ContractState> {
+        fn name(self: @ContractState) -> ByteArray {
+            "foo"
+        }
+
+        fn namespace(self: @ContractState) -> ByteArray {
+            "inv@lid n@mesp@ce"
+        }
+        fn tag(self: @ContractState) -> ByteArray {
+            "inv@lid n@mesp@ce-foo"
+        }
+        fn version(self: @ContractState) -> u8 {
+            1
+        }
+        fn selector(self: @ContractState) -> felt252 {
+            dojo::utils::selector_from_names(@"inv@lid n@mesp@ce", @"foo")
+        }
+        fn name_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@"foo")
+        }
+        fn namespace_hash(self: @ContractState) -> felt252 {
+            dojo::utils::bytearray_hash(@"inv@lid n@mesp@ce")
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            Option::None
+        }
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            Option::None
+        }
+
+        fn layout(self: @ContractState) -> dojo::model::Layout {
+            dojo::model::Layout::Fixed([].span())
+        }
+        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
+            dojo::model::introspect::Ty::Struct(
+                dojo::model::introspect::Struct {
+                    name: 'foo', attrs: [].span(), children: [].span()
+                }
+            )
+        }
+    }
+}
+
+
 #[derive(Copy, Drop, Serde)]
 #[dojo::model(namespace: "another_namespace")]
 pub struct Buzz {
