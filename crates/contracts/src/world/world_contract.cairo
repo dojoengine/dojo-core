@@ -124,9 +124,9 @@ pub mod world {
 
     use starknet::event::EventEmitter;
     use starknet::{
-        get_caller_address, get_contract_address, get_tx_info, ClassHash,
-        ContractAddress, syscalls::{deploy_syscall, emit_event_syscall, replace_class_syscall},
-        SyscallResultTrait, storage::Map,
+        get_caller_address, get_contract_address, get_tx_info, ClassHash, ContractAddress,
+        syscalls::{deploy_syscall, emit_event_syscall, replace_class_syscall}, SyscallResultTrait,
+        storage::Map,
     };
     pub use starknet::storage::{
         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
@@ -141,20 +141,14 @@ pub mod world {
         IUpgradeableState, IFactRegistryDispatcher, IFactRegistryDispatcherTrait, StorageUpdate,
         ProgramOutput
     };
-    use dojo::model::{
-        Model, Layout, ResourceMetadata,
-        ResourceMetadataTrait, metadata
-    };
+    use dojo::model::{Model, Layout, ResourceMetadata, ResourceMetadataTrait, metadata};
     use dojo::storage;
     use dojo::utils::{
         entity_id_from_keys, bytearray_hash, DescriptorTrait, IDescriptorDispatcher,
         IDescriptorDispatcherTrait
     };
 
-    use super::{
-        ModelIndex, IWorld, IUpgradeableWorld, Resource,
-        Permission
-    };
+    use super::{ModelIndex, IWorld, IUpgradeableWorld, Resource, Permission};
 
     const WORLD: felt252 = 0;
 
