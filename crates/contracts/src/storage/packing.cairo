@@ -2,8 +2,6 @@ use core::array::{ArrayTrait, SpanTrait};
 use core::option::OptionTrait;
 use core::traits::{Into, TryInto};
 
-use starknet::{ClassHash, ContractAddress};
-
 pub const PACKING_MAX_BITS: u8 = 251;
 
 pub fn pack(

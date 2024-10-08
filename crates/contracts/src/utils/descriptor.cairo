@@ -3,7 +3,7 @@ use core::num::traits::Zero;
 use core::panics::panic_with_byte_array;
 use core::poseidon::poseidon_hash_span;
 use dojo::utils::bytearray_hash;
-use starknet::{ContractAddress, ClassHash};
+use starknet::ContractAddress;
 
 /// Interface for a world's resource descriptor.
 #[starknet::interface]

@@ -1,9 +1,4 @@
 use core::array::{ArrayTrait, SpanTrait};
-use core::hash::LegacyHash;
-use core::option::OptionTrait;
-use core::poseidon::poseidon_hash_span;
-use core::serde::Serde;
-use core::traits::{Into, TryInto};
 
 use starknet::SyscallResultTrait;
 

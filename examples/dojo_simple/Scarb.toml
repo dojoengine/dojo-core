@@ -1,5 +1,5 @@
 [package]
-cairo-version = "=2.7.1"
+cairo-version = "=2.8.4"
 name = "dojo_simple"
 version = "0.1.0"
 edition = "2024_07"

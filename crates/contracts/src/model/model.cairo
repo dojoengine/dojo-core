@@ -1,9 +1,6 @@
-use starknet::SyscallResult;
-
 use dojo::model::Layout;
 use dojo::model::introspect::Ty;
 use dojo::world::IWorldDispatcher;
-use dojo::utils::{Descriptor, DescriptorTrait};
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub enum ModelIndex {

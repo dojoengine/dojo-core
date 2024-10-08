@@ -1,7 +1,5 @@
 use core::array::{ArrayTrait, SpanTrait};
-use core::option::OptionTrait;
 use core::poseidon::poseidon_hash_span;
-use core::serde::Serde;
 use core::traits::Into;
 
 use starknet::{SyscallResultTrait, SyscallResult};

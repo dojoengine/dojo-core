@@ -1,4 +1,4 @@
-use dojo::model::{Layout, FieldLayout};
+use dojo::model::Layout;
 use dojo::storage::packing;
 
 #[derive(Copy, Drop, Serde)]

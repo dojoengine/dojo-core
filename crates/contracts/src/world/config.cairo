@@ -46,7 +46,6 @@ pub trait IConfig<T> {
 pub mod Config {
     use starknet::ContractAddress;
     use starknet::get_caller_address;
-    use starknet::event::EventEmitter;
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
 
     use super::errors;

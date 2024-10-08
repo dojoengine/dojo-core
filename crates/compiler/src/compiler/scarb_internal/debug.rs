@@ -151,6 +151,9 @@ pub fn get_location_from_text_span(
         FileLongId::Virtual(_) => {
             return None;
         }
+        FileLongId::External(_) => {
+            return None;
+        }
     };
 
     // let file_path = file_id.full_path(compiler_db);
