@@ -29,7 +29,7 @@ pub const CONTRACT_PATCH: &str = "
                     use dojo::contract::IContract;
                     use starknet::storage::{
                         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, \
-                     StoragePointerWriteAccess
+                        StoragePointerWriteAccess
                     };
 
                     component!(path: dojo::contract::upgradeable::upgradeable, storage: \

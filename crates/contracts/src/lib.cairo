@@ -67,7 +67,8 @@ pub mod world {
     };
 
     #[cfg(target: "test")]
-    pub use world_contract::{IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait};
+    pub use world_contract::{IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait,
+        IUpgradeableWorld, IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait};
 }
 
 #[cfg(test)]

@@ -12,7 +12,7 @@ pub mod upgradeable {
     use starknet::{ClassHash, get_caller_address};
     use starknet::syscalls::replace_class_syscall;
 
-    use dojo::world::IWorldProvider;
+    use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher};
 
     #[storage]
     pub struct Storage {}
