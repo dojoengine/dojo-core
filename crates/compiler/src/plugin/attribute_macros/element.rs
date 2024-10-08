@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::compiler::manifest::Member;
+use crate::compiler::annotation::Member;
 use crate::namespace_config::NamespaceConfig;
 use cairo_lang_defs::patcher::RewriteNode;
 use cairo_lang_defs::plugin::PluginDiagnostic;
