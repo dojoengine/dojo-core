@@ -138,7 +138,7 @@ impl NamespaceConfig {
 
 impl From<&CfgSet> for NamespaceConfig {
     fn from(cfg_set: &CfgSet) -> Self {
-        let mut default = "".to_string();
+        let mut default = "DEFAULT_NAMESPACE_CFG".to_string();
         let mut mappings = HashMap::new();
 
         for cfg in cfg_set.into_iter() {
