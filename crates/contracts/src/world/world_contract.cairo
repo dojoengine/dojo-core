@@ -556,7 +556,9 @@ pub mod world {
 
             self.owners.write((resource, address), false);
 
-            EventEmitter::emit(ref self, OwnerUpdated { contract: address, resource, value: false });
+            EventEmitter::emit(
+                ref self, OwnerUpdated { contract: address, resource, value: false }
+            );
         }
 
         /// Checks if the provided contract has writer permission for the resource.
@@ -908,10 +910,7 @@ pub mod world {
             EventEmitter::emit(
                 ref self,
                 ContractDeployed {
-                    salt,
-                    class_hash,
-                    address: contract_address,
-                    selector: descriptor.selector()
+                    salt, class_hash, address: contract_address, selector: descriptor.selector()
                 }
             );
 

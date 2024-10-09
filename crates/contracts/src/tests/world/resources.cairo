@@ -197,7 +197,7 @@ fn test_upgrade_model_from_model_owner() {
             event.class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'bad model class_hash'
         );
 
-         assert(
+        assert(
             event.address != core::num::traits::Zero::<ContractAddress>::zero(),
             'bad model prev address'
         );
