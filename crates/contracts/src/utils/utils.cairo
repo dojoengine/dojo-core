@@ -4,7 +4,7 @@ use core::option::Option;
 use core::poseidon::poseidon_hash_span;
 use core::serde::Serde;
 
-use dojo::model::{Layout, FieldLayout};
+use dojo::meta::{Layout, FieldLayout};
 
 /// Compute the poseidon hash of a serialized ByteArray
 pub fn bytearray_hash(data: @ByteArray) -> felt252 {
@@ -72,7 +72,7 @@ pub fn find_model_field_layout(model_layout: Layout, member_selector: felt252) -
     }
 }
 
-/// Indicates if at least of array item is None.
+/// Indicates if at least one array item is None.
 pub fn any_none<T>(arr: @Array<Option<T>>) -> bool {
     let mut i = 0;
     let mut res = false;

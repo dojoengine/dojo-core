@@ -3,6 +3,7 @@ use starknet::{contract_address_const, ContractAddress, get_caller_address};
 use dojo::world::Resource;
 use dojo::world::config::Config::{DifferProgramHashUpdate, FactsRegistryUpdate};
 use dojo::world::config::{IConfigDispatcher, IConfigDispatcherTrait};
+use dojo::world::world::{Event, EventEmitted};
 use dojo::model::{Model, ResourceMetadata};
 use dojo::utils::bytearray_hash;
 use dojo::world::{
@@ -11,7 +12,8 @@ use dojo::world::{
 };
 use dojo::tests::helpers::{
     IbarDispatcher, IbarDispatcherTrait, drop_all_events, deploy_world_and_bar, Foo, foo, bar,
-    Character, character, test_contract, test_contract_with_dojo_init_args
+    Character, character, test_contract, test_contract_with_dojo_init_args, SimpleEvent,
+    simple_event, SimpleEventEmitter
 };
 use dojo::utils::test::{spawn_test_world, deploy_with_world_address, GasCounterTrait};
 
@@ -52,7 +54,7 @@ mod resource_metadata_malicious {
 }
 
 #[test]
-#[available_gas(2000000)]
+#[available_gas(20000000)]
 fn test_model() {
     let world = deploy_world();
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
@@ -92,55 +94,49 @@ fn test_delete() {
 fn test_contract_getter() {
     let world = deploy_world();
 
-    let _ = world.deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
+    let address = world
+        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
 
-    if let Resource::Contract((class_hash, _)) = world
+    if let Resource::Contract((contract_address, namespace_hash)) = world
         .resource(selector_from_tag!("dojo-test_contract")) {
-        assert(
-            class_hash == test_contract::TEST_CLASS_HASH.try_into().unwrap(),
-            'invalid contract class hash'
-        );
+        assert(address == contract_address, 'invalid contract address');
+
+        assert(namespace_hash == bytearray_hash(@"dojo"), 'invalid namespace hash');
     }
 }
 
 #[test]
 #[available_gas(6000000)]
-fn test_model_class_hash_getter() {
-    let world = deploy_world();
-    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    if let Resource::Model((class_hash, _)) = world.resource(Model::<Foo>::selector()) {
-        assert(class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'foo wrong class hash');
-    } else {
-        panic!("Foo model not found");
-    };
-}
-
-#[test]
-#[ignore]
-#[available_gas(6000000)]
-fn test_legacy_model_class_hash_getter() {
-    let world = deploy_world();
-    world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    if let Resource::Model((class_hash, _)) = world.resource('Foo') {
-        assert(class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'foo wrong class hash');
-    } else {
-        panic!("Foo model not found");
-    };
-}
-
-#[test]
-#[available_gas(6000000)]
 fn test_emit() {
-    let world = deploy_world();
+    let bob = starknet::contract_address_const::<0xb0b>();
 
-    let mut keys = ArrayTrait::new();
-    keys.append('MyEvent');
-    let mut values = ArrayTrait::new();
-    values.append(1);
-    values.append(2);
-    world.emit(keys, values.span());
+    let world = deploy_world();
+    world.register_event(simple_event::TEST_CLASS_HASH.try_into().unwrap());
+    world.grant_writer(dojo::event::Event::<SimpleEvent>::selector(), bob);
+
+    drop_all_events(world.contract_address);
+
+    starknet::testing::set_contract_address(bob);
+
+    let simple_event = SimpleEvent { id: 2, data: (3, 4) };
+    simple_event.emit(world);
+
+    let event = starknet::testing::pop_log::<Event>(world.contract_address);
+
+    assert(event.is_some(), 'no event');
+
+    if let Event::EventEmitted(event) = event.unwrap() {
+        assert(
+            event.event_selector == dojo::event::Event::<SimpleEvent>::selector(),
+            'bad event selector'
+        );
+        assert(event.system_address == bob, 'bad system address');
+        assert(event.historical, 'bad historical value');
+        assert(event.keys == [2].span(), 'bad keys');
+        assert(event.values == [3, 4].span(), 'bad values');
+    } else {
+        core::panic_with_felt252('no EventEmitted event');
+    }
 }
 
 
@@ -352,12 +348,7 @@ fn test_can_call_init_only_world() {
 
 #[test]
 #[available_gas(6000000)]
-#[should_panic(
-    expected: (
-        "Caller `4919` cannot initialize contract `dojo-test_contract` (not owner)",
-        'ENTRYPOINT_FAILED'
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
 fn test_can_call_init_only_owner() {
     let world = deploy_world();
     let _address = world

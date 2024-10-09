@@ -1,4 +1,5 @@
-use dojo::model::{Layout, FieldLayout};
+use dojo::meta::{Layout, FieldLayout};
+use dojo::storage::packing;
 
 #[derive(Copy, Drop, Serde)]
 pub enum Ty {
@@ -45,7 +46,7 @@ pub impl Introspect_felt252 of Introspect<felt252> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('felt252')
@@ -141,7 +142,7 @@ pub impl Introspect_i8 of Introspect<i8> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('i8')
@@ -153,7 +154,7 @@ pub impl Introspect_i16 of Introspect<i16> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('i16')
@@ -165,7 +166,7 @@ pub impl Introspect_i32 of Introspect<i32> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('i32')
@@ -177,7 +178,7 @@ pub impl Introspect_i64 of Introspect<i64> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('i64')
@@ -189,7 +190,7 @@ pub impl Introspect_i128 of Introspect<i128> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('i128')
@@ -201,7 +202,7 @@ pub impl Introspect_address of Introspect<starknet::ContractAddress> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('starknet::ContractAddress')
@@ -213,7 +214,7 @@ pub impl Introspect_classhash of Introspect<starknet::ClassHash> {
         Option::Some(1)
     }
     fn layout() -> Layout {
-        Layout::Fixed([251].span())
+        Layout::Fixed([packing::PACKING_MAX_BITS].span())
     }
     fn ty() -> Ty {
         Ty::Primitive('starknet::ClassHash')
@@ -240,9 +241,9 @@ pub impl Introspect_option<T, +Introspect<T>> of Introspect<Option<T>> {
     fn layout() -> Layout {
         Layout::Enum(
             [
-                dojo::model::FieldLayout { // Some
+                dojo::meta::FieldLayout { // Some
                  selector: 0, layout: Introspect::<T>::layout() },
-                dojo::model::FieldLayout { // None
+                dojo::meta::FieldLayout { // None
                  selector: 1, layout: Layout::Fixed([].span()) },
             ].span()
         )

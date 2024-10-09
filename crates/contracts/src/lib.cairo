@@ -6,15 +6,24 @@ pub mod contract {
     pub mod upgradeable;
 }
 
-pub mod model {
+pub mod event {
+    pub mod event;
+    pub use event::{Event, IEvent, IEventDispatcher, IEventDispatcherTrait};
+
+    #[cfg(target: "test")]
+    pub use event::{EventTest};
+}
+
+pub mod meta {
     pub mod introspect;
     pub mod layout;
     pub use layout::{Layout, FieldLayout};
+}
 
+pub mod model {
     pub mod model;
     pub use model::{
         Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
-        deploy_and_get_metadata
     };
 
     #[cfg(target: "test")]
@@ -48,7 +57,12 @@ pub mod utils {
     pub mod utils;
     pub use utils::{
         bytearray_hash, entity_id_from_keys, find_field_layout, find_model_field_layout, any_none,
-        sum, combine_key, selector_from_names
+        sum, combine_key, selector_from_names,
+    };
+
+    pub mod descriptor;
+    pub use descriptor::{
+        Descriptor, DescriptorTrait, IDescriptorDispatcher, IDescriptorDispatcherTrait
     };
 }
 
@@ -72,8 +86,11 @@ pub mod world {
 
 #[cfg(test)]
 mod tests {
-    mod model {
+    mod meta {
         mod introspect;
+    }
+
+    mod model {
         mod model;
     }
     mod storage {
@@ -83,6 +100,9 @@ mod tests {
     }
     mod base;
     mod benchmarks;
+    mod expanded {
+        pub(crate) mod selector_attack;
+    }
     mod helpers;
     mod world {
         mod acl;

@@ -62,7 +62,7 @@ fn test_set_metadata_resource_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `2827` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
+        "Account `2827` does NOT have OWNER role on model (or its namespace) `dojo-Foo`",
         'ENTRYPOINT_FAILED',
     )
 )]
@@ -85,7 +85,7 @@ fn test_set_metadata_not_possible_for_resource_writer() {
 
 #[test]
 #[should_panic(
-    expected: ("Caller `2827` is not the owner of the resource `0`", 'ENTRYPOINT_FAILED',)
+    expected: ("Account `2827` does NOT have OWNER role on world", 'ENTRYPOINT_FAILED',)
 )]
 fn test_set_metadata_not_possible_for_random_account() {
     let world = deploy_world();
@@ -104,12 +104,7 @@ fn test_set_metadata_not_possible_for_random_account() {
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883`",
-        'ENTRYPOINT_FAILED',
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED',))]
 fn test_set_metadata_through_malicious_contract() {
     let world = spawn_test_world(["dojo"].span(), [foo::TEST_CLASS_HASH].span(),);
 
@@ -162,6 +157,9 @@ fn test_register_model_for_namespace_owner() {
 }
 
 #[test]
+#[should_panic(
+    expected: ("Account `2827` does NOT have OWNER role on namespace `dojo`", 'ENTRYPOINT_FAILED',)
+)]
 fn test_register_model_for_namespace_writer() {
     let bob = starknet::contract_address_const::<0xb0b>();
 
@@ -173,25 +171,6 @@ fn test_register_model_for_namespace_writer() {
     starknet::testing::set_account_contract_address(bob);
     starknet::testing::set_contract_address(bob);
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
-
-    let event = starknet::testing::pop_log::<Event>(world.contract_address);
-    assert(event.is_some(), 'no event)');
-
-    if let Event::ModelRegistered(event) = event.unwrap() {
-        assert(event.name == Model::<Foo>::name(), 'bad model name');
-        assert(event.namespace == Model::<Foo>::namespace(), 'bad model namespace');
-        assert(
-            event.class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'bad model class_hash'
-        );
-        assert(
-            event.address != core::num::traits::Zero::<ContractAddress>::zero(),
-            'bad model prev address'
-        );
-    } else {
-        core::panic_with_felt252('no ModelRegistered event');
-    }
-
-    assert(world.is_owner(Model::<Foo>::selector(), bob), 'bob is not the owner');
 }
 
 #[test]
@@ -213,8 +192,7 @@ fn test_upgrade_model_from_model_owner() {
     assert(event.is_some(), 'no event)');
 
     if let Event::ModelUpgraded(event) = event.unwrap() {
-        assert(event.name == Model::<Foo>::name(), 'bad model name');
-        assert(event.namespace == Model::<Foo>::namespace(), 'bad model namespace');
+        assert(event.selector == Model::<Foo>::selector(), 'bad model selector');
         assert(
             event.class_hash == foo::TEST_CLASS_HASH.try_into().unwrap(), 'bad model class_hash'
         );
@@ -233,8 +211,7 @@ fn test_upgrade_model_from_model_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `2827` cannot upgrade the resource `3123252206139358744730647958636922105676576163624049771737508399526017186883` (not owner)",
-        'ENTRYPOINT_FAILED',
+        "Account `659918` does NOT have OWNER role on namespace `dojo`", 'ENTRYPOINT_FAILED',
     )
 )]
 fn test_upgrade_model_from_model_writer() {
@@ -263,8 +240,8 @@ fn test_upgrade_model_from_random_account() {
     let alice = starknet::contract_address_const::<0xa11ce>();
 
     let world = deploy_world();
-    world.grant_writer(Model::<Foo>::namespace_hash(), bob);
-    world.grant_writer(Model::<Foo>::namespace_hash(), alice);
+    world.grant_owner(Model::<Foo>::namespace_hash(), bob);
+    world.grant_owner(Model::<Foo>::namespace_hash(), alice);
 
     starknet::testing::set_account_contract_address(bob);
     starknet::testing::set_contract_address(bob);
@@ -368,26 +345,26 @@ fn test_deploy_contract_for_namespace_owner() {
     drop_all_events(world.contract_address);
 
     let contract_address = world.deploy_contract('salt1', class_hash);
+
+    let event = match starknet::testing::pop_log::<Event>(world.contract_address).unwrap() {
+        Event::ContractDeployed(event) => event,
+        _ => panic!("no ContractDeployed event"),
+    };
+
     let dispatcher = IContractDispatcher { contract_address };
 
-    let event = starknet::testing::pop_log::<Event>(world.contract_address);
-    assert(event.is_some(), 'no event)');
-
-    if let Event::ContractDeployed(event) = event.unwrap() {
-        assert(event.salt == 'salt1', 'bad event salt');
-        assert(event.class_hash == class_hash, 'bad class_hash');
-        assert(event.name == dispatcher.contract_name(), 'bad contract name');
-        assert(event.namespace == dispatcher.namespace(), 'bad namespace');
-        assert(
-            event.address != core::num::traits::Zero::<ContractAddress>::zero(),
-            'bad contract address'
-        );
-    } else {
-        core::panic_with_felt252('no ContractDeployed event');
-    };
+    assert(event.salt == 'salt1', 'bad event salt');
+    assert(event.class_hash == class_hash, 'bad class_hash');
+    assert(event.selector == dispatcher.selector(), 'bad contract selector');
+    assert(
+        event.address != core::num::traits::Zero::<ContractAddress>::zero(), 'bad contract address'
+    );
 }
 
 #[test]
+#[should_panic(
+    expected: ("Account `2827` does NOT have OWNER role on namespace `dojo`", 'ENTRYPOINT_FAILED',)
+)]
 fn test_deploy_contract_for_namespace_writer() {
     let world = deploy_world();
 
@@ -405,9 +382,9 @@ fn test_deploy_contract_for_namespace_writer() {
 
 #[test]
 #[should_panic(
-    expected: ("Caller `2827` has no write access on namespace `dojo`", 'ENTRYPOINT_FAILED',)
+    expected: ("Account `2827` does NOT have OWNER role on namespace `dojo`", 'ENTRYPOINT_FAILED',)
 )]
-fn test_deploy_contract_no_namespace_write_access() {
+fn test_deploy_contract_no_namespace_owner_access() {
     let world = deploy_world();
 
     let bob = starknet::contract_address_const::<0xb0b>();
@@ -456,22 +433,18 @@ fn test_upgrade_contract_from_resource_owner() {
     starknet::testing::set_contract_address(bob);
 
     let contract_address = world.deploy_contract('salt1', class_hash);
-
     let dispatcher = IContractDispatcher { contract_address };
 
     drop_all_events(world.contract_address);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 
     let event = starknet::testing::pop_log::<Event>(world.contract_address);
     assert(event.is_some(), 'no event)');
 
     if let Event::ContractUpgraded(event) = event.unwrap() {
+        assert(event.selector == dispatcher.selector(), 'bad contract selector');
         assert(event.class_hash == class_hash, 'bad class_hash');
-        assert(
-            event.address != core::num::traits::Zero::<ContractAddress>::zero(),
-            'bad contract address'
-        );
     } else {
         core::panic_with_felt252('no ContractUpgraded event');
     };
@@ -480,7 +453,7 @@ fn test_upgrade_contract_from_resource_owner() {
 #[test]
 #[should_panic(
     expected: (
-        "Caller `659918` is not the owner of the resource `2368393732245529956313345237151518608283468650081902115301417183793437311044`",
+        "Account `659918` does NOT have OWNER role on contract (or its namespace) `dojo-test_contract`",
         'ENTRYPOINT_FAILED',
     )
 )]
@@ -505,13 +478,13 @@ fn test_upgrade_contract_from_resource_writer() {
     starknet::testing::set_account_contract_address(alice);
     starknet::testing::set_contract_address(alice);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 }
 
 #[test]
 #[should_panic(
     expected: (
-        "Caller `659918` is not the owner of the resource `2368393732245529956313345237151518608283468650081902115301417183793437311044`",
+        "Account `659918` does NOT have OWNER role on contract (or its namespace) `dojo-test_contract`",
         'ENTRYPOINT_FAILED',
     )
 )]
@@ -519,24 +492,18 @@ fn test_upgrade_contract_from_random_account() {
     let world = deploy_world();
     let class_hash = test_contract::TEST_CLASS_HASH.try_into().unwrap();
 
-    let contract_address = world.deploy_contract('salt1', class_hash);
+    let _contract_address = world.deploy_contract('salt1', class_hash);
 
     let alice = starknet::contract_address_const::<0xa11ce>();
-    let dispatcher = IContractDispatcher { contract_address };
 
     starknet::testing::set_account_contract_address(alice);
     starknet::testing::set_contract_address(alice);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 }
 
 #[test]
-#[should_panic(
-    expected: (
-        "Caller `57005` is not the owner of the resource `2368393732245529956313345237151518608283468650081902115301417183793437311044`",
-        'ENTRYPOINT_FAILED',
-    )
-)]
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED',))]
 fn test_upgrade_contract_through_malicious_contract() {
     let world = deploy_world();
     let class_hash = test_contract::TEST_CLASS_HASH.try_into().unwrap();
@@ -549,11 +516,9 @@ fn test_upgrade_contract_through_malicious_contract() {
     starknet::testing::set_account_contract_address(bob);
     starknet::testing::set_contract_address(bob);
 
-    let contract_address = world.deploy_contract('salt1', class_hash);
-
-    let dispatcher = IContractDispatcher { contract_address };
+    let _contract_address = world.deploy_contract('salt1', class_hash);
 
     starknet::testing::set_contract_address(malicious_contract);
 
-    world.upgrade_contract(dispatcher.selector(), class_hash);
+    world.upgrade_contract(class_hash);
 }

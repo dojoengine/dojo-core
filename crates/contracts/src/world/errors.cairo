@@ -2,14 +2,8 @@ use starknet::ContractAddress;
 
 pub const DELETE_ENTITY_MEMBER: felt252 = 'Cannot delete entity member';
 
-pub fn no_write_access_with_tags(
-    contract_tag: @ByteArray, on_type: @ByteArray, on_tag: @ByteArray
-) -> ByteArray {
+pub fn not_writer(contract_tag: @ByteArray, on_type: @ByteArray, on_tag: @ByteArray) -> ByteArray {
     format!("Caller `{}` has no write access on {} `{}`", contract_tag, on_type, on_tag)
-}
-
-pub fn not_owner_init(contract_tag: @ByteArray, caller: ContractAddress) -> ByteArray {
-    format!("Caller `{:?}` cannot initialize contract `{}` (not owner)", caller, contract_tag)
 }
 
 pub fn contract_already_initialized(contract_tag: @ByteArray) -> ByteArray {
@@ -28,7 +22,19 @@ pub fn no_namespace_write_access(caller: ContractAddress, namespace: @ByteArray)
     format!("Caller `{:?}` has no write access on namespace `{}`", caller, namespace)
 }
 
+pub fn event_already_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
+    format!("Resource `{}-{}` is already registered", namespace, name)
+}
+
+pub fn event_not_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
+    format!("Resource `{}-{}` is not registered", namespace, name)
+}
+
 pub fn model_already_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
+    format!("Resource `{}-{}` is already registered", namespace, name)
+}
+
+pub fn contract_already_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
     format!("Resource `{}-{}` is already registered", namespace, name)
 }
 
