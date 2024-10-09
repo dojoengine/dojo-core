@@ -49,14 +49,13 @@ fn test_set_metadata_resource_owner() {
     world.set_metadata(metadata.clone());
     assert(world.metadata(Model::<Foo>::selector()) == metadata, 'bad metadata');
 
-    assert_eq!(
-        starknet::testing::pop_log(world.contract_address),
-        Option::Some(
-            Event::MetadataUpdate(
-                MetadataUpdate { resource: metadata.resource_id, uri: metadata.metadata_uri }
-            )
-        )
-    );
+    match starknet::testing::pop_log::<Event>(world.contract_address).unwrap() {
+        Event::MetadataUpdate(event) => {
+            assert(event.resource == metadata.resource_id, 'bad resource');
+            assert(event.uri == metadata.metadata_uri, 'bad uri');
+        },
+        _ => panic!("no MetadataUpdate event"),
+    }
 }
 
 #[test]
@@ -292,11 +291,13 @@ fn test_register_namespace() {
 
     assert(world.is_owner(hash, bob), 'namespace not registered');
 
-    let expected_event = NamespaceRegistered { namespace, hash };
-    assert_eq!(
-        starknet::testing::pop_log(world.contract_address),
-        Option::Some(Event::NamespaceRegistered(expected_event))
-    );
+    match starknet::testing::pop_log::<Event>(world.contract_address).unwrap() {
+        Event::NamespaceRegistered(event) => {
+            assert(event.namespace == namespace, 'bad namespace');
+            assert(event.hash == hash, 'bad hash');
+        },
+        _ => panic!("no NamespaceRegistered event"),
+    }
 }
 
 #[test]
