@@ -17,7 +17,6 @@ pub const DEFAULT_VERSION: u8 = 1;
 
 pub const PARAMETER_VERSION_NAME: &str = "version";
 pub const PARAMETER_NAMESPACE: &str = "namespace";
-pub const PARAMETER_NOMAPPING: &str = "nomapping";
 
 /// `StructParameterParser` provides a general `from_struct` function to parse
 /// the parameters of a struct attribute like dojo::model or dojo::event.
@@ -130,8 +129,7 @@ impl StructParameterParser for CommonStructParameters {
             }
             PARAMETER_NAMESPACE => {
                 self.namespace = get_namespace(db, attribute_name, arg_value, diagnostics);
-            }
-            PARAMETER_NOMAPPING => {
+                // If the namespace is explicitly set, we don't want to allow mappings.
                 self.nomapping = true;
             }
             _ => {
