@@ -6524,12 +6524,12 @@ pub impl ModelWithBadNamespaceFormatModelImpl of dojo::model::Model<ModelWithBad
 
     #[inline(always)]
     fn namespace() -> ByteArray {
-        "dojo_test"
+        "MyNamespace"
     }
 
     #[inline(always)]
     fn tag() -> ByteArray {
-        "dojo_test-ModelWithBadNamespaceFormat"
+        "MyNamespace-ModelWithBadNamespaceFormat"
     }
 
     #[inline(always)]
@@ -6539,7 +6539,7 @@ pub impl ModelWithBadNamespaceFormatModelImpl of dojo::model::Model<ModelWithBad
 
     #[inline(always)]
     fn selector() -> felt252 {
-        3339335350336894195883884955409923858499485801033572582237787132047489035817
+        3498075185010572568869958326439183660947774785526793544998939163671395407352
     }
 
     #[inline(always)]
@@ -6554,7 +6554,7 @@ pub impl ModelWithBadNamespaceFormatModelImpl of dojo::model::Model<ModelWithBad
 
     #[inline(always)]
     fn namespace_hash() -> felt252 {
-        1452123528942907587532668415362544424816022573043154497385993678618948064048
+        2518247443458975119180817677753479732439290689944304814934908400279022945373
     }
 
     #[inline(always)]
@@ -6611,11 +6611,11 @@ pub mod model_with_bad_namespace_format {
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-           "dojo_test"
+           "MyNamespace"
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            "dojo_test-ModelWithBadNamespaceFormat"
+            "MyNamespace-ModelWithBadNamespaceFormat"
         }
 
         fn version(self: @ContractState) -> u8 {
@@ -6623,7 +6623,7 @@ pub mod model_with_bad_namespace_format {
         }
 
         fn selector(self: @ContractState) -> felt252 {
-           3339335350336894195883884955409923858499485801033572582237787132047489035817
+           3498075185010572568869958326439183660947774785526793544998939163671395407352
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
@@ -6631,7 +6631,7 @@ pub mod model_with_bad_namespace_format {
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            1452123528942907587532668415362544424816022573043154497385993678618948064048
+            2518247443458975119180817677753479732439290689944304814934908400279022945373
         }
 
         fn unpacked_size(self: @ContractState) -> Option<usize> {
@@ -7360,12 +7360,12 @@ pub impl ModelWithShortStringNamespaceModelImpl of dojo::model::Model<ModelWithS
 
     #[inline(always)]
     fn namespace() -> ByteArray {
-        "dojo_test"
+        "my_namespace"
     }
 
     #[inline(always)]
     fn tag() -> ByteArray {
-        "dojo_test-ModelWithShortStringNamespace"
+        "my_namespace-ModelWithShortStringNamespace"
     }
 
     #[inline(always)]
@@ -7375,7 +7375,7 @@ pub impl ModelWithShortStringNamespaceModelImpl of dojo::model::Model<ModelWithS
 
     #[inline(always)]
     fn selector() -> felt252 {
-        3563011140946869267852628778244415212055246902495528859686589254859279333005
+        643350075018191729855964658181798951445581630505240307235771395728709379388
     }
 
     #[inline(always)]
@@ -7390,7 +7390,7 @@ pub impl ModelWithShortStringNamespaceModelImpl of dojo::model::Model<ModelWithS
 
     #[inline(always)]
     fn namespace_hash() -> felt252 {
-        1452123528942907587532668415362544424816022573043154497385993678618948064048
+        1685136890688416384941629523783652800960468745356230625531475538826800548713
     }
 
     #[inline(always)]
@@ -7447,11 +7447,11 @@ pub mod model_with_short_string_namespace {
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-           "dojo_test"
+           "my_namespace"
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            "dojo_test-ModelWithShortStringNamespace"
+            "my_namespace-ModelWithShortStringNamespace"
         }
 
         fn version(self: @ContractState) -> u8 {
@@ -7459,7 +7459,7 @@ pub mod model_with_short_string_namespace {
         }
 
         fn selector(self: @ContractState) -> felt252 {
-           3563011140946869267852628778244415212055246902495528859686589254859279333005
+           643350075018191729855964658181798951445581630505240307235771395728709379388
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
@@ -7467,7 +7467,7 @@ pub mod model_with_short_string_namespace {
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            1452123528942907587532668415362544424816022573043154497385993678618948064048
+            1685136890688416384941629523783652800960468745356230625531475538826800548713
         }
 
         fn unpacked_size(self: @ContractState) -> Option<usize> {
@@ -8196,12 +8196,12 @@ pub impl ModelWithStringNamespaceModelImpl of dojo::model::Model<ModelWithString
 
     #[inline(always)]
     fn namespace() -> ByteArray {
-        "dojo_test"
+        "my_namespace"
     }
 
     #[inline(always)]
     fn tag() -> ByteArray {
-        "dojo_test-ModelWithStringNamespace"
+        "my_namespace-ModelWithStringNamespace"
     }
 
     #[inline(always)]
@@ -8211,7 +8211,7 @@ pub impl ModelWithStringNamespaceModelImpl of dojo::model::Model<ModelWithString
 
     #[inline(always)]
     fn selector() -> felt252 {
-        3428238780389029245974129676124052799610748885939447299287640410044966811336
+        2567055065785696374111447326195815858786390804996225951953791904194802101726
     }
 
     #[inline(always)]
@@ -8226,7 +8226,7 @@ pub impl ModelWithStringNamespaceModelImpl of dojo::model::Model<ModelWithString
 
     #[inline(always)]
     fn namespace_hash() -> felt252 {
-        1452123528942907587532668415362544424816022573043154497385993678618948064048
+        1685136890688416384941629523783652800960468745356230625531475538826800548713
     }
 
     #[inline(always)]
@@ -8283,11 +8283,11 @@ pub mod model_with_string_namespace {
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-           "dojo_test"
+           "my_namespace"
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            "dojo_test-ModelWithStringNamespace"
+            "my_namespace-ModelWithStringNamespace"
         }
 
         fn version(self: @ContractState) -> u8 {
@@ -8295,7 +8295,7 @@ pub mod model_with_string_namespace {
         }
 
         fn selector(self: @ContractState) -> felt252 {
-           3428238780389029245974129676124052799610748885939447299287640410044966811336
+           2567055065785696374111447326195815858786390804996225951953791904194802101726
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
@@ -8303,7 +8303,7 @@ pub mod model_with_string_namespace {
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            1452123528942907587532668415362544424816022573043154497385993678618948064048
+            1685136890688416384941629523783652800960468745356230625531475538826800548713
         }
 
         fn unpacked_size(self: @ContractState) -> Option<usize> {

@@ -2,6 +2,14 @@ pub mod models {
     use starknet::ContractAddress;
 
     #[derive(Drop, Serde)]
+    #[dojo::model(namespace: "ns1")]
+    pub struct UnmappedModel {
+        #[key]
+        pub id: u32,
+        pub data: u32,
+    }
+
+    #[derive(Drop, Serde)]
     #[dojo::model]
     pub struct Position {
         #[key]

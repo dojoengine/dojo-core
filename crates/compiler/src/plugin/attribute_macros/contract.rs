@@ -26,7 +26,6 @@ use super::DOJO_CONTRACT_ATTR;
 
 const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";
-const CONTRACT_NOMAPPING: &str = "nomapping";
 
 #[derive(Debug, Clone, Default)]
 pub struct ContractParameters {
@@ -658,8 +657,6 @@ fn get_parameters(
                             CONTRACT_NAMESPACE => {
                                 parameters.namespace =
                                     get_contract_namespace(db, arg_value, diagnostics);
-                            }
-                            CONTRACT_NOMAPPING => {
                                 parameters.nomapping = true;
                             }
                             _ => {

@@ -23,7 +23,7 @@ pub struct Foo {
 }
 
 #[derive(Copy, Drop, Serde)]
-#[dojo::model(namespace: "another_namespace", nomapping: true)]
+#[dojo::model(namespace: "another_namespace")]
 pub struct Buzz {
     #[key]
     pub caller: ContractAddress,
@@ -59,7 +59,7 @@ pub mod test_contract_with_dojo_init_args {
     }
 }
 
-#[dojo::contract(namespace: "buzz_namespace", nomapping: true)]
+#[dojo::contract(namespace: "buzz_namespace")]
 pub mod buzz_contract {}
 
 #[derive(IntrospectPacked, Copy, Drop, Serde)]

@@ -614,12 +614,12 @@ pub impl MyEventWithNamespaceEventImpl of dojo::event::Event<MyEventWithNamespac
 
     #[inline(always)]
     fn namespace() -> ByteArray {
-        "dojo_test"
+        "my_namespace"
     }
 
     #[inline(always)]
     fn tag() -> ByteArray {
-        "dojo_test-MyEventWithNamespace"
+        "my_namespace-MyEventWithNamespace"
     }
 
     #[inline(always)]
@@ -629,7 +629,7 @@ pub impl MyEventWithNamespaceEventImpl of dojo::event::Event<MyEventWithNamespac
 
     #[inline(always)]
     fn selector() -> felt252 {
-        2657911819624041908110491051081365977193385901634711445959602441678296212168
+        522863814429969509522276935486616304495946442516761817333050868296788859995
     }
 
     #[inline(always)]
@@ -644,7 +644,7 @@ pub impl MyEventWithNamespaceEventImpl of dojo::event::Event<MyEventWithNamespac
 
     #[inline(always)]
     fn namespace_hash() -> felt252 {
-        1452123528942907587532668415362544424816022573043154497385993678618948064048
+        1685136890688416384941629523783652800960468745356230625531475538826800548713
     }
 
     #[inline(always)]
@@ -690,11 +690,11 @@ pub mod my_event_with_namespace {
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-           "dojo_test"
+           "my_namespace"
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            "dojo_test-MyEventWithNamespace"
+            "my_namespace-MyEventWithNamespace"
         }
 
         fn version(self: @ContractState) -> u8 {
@@ -702,7 +702,7 @@ pub mod my_event_with_namespace {
         }
 
         fn selector(self: @ContractState) -> felt252 {
-           2657911819624041908110491051081365977193385901634711445959602441678296212168
+           522863814429969509522276935486616304495946442516761817333050868296788859995
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
@@ -710,7 +710,7 @@ pub mod my_event_with_namespace {
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            1452123528942907587532668415362544424816022573043154497385993678618948064048
+            1685136890688416384941629523783652800960468745356230625531475538826800548713
         }
 
         fn layout(self: @ContractState) -> dojo::meta::Layout {
