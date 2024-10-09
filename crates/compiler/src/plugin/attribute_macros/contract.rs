@@ -464,7 +464,7 @@ impl DojoContract {
     ///  * adding `let world = self.world_dispatcher.read();` statement at the beginning of the
     ///    function to restore the removed `world` parameter.
     ///  * if `has_generate_trait` is true, the implementation containing the function has the
-    ///    #[generate_trait] attribute.
+    ///    `#[generate_trait]` attribute.
     pub fn rewrite_function(
         &mut self,
         db: &dyn SyntaxGroup,

@@ -3,7 +3,7 @@
 //! We append the event selector directly within the append_keys_and_data function.
 //! Without the need of the enum for all event variants.
 //!
-//! https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-starknet/src/plugin/derive/event.rs
+//! <https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-starknet/src/plugin/derive/event.rs>
 
 use cairo_lang_defs::patcher::{PatchBuilder, RewriteNode};
 use cairo_lang_defs::plugin::{

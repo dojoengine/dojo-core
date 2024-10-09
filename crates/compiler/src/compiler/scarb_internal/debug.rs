@@ -33,7 +33,7 @@ pub fn compile_prepared_db_to_debug_info(
 /// Compile declared Starknet contract.
 ///
 /// The `contract` value **must** come from `db`, for example as a result of calling
-/// [`find_contracts`]. Does not check diagnostics, it is expected that they are checked by caller
+/// `find_contracts`. Does not check diagnostics, it is expected that they are checked by caller
 /// of this function.
 fn compile_contract_with_prepared_and_checked_db_to_debug_info(
     db: &RootDatabase,

@@ -1,7 +1,7 @@
 //! Scarb internal code used to compile Cairo contracts.
 //!
-//! Copied from source code from https://github.com/software-mansion/scarb/blob/main/scarb/src/compiler/db.rs
-//! since build_scarb_root_database is not public.
+//! Copied from source code from <https://github.com/software-mansion/scarb/blob/main/scarb/src/compiler/db.rs>
+//! since `build_scarb_root_database` is not public.
 use anyhow::Result;
 use cairo_lang_compiler::db::RootDatabase;
 use cairo_lang_compiler::project::{ProjectConfig, ProjectConfigContent};

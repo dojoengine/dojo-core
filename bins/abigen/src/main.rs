@@ -87,7 +87,9 @@ fn generate_bindings(
         if Path::new(&out_path).exists() {
             let existing_bindings = fs::read_to_string(out_path)?;
 
-            if existing_bindings != generated_bindings {
+            if existing_bindings.replace(char::is_whitespace, "")
+                != generated_bindings.replace(char::is_whitespace, "")
+            {
                 return Err(anyhow!(
                     "{contract_name} ABI bindings are not up to date. Consider generating them \
                      running `cargo run -p dojo-abigen`"

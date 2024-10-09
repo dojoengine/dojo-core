@@ -102,7 +102,7 @@ pub fn get_layout_from_type_clause(
 }
 
 /// Build the array layout describing the provided array type.
-/// item_type could be something like Array<u128> for example.
+/// item_type could be something like `Array<u128>` for example.
 pub fn build_array_layout_from_type(
     diagnostics: &mut Vec<PluginDiagnostic>,
     diagnostic_item: ids::SyntaxStablePtrId,
