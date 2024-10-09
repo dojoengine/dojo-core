@@ -1,202 +1,292 @@
 //! A custom implementation of the starknet::Event derivation path.
-//! 
+//!
 //! We append the event selector directly within the append_keys_and_data function.
 //! Without the need of the enum for all event variants.
 //!
-//! https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-starknet/src/plugin/derive/event.rs
+//! <https://github.com/starkware-libs/cairo/blob/main/crates/cairo-lang-starknet/src/plugin/derive/event.rs>
 
-use cairo_lang_defs::patcher::{ModifiedNode, RewriteNode};
-use cairo_lang_defs::plugin::PluginDiagnostic;
-use cairo_lang_starknet::plugin::aux_data::StarkNetEventAuxData;
-use cairo_lang_starknet::plugin::consts::{
-    EVENT_TRAIT, EVENT_TYPE_NAME, KEY_ATTR, NESTED_ATTR, SERDE_ATTR,
+use cairo_lang_defs::patcher::{PatchBuilder, RewriteNode};
+use cairo_lang_defs::plugin::{
+    DynGeneratedFileAuxData, PluginDiagnostic, PluginGeneratedFile, PluginResult,
 };
-use cairo_lang_starknet::plugin::events::EventData;
-use cairo_lang_starknet_classes::abi::EventFieldKind;
-use cairo_lang_syntax::node::db::SyntaxGroup;
-use cairo_lang_syntax::node::helpers::QueryAttrs;
-use cairo_lang_syntax::node::{ast, Terminal, TypedStablePtr, TypedSyntaxNode};
-use indoc::formatdoc;
+use cairo_lang_diagnostics::Severity;
+use cairo_lang_syntax::node::{
+    ast, ast::ArgClauseNamed, ast::Expr, ast::ModuleItem, db::SyntaxGroup, helpers::QueryAttrs,
+    Terminal, TypedStablePtr, TypedSyntaxNode,
+};
+use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 
-use crate::aux_data::DojoAuxData;
+use convert_case::{Case, Casing};
+use dojo_types::naming;
+
+use crate::aux_data::EventAuxData;
+use crate::namespace_config::NamespaceConfig;
+use crate::plugin::derive_macros::{
+    extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
+};
+
+use super::element::{
+    compute_namespace, parse_members, serialize_keys_and_values, CommonStructParameters,
+    StructParameterParser,
+};
+
+use super::patches::EVENT_PATCH;
+use super::DOJO_EVENT_ATTR;
+
+pub const PARAMETER_HISTORICAL: &str = "historical";
+pub const DEFAULT_HISTORICAL_VALUE: bool = true;
+
+#[derive(Debug)]
+struct EventParameters {
+    common: CommonStructParameters,
+    historical: bool,
+}
+
+impl Default for EventParameters {
+    fn default() -> EventParameters {
+        EventParameters {
+            common: CommonStructParameters::default(),
+            historical: DEFAULT_HISTORICAL_VALUE,
+        }
+    }
+}
+
+impl StructParameterParser for EventParameters {
+    fn process_named_parameters(
+        &mut self,
+        db: &dyn SyntaxGroup,
+        attribute_name: &String,
+        arg: ArgClauseNamed,
+        diagnostics: &mut Vec<PluginDiagnostic>,
+    ) {
+        match arg.name(db).text(db).as_str() {
+            PARAMETER_HISTORICAL => {
+                self.historical = get_historical(attribute_name, arg.value(db), diagnostics);
+            }
+            _ => {
+                self.common
+                    .process_named_parameters(db, attribute_name, arg, diagnostics);
+            }
+        }
+    }
+}
 
 #[derive(Debug, Clone, Default)]
 pub struct DojoEvent {}
 
 impl DojoEvent {
+    /// A handler for Dojo code that modifies an event struct.
+    /// Parameters:
+    /// * db: The semantic database.
+    /// * struct_ast: The AST of the event struct.
+    ///
+    /// Returns:
+    /// * A RewriteNode containing the generated code.
     pub fn from_struct(
         db: &dyn SyntaxGroup,
-        aux_data: &mut DojoAuxData,
         struct_ast: ast::ItemStruct,
-    ) -> (RewriteNode, Vec<PluginDiagnostic>) {
+        namespace_config: &NamespaceConfig,
+    ) -> PluginResult {
         let mut diagnostics = vec![];
+        let mut parameters = EventParameters::default();
 
-        let generic_params = struct_ast.generic_params(db);
-        match generic_params {
-            ast::OptionWrappedGenericParamList::Empty(_) => {}
-            _ => {
-                diagnostics.push(PluginDiagnostic::error(
-                    generic_params.stable_ptr().untyped(),
-                    format!("{EVENT_TYPE_NAME} structs with generic arguments are unsupported"),
-                ));
+        parameters.from_struct(
+            db,
+            &DOJO_EVENT_ATTR.to_string(),
+            struct_ast.clone(),
+            &mut diagnostics,
+        );
+
+        let event_name = struct_ast
+            .name(db)
+            .as_syntax_node()
+            .get_text(db)
+            .trim()
+            .to_string();
+        let event_namespace = compute_namespace(&event_name, &parameters.common, namespace_config);
+
+        for (id, value) in [("name", &event_name), ("namespace", &event_namespace)] {
+            if !NamespaceConfig::is_name_valid(value) {
+                return PluginResult {
+                    code: None,
+                    diagnostics: vec![PluginDiagnostic {
+                        stable_ptr: struct_ast.stable_ptr().0,
+                        message: format!(
+                            "The event {id} '{value}' can only contain characters (a-z/A-Z), \
+                             digits (0-9) and underscore (_)."
+                        ),
+                        severity: Severity::Error,
+                    }],
+                    remove_original_item: false,
+                };
             }
         }
 
-        // Generate append_keys_and_data() code.
-        let mut append_members = vec![];
-        let mut deserialize_members = vec![];
-        let mut ctor = vec![];
-        let mut members = vec![];
-        for member in struct_ast.members(db).elements(db) {
-            let member_name = RewriteNode::new_trimmed(member.name(db).as_syntax_node());
-            let member_kind =
-                get_field_kind_for_member(db, &mut diagnostics, &member, EventFieldKind::DataSerde);
-            members.push((member.name(db).text(db), member_kind));
+        let event_tag = naming::get_tag(&event_namespace, &event_name);
+        let event_name_hash = naming::compute_bytearray_hash(&event_name);
+        let event_namespace_hash = naming::compute_bytearray_hash(&event_namespace);
 
-            let member_for_append = RewriteNode::interpolate_patched(
-                "self.$member_name$",
-                &[("member_name".to_string(), member_name.clone())].into(),
-            );
-            let append_member = append_field(member_kind, member_for_append);
-            let deserialize_member = deserialize_field(member_kind, member_name.clone());
-            append_members.push(append_member);
-            deserialize_members.push(deserialize_member);
-            ctor.push(RewriteNode::interpolate_patched(
-                "$member_name$, ",
-                &[("member_name".to_string(), member_name)].into(),
-            ));
+        let event_version = parameters.common.version.to_string();
+        let event_historical = parameters.historical.to_string();
+        let event_selector =
+            naming::compute_selector_from_hashes(event_namespace_hash, event_name_hash).to_string();
+
+        let members = parse_members(db, &struct_ast.members(db).elements(db), &mut diagnostics);
+
+        let mut serialized_keys: Vec<RewriteNode> = vec![];
+        let mut serialized_values: Vec<RewriteNode> = vec![];
+
+        serialize_keys_and_values(&members, &mut serialized_keys, &mut serialized_values);
+
+        if serialized_keys.is_empty() {
+            diagnostics.push(PluginDiagnostic {
+                message: "Event must define at least one #[key] attribute".into(),
+                stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
+                severity: Severity::Error,
+            });
         }
-        let event_data = EventData::Struct { members };
-        //aux_data.events.push(StarkNetEventAuxData { event_data });
 
-        let append_members = RewriteNode::Modified(ModifiedNode {
-            children: Some(append_members),
-        });
-        let deserialize_members = RewriteNode::Modified(ModifiedNode {
-            children: Some(deserialize_members),
-        });
-        let ctor = RewriteNode::Modified(ModifiedNode {
-            children: Some(ctor),
-        });
+        if serialized_values.is_empty() {
+            diagnostics.push(PluginDiagnostic {
+                message: "Event must define at least one member that is not a key".into(),
+                stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
+                severity: Severity::Error,
+            });
+        }
 
-        // Add an implementation for `Event<StructName>`.
-        let struct_name = RewriteNode::new_trimmed(struct_ast.name(db).as_syntax_node());
-        (
-            // Append the event selector using the struct_name for the selector
-            // and then append the members.
-            RewriteNode::interpolate_patched(
-                &formatdoc!(
-                    "
-            impl $struct_name$IsEvent of {EVENT_TRAIT}<$struct_name$> {{
-                fn append_keys_and_data(
-                    self: @$struct_name$, ref keys: Array<felt252>, ref data: Array<felt252>
-                ) {{
-                    core::array::ArrayTrait::append(ref keys, \
-                 dojo::model::Model::<$struct_name$>::selector());
-                    $append_members$
-                }}
-                fn deserialize(
-                    ref keys: Span<felt252>, ref data: Span<felt252>,
-                ) -> Option<$struct_name$> {{$deserialize_members$
-                    Option::Some($struct_name$ {{$ctor$}})
-                }}
-            }}
-            "
+        let member_names = members
+            .iter()
+            .map(|member| RewriteNode::Text(format!("{},\n", member.name.clone())))
+            .collect::<Vec<_>>();
+
+        let mut derive_attr_names = extract_derive_attr_names(
+            db,
+            &mut diagnostics,
+            struct_ast.attributes(db).query_attr(db, "derive"),
+        );
+
+        // Ensures events always derive Introspect if not already derived,
+        // and do not derive IntrospectPacked.
+        if derive_attr_names.contains(&DOJO_PACKED_DERIVE.to_string()) {
+            diagnostics.push(PluginDiagnostic {
+                message: format!(
+                    "Event should derive {DOJO_INTROSPECT_DERIVE} instead of {DOJO_PACKED_DERIVE}."
                 ),
-                &[
-                    ("struct_name".to_string(), struct_name),
-                    ("append_members".to_string(), append_members),
-                    ("deserialize_members".to_string(), deserialize_members),
-                    ("ctor".to_string(), ctor),
-                ]
-                .into(),
-            ),
+                stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
+                severity: Severity::Error,
+            });
+        }
+
+        if !derive_attr_names.contains(&DOJO_INTROSPECT_DERIVE.to_string()) {
+            derive_attr_names.push(DOJO_INTROSPECT_DERIVE.to_string());
+        }
+
+        let (derive_nodes, derive_diagnostics) = handle_derive_attrs(
+            db,
+            &derive_attr_names,
+            &ModuleItem::Struct(struct_ast.clone()),
+        );
+
+        diagnostics.extend(derive_diagnostics);
+
+        let node = RewriteNode::interpolate_patched(
+            EVENT_PATCH,
+            &UnorderedHashMap::from([
+                (
+                    "contract_name".to_string(),
+                    RewriteNode::Text(event_name.to_case(Case::Snake)),
+                ),
+                (
+                    "type_name".to_string(),
+                    RewriteNode::Text(event_name.clone()),
+                ),
+                (
+                    "member_names".to_string(),
+                    RewriteNode::new_modified(member_names),
+                ),
+                (
+                    "serialized_keys".to_string(),
+                    RewriteNode::new_modified(serialized_keys),
+                ),
+                (
+                    "serialized_values".to_string(),
+                    RewriteNode::new_modified(serialized_values),
+                ),
+                ("event_tag".to_string(), RewriteNode::Text(event_tag)),
+                (
+                    "event_version".to_string(),
+                    RewriteNode::Text(event_version),
+                ),
+                (
+                    "event_historical".to_string(),
+                    RewriteNode::Text(event_historical),
+                ),
+                (
+                    "event_selector".to_string(),
+                    RewriteNode::Text(event_selector),
+                ),
+                (
+                    "event_namespace".to_string(),
+                    RewriteNode::Text(event_namespace.clone()),
+                ),
+                (
+                    "event_name_hash".to_string(),
+                    RewriteNode::Text(event_name_hash.to_string()),
+                ),
+                (
+                    "event_namespace_hash".to_string(),
+                    RewriteNode::Text(event_namespace_hash.to_string()),
+                ),
+            ]),
+        );
+
+        let mut builder = PatchBuilder::new(db, &struct_ast);
+
+        for node in derive_nodes {
+            builder.add_modified(node);
+        }
+
+        builder.add_modified(node);
+
+        let (code, code_mappings) = builder.build();
+
+        let aux_data = EventAuxData {
+            name: event_name.clone(),
+            namespace: event_namespace.clone(),
+            members,
+        };
+
+        PluginResult {
+            code: Some(PluginGeneratedFile {
+                name: event_name.into(),
+                content: code,
+                aux_data: Some(DynGeneratedFileAuxData::new(aux_data)),
+                code_mappings,
+            }),
             diagnostics,
-        )
+            remove_original_item: false,
+        }
     }
 }
 
-/// Generates code to emit an event for a field
-fn append_field(member_kind: EventFieldKind, field: RewriteNode) -> RewriteNode {
-    match member_kind {
-        EventFieldKind::Nested | EventFieldKind::Flat => RewriteNode::interpolate_patched(
-            &format!(
-                "
-                {EVENT_TRAIT}::append_keys_and_data(
-                    $field$, ref keys, ref data
-                );"
-            ),
-            &[("field".to_string(), field)].into(),
-        ),
-        EventFieldKind::KeySerde => RewriteNode::interpolate_patched(
-            "
-                core::serde::Serde::serialize($field$, ref keys);",
-            &[("field".to_string(), field)].into(),
-        ),
-        EventFieldKind::DataSerde => RewriteNode::interpolate_patched(
-            "
-            core::serde::Serde::serialize($field$, ref data);",
-            &[("field".to_string(), field)].into(),
-        ),
-    }
-}
-
-fn deserialize_field(member_kind: EventFieldKind, member_name: RewriteNode) -> RewriteNode {
-    RewriteNode::interpolate_patched(
-        match member_kind {
-            EventFieldKind::Nested | EventFieldKind::Flat => {
-                "
-                let $member_name$ = starknet::Event::deserialize(
-                    ref keys, ref data
-                )?;"
-            }
-            EventFieldKind::KeySerde => {
-                "
-                let $member_name$ = core::serde::Serde::deserialize(
-                    ref keys
-                )?;"
-            }
-            EventFieldKind::DataSerde => {
-                "
-                let $member_name$ = core::serde::Serde::deserialize(
-                    ref data
-                )?;"
-            }
-        },
-        &[("member_name".to_string(), member_name)].into(),
-    )
-}
-
-/// Retrieves the field kind for a given enum variant,
-/// indicating how the field should be serialized.
-/// See [EventFieldKind].
-fn get_field_kind_for_member(
-    db: &dyn SyntaxGroup,
+/// Get the historical boolean parameter from the `Expr` parameter.
+fn get_historical(
+    attribute_name: &String,
+    arg_value: Expr,
     diagnostics: &mut Vec<PluginDiagnostic>,
-    member: &ast::Member,
-    default: EventFieldKind,
-) -> EventFieldKind {
-    let is_nested = member.has_attr(db, NESTED_ATTR);
-    let is_key = member.has_attr(db, KEY_ATTR);
-    let is_serde = member.has_attr(db, SERDE_ATTR);
-
-    // Currently, nested fields are unsupported.
-    if is_nested {
-        diagnostics.push(PluginDiagnostic::error(
-            member.stable_ptr().untyped(),
-            "Nested event fields are currently unsupported".to_string(),
-        ));
+) -> bool {
+    match arg_value {
+        Expr::True(_) => true,
+        Expr::False(_) => false,
+        _ => {
+            diagnostics.push(PluginDiagnostic {
+                message: format!(
+                    "The argument '{PARAMETER_HISTORICAL}' of {attribute_name} must be a boolean",
+                ),
+                stable_ptr: arg_value.stable_ptr().untyped(),
+                severity: Severity::Error,
+            });
+            DEFAULT_HISTORICAL_VALUE
+        }
     }
-    // Currently, serde fields are unsupported.
-    if is_serde {
-        diagnostics.push(PluginDiagnostic::error(
-            member.stable_ptr().untyped(),
-            "Serde event fields are currently unsupported".to_string(),
-        ));
-    }
-
-    if is_key {
-        return EventFieldKind::KeySerde;
-    }
-    default
 }

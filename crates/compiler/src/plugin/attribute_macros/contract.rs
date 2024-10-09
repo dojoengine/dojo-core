@@ -189,8 +189,8 @@ impl DojoContract {
                     name: name.clone(),
                     content: code,
                     aux_data: Some(DynGeneratedFileAuxData::new(ContractAuxData {
-                        name,
-                        namespace: contract_namespace.clone(),
+                        name: name.to_string(),
+                        namespace: contract_namespace.to_string(),
                         systems: contract.systems.clone(),
                     })),
                     code_mappings,
@@ -464,7 +464,7 @@ impl DojoContract {
     ///  * adding `let world = self.world_dispatcher.read();` statement at the beginning of the
     ///    function to restore the removed `world` parameter.
     ///  * if `has_generate_trait` is true, the implementation containing the function has the
-    ///    #[generate_trait] attribute.
+    ///    `#[generate_trait]` attribute.
     pub fn rewrite_function(
         &mut self,
         db: &dyn SyntaxGroup,

@@ -19,6 +19,19 @@ pub mod models {
     }
 }
 
+pub mod events {
+    use starknet::ContractAddress;
+    
+    #[derive(Drop, Serde)]
+    #[dojo::event]
+    pub struct PositionUpdated {
+        #[key]
+        pub player: ContractAddress,
+        pub new_x: u32,
+        pub new_y: u32,
+    }
+}
+
 #[dojo::interface]
 pub trait IActions {
     fn spawn(ref world: IWorldDispatcher);
@@ -26,7 +39,7 @@ pub trait IActions {
 
 #[dojo::contract]
 pub mod actions {
-    use super::{IActions, models::{Position, PositionStore}};
+    use super::{IActions, models::{Position, PositionStore}, events::PositionUpdated};
 
     #[derive(Drop, Serde)]
     #[dojo::model]
@@ -43,21 +56,20 @@ pub mod actions {
 
             let position = Position { player: caller, x: 1, y: 2 };
             position.set(world);
+
+            emit!(world, PositionUpdated { player: caller, new_x: 1, new_y: 2 });
         }
     }
 }
 
 #[starknet::contract]
 pub mod sn_actions {
-
     #[storage]
     struct Storage {}
-
 }
 
 #[cfg(test)]
 mod tests {
-
     #[test]
     fn test_spawn_world_full() {
         let _world = spawn_test_world!();

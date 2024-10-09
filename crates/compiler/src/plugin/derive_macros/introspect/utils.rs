@@ -20,7 +20,7 @@ pub fn primitive_type_introspection() -> HashMap<String, TypeIntrospection> {
     ])
 }
 
-/// Check if the provided type is an unsupported Option<T>,
+/// Check if the provided type is an unsupported `Option<T>`,
 /// because tuples are not supported with Option.
 pub fn is_unsupported_option_type(ty: &str) -> bool {
     ty.starts_with("Option<(")

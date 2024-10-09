@@ -1,4 +1,4 @@
-use dojo::model::{Layout, FieldLayout};
+use dojo::meta::{Layout, FieldLayout};
 use dojo::storage::packing;
 
 #[derive(Copy, Drop, Serde)]
@@ -241,9 +241,9 @@ pub impl Introspect_option<T, +Introspect<T>> of Introspect<Option<T>> {
     fn layout() -> Layout {
         Layout::Enum(
             [
-                dojo::model::FieldLayout { // Some
+                dojo::meta::FieldLayout { // Some
                  selector: 0, layout: Introspect::<T>::layout() },
-                dojo::model::FieldLayout { // None
+                dojo::meta::FieldLayout { // None
                  selector: 1, layout: Layout::Fixed([].span()) },
             ].span()
         )
