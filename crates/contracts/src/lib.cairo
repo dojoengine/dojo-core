@@ -8,15 +8,19 @@ pub mod contract {
 
 pub mod model {
     pub mod introspect;
+    pub use introspect::Introspect;
+    
     pub mod layout;
     pub use layout::{Layout, FieldLayout};
 
     pub mod model;
     pub use model::{
-        Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
+        Model, ModelIndex, ModelEntity, 
         ModelAttributes
     };
 
+    pub mod interface;
+    pub use interface::{IModelTest, IModelTestDispatcher, IModelTestDispatcherTrait};
     #[cfg(target: "test")]
     pub use model::{ModelTest, ModelEntityTest};
 
@@ -24,8 +28,8 @@ pub mod model {
     pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
     pub(crate) use metadata::{initial_address, initial_class_hash};
 
-
-    pub mod members;
+    pub mod world_store;
+    pub use world_store::{WorldStore};
 }
 
 pub(crate) mod storage {
