@@ -54,7 +54,7 @@ pub fn build_test_config(path: &str, profile: Profile) -> anyhow::Result<Config>
 ///
 /// * `config` - The [`Config`] to use for the corelib detection.
 pub fn corelib(config: &Config) -> PathBuf {
-    let ws = ops::read_workspace(config.manifest_path(), &config).unwrap();
+    let ws = ops::read_workspace(config.manifest_path(), config).unwrap();
     let resolve = ops::resolve_workspace(&ws).unwrap();
 
     let features_opts = FeaturesOpts {

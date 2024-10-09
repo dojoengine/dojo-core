@@ -26,7 +26,6 @@ use super::DOJO_CONTRACT_ATTR;
 
 const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";
-const CONTRACT_NOMAPPING: &str = "nomapping";
 
 #[derive(Debug, Clone, Default)]
 pub struct ContractParameters {
@@ -189,8 +188,8 @@ impl DojoContract {
                     name: name.clone(),
                     content: code,
                     aux_data: Some(DynGeneratedFileAuxData::new(ContractAuxData {
-                        name,
-                        namespace: contract_namespace.clone(),
+                        name: name.to_string(),
+                        namespace: contract_namespace.to_string(),
                         systems: contract.systems.clone(),
                     })),
                     code_mappings,
@@ -464,7 +463,7 @@ impl DojoContract {
     ///  * adding `let world = self.world_dispatcher.read();` statement at the beginning of the
     ///    function to restore the removed `world` parameter.
     ///  * if `has_generate_trait` is true, the implementation containing the function has the
-    ///    #[generate_trait] attribute.
+    ///    `#[generate_trait]` attribute.
     pub fn rewrite_function(
         &mut self,
         db: &dyn SyntaxGroup,
@@ -658,8 +657,6 @@ fn get_parameters(
                             CONTRACT_NAMESPACE => {
                                 parameters.namespace =
                                     get_contract_namespace(db, arg_value, diagnostics);
-                            }
-                            CONTRACT_NOMAPPING => {
                                 parameters.nomapping = true;
                             }
                             _ => {

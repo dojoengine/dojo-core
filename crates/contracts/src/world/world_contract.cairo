@@ -4,7 +4,7 @@ use core::traits::{Into, TryInto};
 use starknet::{ContractAddress, ClassHash, storage_access::StorageBaseAddress, SyscallResult};
 
 use dojo::model::{ModelIndex, ResourceMetadata};
-use dojo::model::{Layout};
+use dojo::meta::Layout;
 
 /// Resource is the type of the resource that can be registered in the world.
 ///
@@ -20,6 +20,7 @@ use dojo::model::{Layout};
 #[derive(Drop, starknet::Store, Serde, Default, Debug)]
 pub enum Resource {
     Model: (ContractAddress, felt252),
+    Event: (ContractAddress, felt252),
     Contract: (ContractAddress, felt252),
     Namespace: ByteArray,
     World,
@@ -51,6 +52,9 @@ pub trait IWorld<T> {
 
     fn register_namespace(ref self: T, namespace: ByteArray);
 
+    fn register_event(ref self: T, class_hash: ClassHash);
+    fn upgrade_event(ref self: T, class_hash: ClassHash);
+
     fn register_model(ref self: T, class_hash: ClassHash);
     fn upgrade_model(ref self: T, class_hash: ClassHash);
 
@@ -59,7 +63,13 @@ pub trait IWorld<T> {
     fn init_contract(ref self: T, selector: felt252, init_calldata: Span<felt252>);
 
     fn uuid(ref self: T) -> usize;
-    fn emit(self: @T, keys: Array<felt252>, values: Span<felt252>);
+    fn emit(
+        ref self: T,
+        event_selector: felt252,
+        keys: Span<felt252>,
+        values: Span<felt252>,
+        historical: bool
+    );
 
     fn entity(
         self: @T, model_selector: felt252, index: ModelIndex, layout: Layout
@@ -100,6 +110,14 @@ pub trait IWorldTest<T> {
     );
 
     fn delete_entity_test(ref self: T, model_selector: felt252, index: ModelIndex, layout: Layout);
+
+    fn emit_test(
+        ref self: T,
+        event_selector: felt252,
+        keys: Span<felt252>,
+        values: Span<felt252>,
+        historical: bool
+    );
 }
 
 #[starknet::interface]
@@ -146,9 +164,11 @@ pub mod world {
         IUpgradeableState, IFactRegistryDispatcher, IFactRegistryDispatcherTrait, StorageUpdate,
         ProgramOutput
     };
+    use dojo::meta::Layout;
+    use dojo::event::{IEventDispatcher, IEventDispatcherTrait};
     use dojo::model::{
-        Model, IModelDispatcher, IModelDispatcherTrait, Layout, ResourceMetadata,
-        ResourceMetadataTrait, metadata
+        Model, IModelDispatcher, IModelDispatcherTrait, ResourceMetadata, ResourceMetadataTrait,
+        metadata
     };
     use dojo::storage;
     use dojo::utils::{
@@ -183,6 +203,8 @@ pub mod world {
         NamespaceRegistered: NamespaceRegistered,
         ModelRegistered: ModelRegistered,
         ModelUpgraded: ModelUpgraded,
+        EventRegistered: EventRegistered,
+        EventUpgraded: EventUpgraded,
         StoreSetRecord: StoreSetRecord,
         StoreUpdateRecord: StoreUpdateRecord,
         StoreUpdateMember: StoreUpdateMember,
@@ -190,7 +212,8 @@ pub mod world {
         WriterUpdated: WriterUpdated,
         OwnerUpdated: OwnerUpdated,
         ConfigEvent: Config::Event,
-        StateUpdated: StateUpdated
+        StateUpdated: StateUpdated,
+        EventEmitted: EventEmitted
     }
 
     #[derive(Drop, starknet::Event)]
@@ -259,6 +282,23 @@ pub mod world {
         pub prev_address: ContractAddress,
     }
 
+    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    pub struct EventRegistered {
+        pub name: ByteArray,
+        pub namespace: ByteArray,
+        pub class_hash: ClassHash,
+        pub address: ContractAddress,
+    }
+
+    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    pub struct EventUpgraded {
+        pub name: ByteArray,
+        pub namespace: ByteArray,
+        pub class_hash: ClassHash,
+        pub address: ContractAddress,
+        pub prev_address: ContractAddress,
+    }
+
     #[derive(Drop, starknet::Event)]
     pub struct StoreSetRecord {
         pub table: felt252,
@@ -302,11 +342,24 @@ pub mod world {
         pub value: bool,
     }
 
+    #[derive(Drop, starknet::Event)]
+    pub struct EventEmitted {
+        #[key]
+        pub event_selector: felt252,
+        #[key]
+        pub system_address: ContractAddress,
+        #[key]
+        pub historical: bool,
+        pub keys: Span<felt252>,
+        pub values: Span<felt252>,
+    }
+
     #[storage]
     struct Storage {
         contract_base: ClassHash,
         nonce: usize,
         models_salt: usize,
+        events_salt: usize,
         resources: Map::<felt252, Resource>,
         owners: Map::<(felt252, ContractAddress), bool>,
         writers: Map::<(felt252, ContractAddress), bool>,
@@ -370,6 +423,21 @@ pub mod world {
         ) {
             self.delete_entity_internal(model_selector, index, layout);
         }
+
+        fn emit_test(
+            ref self: ContractState,
+            event_selector: felt252,
+            keys: Span<felt252>,
+            values: Span<felt252>,
+            historical: bool
+        ) {
+            EventEmitter::emit(
+                ref self,
+                EventEmitted {
+                    event_selector, system_address: get_caller_address(), historical, keys, values
+                }
+            );
+        }
     }
 
     #[abi(embed_v0)]
@@ -387,7 +455,10 @@ pub mod world {
                     Model::<ResourceMetadata>::layout()
                 );
 
-            ResourceMetadataTrait::from_values(resource_selector, ref values)
+            match ResourceMetadataTrait::from_values(resource_selector, ref values) {
+                Option::Some(x) => x,
+                Option::None => panic!("Model `ResourceMetadata`: deserialization failed.")
+            }
         }
 
         /// Sets the metadata of the resource.
@@ -524,8 +595,116 @@ pub mod world {
             EventEmitter::emit(ref self, WriterUpdated { resource, contract, value: false });
         }
 
-        /// Registers a model in the world. If the model is already registered,
-        /// the implementation will be updated.
+        /// Registers an event in the world.
+        ///
+        /// # Arguments
+        ///
+        /// * `class_hash` - The class hash of the event to be registered.
+        fn register_event(ref self: ContractState, class_hash: ClassHash) {
+            let caller = get_caller_address();
+            let salt = self.events_salt.read();
+
+            let (contract_address, _) = starknet::syscalls::deploy_syscall(
+                class_hash, salt.into(), [].span(), false,
+            )
+                .unwrap_syscall();
+            self.events_salt.write(salt + 1);
+
+            let descriptor = DescriptorTrait::from_contract_assert(contract_address);
+
+            if !self.is_namespace_registered(descriptor.namespace_hash()) {
+                panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
+            }
+
+            self.assert_caller_permissions(descriptor.namespace_hash(), Permission::Owner);
+
+            let maybe_existing_event = self.resources.read(descriptor.selector());
+            if !maybe_existing_event.is_unregistered() {
+                panic_with_byte_array(
+                    @errors::event_already_registered(descriptor.namespace(), descriptor.name())
+                );
+            }
+
+            self
+                .resources
+                .write(
+                    descriptor.selector(),
+                    Resource::Event((contract_address, descriptor.namespace_hash()))
+                );
+            self.owners.write((descriptor.selector(), caller), true);
+
+            EventEmitter::emit(
+                ref self,
+                EventRegistered {
+                    name: descriptor.name().clone(),
+                    namespace: descriptor.namespace().clone(),
+                    address: contract_address,
+                    class_hash
+                }
+            );
+        }
+
+        fn upgrade_event(ref self: ContractState, class_hash: ClassHash) {
+            let salt = self.events_salt.read();
+
+            let (new_contract_address, _) = starknet::syscalls::deploy_syscall(
+                class_hash, salt.into(), [].span(), false,
+            )
+                .unwrap_syscall();
+
+            self.events_salt.write(salt + 1);
+
+            let new_descriptor = DescriptorTrait::from_contract_assert(new_contract_address);
+
+            if !self.is_namespace_registered(new_descriptor.namespace_hash()) {
+                panic_with_byte_array(
+                    @errors::namespace_not_registered(new_descriptor.namespace())
+                );
+            }
+
+            self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
+
+            let mut prev_address = core::num::traits::Zero::<ContractAddress>::zero();
+
+            // If the namespace or name of the event have been changed, the descriptor
+            // will be different, hence not upgradeable.
+            match self.resources.read(new_descriptor.selector()) {
+                Resource::Event((model_address, _)) => { prev_address = model_address; },
+                Resource::Unregistered => {
+                    panic_with_byte_array(
+                        @errors::event_not_registered(
+                            new_descriptor.namespace(), new_descriptor.name()
+                        )
+                    )
+                },
+                _ => panic_with_byte_array(
+                    @errors::resource_conflict(
+                        @format!("{}-{}", new_descriptor.namespace(), new_descriptor.name()),
+                        @"event"
+                    )
+                )
+            };
+
+            self
+                .resources
+                .write(
+                    new_descriptor.selector(),
+                    Resource::Event((new_contract_address, new_descriptor.namespace_hash()))
+                );
+
+            EventEmitter::emit(
+                ref self,
+                EventUpgraded {
+                    name: new_descriptor.name().clone(),
+                    namespace: new_descriptor.namespace().clone(),
+                    prev_address,
+                    address: new_contract_address,
+                    class_hash,
+                }
+            );
+        }
+
+        /// Registers a model in the world.
         ///
         /// # Arguments
         ///
@@ -819,11 +998,31 @@ pub mod world {
         ///
         /// * `keys` - The keys of the event.
         /// * `values` - The data to be logged by the event.
-        fn emit(self: @ContractState, mut keys: Array<felt252>, values: Span<felt252>) {
-            let system = get_caller_address();
-            system.serialize(ref keys);
+        fn emit(
+            ref self: ContractState,
+            event_selector: felt252,
+            keys: Span<felt252>,
+            values: Span<felt252>,
+            historical: bool
+        ) {
+            if let Resource::Event((_, _)) = self.resources.read(event_selector) {
+                self.assert_caller_permissions(event_selector, Permission::Writer);
 
-            emit_event_syscall(keys.span(), values).unwrap_syscall();
+                EventEmitter::emit(
+                    ref self,
+                    EventEmitted {
+                        event_selector,
+                        system_address: get_caller_address(),
+                        historical,
+                        keys,
+                        values,
+                    }
+                );
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{event_selector}"), @"event")
+                );
+            }
         }
 
         /// Gets the values of a model record/entity/member.
@@ -1102,6 +1301,12 @@ pub mod world {
                 )) => {
                     let d = IDescriptorDispatcher { contract_address };
                     format!("contract (or its namespace) `{}`", d.tag())
+                },
+                Resource::Event((
+                    contract_address, _
+                )) => {
+                    let d = IDescriptorDispatcher { contract_address };
+                    format!("event (or its namespace) `{}`", d.tag())
                 },
                 Resource::Model((
                     contract_address, _

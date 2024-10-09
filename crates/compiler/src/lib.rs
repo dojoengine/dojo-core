@@ -16,5 +16,6 @@ pub const BASE_CONTRACT_TAG: &str = "dojo-base";
 pub const RESOURCE_METADATA_QUALIFIED_PATH: &str = "dojo::model::metadata::resource_metadata";
 pub const CONTRACTS_DIR: &str = "contracts";
 pub const MODELS_DIR: &str = "models";
+pub const EVENTS_DIR: &str = "events";
 pub const MANIFESTS_DIR: &str = "manifests";
 pub const MANIFESTS_BASE_DIR: &str = "base";

@@ -1,8 +1,8 @@
 pub mod attribute_macros;
+pub mod cairo_plugin;
 pub mod derive_macros;
 pub mod inline_macros;
-pub mod plugin;
 pub mod semantics;
 pub mod syntax;
 
-pub use plugin::{dojo_plugin_suite, CairoPluginRepository};
+pub use cairo_plugin::{dojo_plugin_suite, CairoPluginRepository};

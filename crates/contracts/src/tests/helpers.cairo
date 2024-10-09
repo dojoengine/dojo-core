@@ -6,6 +6,14 @@ use dojo::model::Model;
 use dojo::utils::test::{deploy_with_world_address, spawn_test_world};
 
 #[derive(Copy, Drop, Serde, Debug)]
+#[dojo::event]
+pub struct SimpleEvent {
+    #[key]
+    pub id: u32,
+    pub data: (felt252, felt252),
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct Foo {
     #[key]
@@ -15,7 +23,7 @@ pub struct Foo {
 }
 
 #[derive(Copy, Drop, Serde)]
-#[dojo::model(namespace: "another_namespace", nomapping: true)]
+#[dojo::model(namespace: "another_namespace")]
 pub struct Buzz {
     #[key]
     pub caller: ContractAddress,
@@ -51,7 +59,7 @@ pub mod test_contract_with_dojo_init_args {
     }
 }
 
-#[dojo::contract(namespace: "buzz_namespace", nomapping: true)]
+#[dojo::contract(namespace: "buzz_namespace")]
 pub mod buzz_contract {}
 
 #[derive(IntrospectPacked, Copy, Drop, Serde)]

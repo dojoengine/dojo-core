@@ -15,7 +15,7 @@ use cairo_lang_sierra_generator::program_generator::{
 use cairo_lang_starknet::compile::{extract_semantic_entrypoints, SemanticEntryPoints};
 use cairo_lang_starknet::contract::ContractDeclaration;
 use itertools::{chain, Itertools};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub fn compile_prepared_db_to_debug_info(
     db: &RootDatabase,
@@ -33,7 +33,7 @@ pub fn compile_prepared_db_to_debug_info(
 /// Compile declared Starknet contract.
 ///
 /// The `contract` value **must** come from `db`, for example as a result of calling
-/// [`find_contracts`]. Does not check diagnostics, it is expected that they are checked by caller
+/// `find_contracts`. Does not check diagnostics, it is expected that they are checked by caller
 /// of this function.
 fn compile_contract_with_prepared_and_checked_db_to_debug_info(
     db: &RootDatabase,
@@ -60,13 +60,13 @@ fn compile_contract_with_prepared_and_checked_db_to_debug_info(
     Ok(debug_info)
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SierraToCairoDebugInfo {
     pub sierra_statements_to_cairo_info: HashMap<usize, SierraStatementToCairoDebugInfo>,
 }
 
 /// Human readable position inside a file, in lines and characters.
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TextPosition {
     /// Line index, 0 based.
     pub line: usize,
@@ -74,14 +74,14 @@ pub struct TextPosition {
     pub col: usize,
 }
 
-#[derive(Debug, Serialize, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Location {
     pub start: TextPosition,
     pub end: TextPosition,
     pub file_path: String,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SierraStatementToCairoDebugInfo {
     pub cairo_locations: Vec<Location>,
 }

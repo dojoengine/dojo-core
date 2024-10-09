@@ -36,8 +36,7 @@ pub fn dojo_derive_all(
 
     let derive_attr_names = extract_derive_attr_names(db, &mut diagnostics, attrs);
 
-    let (rewrite_nodes, derive_diagnostics) =
-        handle_derive_attrs(db, &derive_attr_names, &item_ast);
+    let (rewrite_nodes, derive_diagnostics) = handle_derive_attrs(db, &derive_attr_names, item_ast);
 
     diagnostics.extend(derive_diagnostics);
 
