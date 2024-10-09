@@ -12,6 +12,7 @@
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
+use std::process::Command;
 
 use anyhow::{anyhow, Result};
 use cainome::rs::Abigen;
@@ -82,21 +83,26 @@ fn generate_bindings(
     let out_path = format!("{OUT_DIR}/{bindings_filename}");
 
     if is_check_only {
-        let generated_bindings = fs::read_to_string(tmp_file)?;
+        Command::new("rustfmt")
+            .arg(&tmp_file)
+            .status()
+            .expect("Failed to run rustfmt on generated bindings");
+
+        let generated_bindings = fs::read_to_string(tmp_file)?.replace(char::is_whitespace, "");
 
         if Path::new(&out_path).exists() {
-            let existing_bindings = fs::read_to_string(out_path)?;
+            let existing_bindings = fs::read_to_string(out_path)?.replace(char::is_whitespace, "");
 
-            if existing_bindings.replace(char::is_whitespace, "")
-                != generated_bindings.replace(char::is_whitespace, "")
-            {
+            if existing_bindings != generated_bindings {
                 return Err(anyhow!(
                     "{contract_name} ABI bindings are not up to date. Consider generating them \
-                     running `cargo run -p dojo-abigen`"
+                     running `cargo run -p dojo-abigen`.",
                 ));
             }
         } else {
-            println!("No bindings found for {contract_name}, check skipped");
+            return Err(anyhow!(
+                "No bindings found for {contract_name}, expected at {out_path}."
+            ));
         }
     } else {
         // Rename the temporary file to the output file is enough to update the bindings.
