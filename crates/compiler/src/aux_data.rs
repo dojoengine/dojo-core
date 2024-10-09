@@ -47,14 +47,14 @@ pub trait AuxDataToAnnotation<T> {
     /// # Arguments
     ///
     /// * `module_path` - The path to the module that generated the aux data.
-    fn contract_qualified_path(&self, module_path: &String) -> String;
+    fn contract_qualified_path(&self, module_path: &str) -> String;
 
     /// Converts the aux data to the corresponding annotation.
     ///
     /// # Arguments
     ///
     /// * `module_path` - The path to the module that generated the aux data.
-    fn to_annotation(&self, module_path: &String) -> Result<T>;
+    fn to_annotation(&self, module_path: &str) -> Result<T>;
 }
 
 impl GeneratedFileAuxData for ModelAuxData {
@@ -72,7 +72,7 @@ impl GeneratedFileAuxData for ModelAuxData {
 }
 
 impl AuxDataToAnnotation<ModelAnnotation> for ModelAuxData {
-    fn contract_qualified_path(&self, module_path: &String) -> String {
+    fn contract_qualified_path(&self, module_path: &str) -> String {
         // As models are defined from a struct (usually Pascal case), we have converted
         // the underlying starknet contract name to snake case in the `#[dojo::model]` attribute
         // macro processing.
@@ -86,8 +86,8 @@ impl AuxDataToAnnotation<ModelAnnotation> for ModelAuxData {
         )
     }
 
-    fn to_annotation(&self, module_path: &String) -> Result<ModelAnnotation> {
-        let contract_qualified_path = self.contract_qualified_path(&module_path);
+    fn to_annotation(&self, module_path: &str) -> Result<ModelAnnotation> {
+        let contract_qualified_path = self.contract_qualified_path(module_path);
 
         let annotation = ModelAnnotation {
             qualified_path: contract_qualified_path.clone(),
@@ -122,7 +122,7 @@ impl GeneratedFileAuxData for EventAuxData {
 }
 
 impl AuxDataToAnnotation<EventAnnotation> for EventAuxData {
-    fn contract_qualified_path(&self, module_path: &String) -> String {
+    fn contract_qualified_path(&self, module_path: &str) -> String {
         // As events are defined from a struct (usually Pascal case), we have converted
         // the underlying starknet contract name to snake case in the `#[dojo::event]` attribute
         // macro processing.
@@ -136,8 +136,8 @@ impl AuxDataToAnnotation<EventAnnotation> for EventAuxData {
         )
     }
 
-    fn to_annotation(&self, module_path: &String) -> Result<EventAnnotation> {
-        let contract_qualified_path = self.contract_qualified_path(&module_path);
+    fn to_annotation(&self, module_path: &str) -> Result<EventAnnotation> {
+        let contract_qualified_path = self.contract_qualified_path(module_path);
 
         let annotation = EventAnnotation {
             qualified_path: contract_qualified_path.clone(),
@@ -172,15 +172,15 @@ impl GeneratedFileAuxData for ContractAuxData {
 }
 
 impl AuxDataToAnnotation<ContractAnnotation> for ContractAuxData {
-    fn contract_qualified_path(&self, module_path: &String) -> String {
+    fn contract_qualified_path(&self, module_path: &str) -> String {
         // The module path for contracts is the path to the contract file, not the fully
         // qualified path of the actual contract module.
         // Adding the contract name to the module path allows to get the fully qualified path
         format!("{}{}{}", module_path, CAIRO_PATH_SEPARATOR, self.name)
     }
 
-    fn to_annotation(&self, module_path: &String) -> Result<ContractAnnotation> {
-        let contract_qualified_path = self.contract_qualified_path(&module_path);
+    fn to_annotation(&self, module_path: &str) -> Result<ContractAnnotation> {
+        let contract_qualified_path = self.contract_qualified_path(module_path);
 
         let annotation = ContractAnnotation {
             qualified_path: contract_qualified_path.clone(),
@@ -201,13 +201,13 @@ impl AuxDataToAnnotation<ContractAnnotation> for ContractAuxData {
 }
 
 impl AuxDataToAnnotation<StarknetContractAnnotation> for StarkNetContractAuxData {
-    fn contract_qualified_path(&self, module_path: &String) -> String {
+    fn contract_qualified_path(&self, module_path: &str) -> String {
         // The qualified path for starknet contracts is the same as the module path.
-        module_path.clone()
+        module_path.to_string()
     }
 
-    fn to_annotation(&self, module_path: &String) -> Result<StarknetContractAnnotation> {
-        let contract_qualified_path = self.contract_qualified_path(&module_path);
+    fn to_annotation(&self, module_path: &str) -> Result<StarknetContractAnnotation> {
+        let contract_qualified_path = self.contract_qualified_path(module_path);
 
         let annotation = StarknetContractAnnotation {
             qualified_path: contract_qualified_path.clone(),

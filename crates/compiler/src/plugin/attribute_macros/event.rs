@@ -55,7 +55,7 @@ impl StructParameterParser for EventParameters {
     fn process_named_parameters(
         &mut self,
         db: &dyn SyntaxGroup,
-        attribute_name: &String,
+        attribute_name: &str,
         arg: ArgClauseNamed,
         diagnostics: &mut Vec<PluginDiagnostic>,
     ) {
@@ -90,7 +90,7 @@ impl DojoEvent {
         let mut diagnostics = vec![];
         let mut parameters = EventParameters::default();
 
-        parameters.from_struct(
+        parameters.load_from_struct(
             db,
             &DOJO_EVENT_ATTR.to_string(),
             struct_ast.clone(),
@@ -271,7 +271,7 @@ impl DojoEvent {
 
 /// Get the historical boolean parameter from the `Expr` parameter.
 fn get_historical(
-    attribute_name: &String,
+    attribute_name: &str,
     arg_value: Expr,
     diagnostics: &mut Vec<PluginDiagnostic>,
 ) -> bool {

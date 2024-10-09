@@ -287,12 +287,12 @@ impl DojoAnnotation {
     /// # Arguments
     ///
     /// * `workspace` - The workspace to read the annotations from.
-    pub fn read(workspace: &Workspace) -> Result<Self> {
+    pub fn read(workspace: &Workspace<'_>) -> Result<Self> {
         let target_dir = workspace.target_dir_profile();
 
         let mut file = target_dir.open_ro(
             format!("{}.toml", DOJO_ANNOTATION_FILE_NAME),
-            &format!("Dojo annotations"),
+            "Dojo annotations",
             workspace.config(),
         )?;
 
@@ -310,17 +310,17 @@ impl DojoAnnotation {
     /// # Arguments
     ///
     /// * `workspace` - The workspace to write the annotations to.
-    pub fn write(&self, workspace: &Workspace) -> Result<()> {
+    pub fn write(&self, workspace: &Workspace<'_>) -> Result<()> {
         let target_dir = workspace.target_dir_profile();
         let content = toml::to_string(&self)?;
 
         let mut file = target_dir.open_rw(
             format!("{}.toml", DOJO_ANNOTATION_FILE_NAME),
-            &format!("Dojo annotations"),
+            "Dojo annotations",
             workspace.config(),
         )?;
 
-        file.write(content.as_bytes())?;
+        let _written = file.write(content.as_bytes())?;
 
         Ok(())
     }

@@ -49,7 +49,7 @@ impl DojoModel {
         let mut diagnostics = vec![];
         let mut parameters = ModelParameters::default();
 
-        parameters.from_struct(
+        parameters.load_from_struct(
             db,
             &DOJO_MODEL_ATTR.to_string(),
             struct_ast.clone(),

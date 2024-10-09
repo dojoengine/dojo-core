@@ -21,10 +21,11 @@ pub const PARAMETER_NOMAPPING: &str = "nomapping";
 
 /// `StructParameterParser` provides a general `from_struct` function to parse
 /// the parameters of a struct attribute like dojo::model or dojo::event.
+///
 /// Processing of specific parameters can then be implemented through the `process_named_parameters`
 /// function.
 pub trait StructParameterParser {
-    fn from_struct(
+    fn load_from_struct(
         &mut self,
         db: &dyn SyntaxGroup,
         attribute_name: &String,
@@ -89,7 +90,7 @@ pub trait StructParameterParser {
     fn process_named_parameters(
         &mut self,
         db: &dyn SyntaxGroup,
-        attribute_name: &String,
+        attribute_name: &str,
         arg: ArgClauseNamed,
         diagnostics: &mut Vec<PluginDiagnostic>,
     );
@@ -116,7 +117,7 @@ impl StructParameterParser for CommonStructParameters {
     fn process_named_parameters(
         &mut self,
         db: &dyn SyntaxGroup,
-        attribute_name: &String,
+        attribute_name: &str,
         arg: ArgClauseNamed,
         diagnostics: &mut Vec<PluginDiagnostic>,
     ) {
@@ -252,7 +253,7 @@ pub fn deserialize_member_ty(member: &Member, input_name: &str) -> RewriteNode {
 /// Get the version from the `Expr` parameter.
 fn get_version(
     db: &dyn SyntaxGroup,
-    attribute_name: &String,
+    attribute_name: &str,
     arg_value: Expr,
     diagnostics: &mut Vec<PluginDiagnostic>,
 ) -> u8 {
@@ -298,7 +299,7 @@ fn get_version(
 /// Get the namespace from the `Expr` parameter.
 fn get_namespace(
     db: &dyn SyntaxGroup,
-    attribute_name: &String,
+    attribute_name: &str,
     arg_value: Expr,
     diagnostics: &mut Vec<PluginDiagnostic>,
 ) -> Option<String> {
