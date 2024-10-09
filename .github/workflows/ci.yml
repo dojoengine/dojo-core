@@ -13,10 +13,11 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest-4-cores
+    container:
+      image: ghcr.io/dojoengine/dojo-core-dev:5995840
     steps:
       - uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
-      - uses: dtolnay/rust-toolchain@1.80.0
       - run: |
           scripts/tests.sh
 
@@ -32,17 +33,19 @@ jobs:
 
   rustfmt:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dojoengine/dojo-core-dev:5995840
     steps:
       - uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
-      - uses: dtolnay/rust-toolchain@1.80.0
       - run: scripts/rust_fmt.sh --check
 
   docs:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dojoengine/dojo-core-dev:5995840
     steps:
       - uses: actions/checkout@v3
       - uses: Swatinem/rust-cache@v2
-      - uses: dtolnay/rust-toolchain@1.80.0
       - run: >
           scripts/docs.sh
