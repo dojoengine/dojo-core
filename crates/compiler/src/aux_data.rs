@@ -8,35 +8,32 @@ use cairo_lang_defs::plugin::GeneratedFileAuxData;
 use cairo_lang_starknet::plugin::aux_data::StarkNetContractAuxData;
 use convert_case::{Case, Casing};
 use dojo_types::naming;
-use smol_str::SmolStr;
+use serde::{Deserialize, Serialize};
 use tracing::trace;
 
 use super::compiler::annotation::Member;
 use crate::{
-    compiler::{
-        annotation::{
-            ContractAnnotation, EventAnnotation, ModelAnnotation, StarknetContractAnnotation,
-        },
-        artifact_manager::ArtifactManager,
+    compiler::annotation::{
+        ContractAnnotation, EventAnnotation, ModelAnnotation, StarknetContractAnnotation,
     },
     CAIRO_PATH_SEPARATOR,
 };
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ModelAuxData {
     pub name: String,
     pub namespace: String,
     pub members: Vec<Member>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ContractAuxData {
-    pub name: SmolStr,
+    pub name: String,
     pub namespace: String,
     pub systems: Vec<String>,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct EventAuxData {
     pub name: String,
     pub namespace: String,
@@ -56,9 +53,8 @@ pub trait AuxDataToAnnotation<T> {
     ///
     /// # Arguments
     ///
-    /// * `artifact_manager` - The artifact manager to get the class from the artifact.
     /// * `module_path` - The path to the module that generated the aux data.
-    fn to_annotation(&self, artifact_manager: &ArtifactManager, module_path: &String) -> Result<T>;
+    fn to_annotation(&self, module_path: &String) -> Result<T>;
 }
 
 impl GeneratedFileAuxData for ModelAuxData {
@@ -90,20 +86,11 @@ impl AuxDataToAnnotation<ModelAnnotation> for ModelAuxData {
         )
     }
 
-    fn to_annotation(
-        &self,
-        artifact_manager: &ArtifactManager,
-        module_path: &String,
-    ) -> Result<ModelAnnotation> {
+    fn to_annotation(&self, module_path: &String) -> Result<ModelAnnotation> {
         let contract_qualified_path = self.contract_qualified_path(&module_path);
-
-        let artifact = artifact_manager
-            .get_artifact(&contract_qualified_path)
-            .ok_or(anyhow::anyhow!("Artifact not found"))?;
 
         let annotation = ModelAnnotation {
             qualified_path: contract_qualified_path.clone(),
-            class_hash: artifact.class_hash,
             tag: naming::get_tag(&self.namespace, &self.name),
             members: self.members.clone(),
         };
@@ -149,20 +136,11 @@ impl AuxDataToAnnotation<EventAnnotation> for EventAuxData {
         )
     }
 
-    fn to_annotation(
-        &self,
-        artifact_manager: &ArtifactManager,
-        module_path: &String,
-    ) -> Result<EventAnnotation> {
+    fn to_annotation(&self, module_path: &String) -> Result<EventAnnotation> {
         let contract_qualified_path = self.contract_qualified_path(&module_path);
-
-        let artifact = artifact_manager
-            .get_artifact(&contract_qualified_path)
-            .ok_or(anyhow::anyhow!("Artifact not found"))?;
 
         let annotation = EventAnnotation {
             qualified_path: contract_qualified_path.clone(),
-            class_hash: artifact.class_hash,
             tag: naming::get_tag(&self.namespace, &self.name),
             members: self.members.clone(),
         };
@@ -201,20 +179,11 @@ impl AuxDataToAnnotation<ContractAnnotation> for ContractAuxData {
         format!("{}{}{}", module_path, CAIRO_PATH_SEPARATOR, self.name)
     }
 
-    fn to_annotation(
-        &self,
-        artifact_manager: &ArtifactManager,
-        module_path: &String,
-    ) -> Result<ContractAnnotation> {
+    fn to_annotation(&self, module_path: &String) -> Result<ContractAnnotation> {
         let contract_qualified_path = self.contract_qualified_path(&module_path);
-
-        let artifact = artifact_manager
-            .get_artifact(&contract_qualified_path)
-            .ok_or(anyhow::anyhow!("Artifact not found"))?;
 
         let annotation = ContractAnnotation {
             qualified_path: contract_qualified_path.clone(),
-            class_hash: artifact.class_hash,
             tag: naming::get_tag(&self.namespace, &self.name),
             systems: self.systems.clone(),
         };
@@ -237,20 +206,11 @@ impl AuxDataToAnnotation<StarknetContractAnnotation> for StarkNetContractAuxData
         module_path.clone()
     }
 
-    fn to_annotation(
-        &self,
-        artifact_manager: &ArtifactManager,
-        module_path: &String,
-    ) -> Result<StarknetContractAnnotation> {
+    fn to_annotation(&self, module_path: &String) -> Result<StarknetContractAnnotation> {
         let contract_qualified_path = self.contract_qualified_path(&module_path);
-
-        let artifact = artifact_manager
-            .get_artifact(&contract_qualified_path)
-            .ok_or(anyhow::anyhow!("Artifact not found"))?;
 
         let annotation = StarknetContractAnnotation {
             qualified_path: contract_qualified_path.clone(),
-            class_hash: artifact.class_hash,
             name: self.contract_name.to_string(),
         };
 

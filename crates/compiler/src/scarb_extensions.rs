@@ -2,8 +2,6 @@ use anyhow::Result;
 use camino::Utf8Path;
 use scarb::{core::Workspace, flock::Filesystem};
 
-use crate::{MANIFESTS_BASE_DIR, MANIFESTS_DIR};
-
 /// Handy enum for selecting the current profile or all profiles.
 #[derive(Debug)]
 pub enum ProfileSpec {

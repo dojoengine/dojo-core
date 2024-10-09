@@ -189,8 +189,8 @@ impl DojoContract {
                     name: name.clone(),
                     content: code,
                     aux_data: Some(DynGeneratedFileAuxData::new(ContractAuxData {
-                        name,
-                        namespace: contract_namespace.clone(),
+                        name: name.to_string(),
+                        namespace: contract_namespace.to_string(),
                         systems: contract.systems.clone(),
                     })),
                     code_mappings,

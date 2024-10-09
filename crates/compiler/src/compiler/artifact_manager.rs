@@ -3,11 +3,12 @@
 //! The primary purpose of this module is to manage the compiled artifacts
 //! and abstract the writing of the artifacts to the filesystem.
 //!
-//! The artifact manager doesn't have any context of the nature of the contracts
-//! that are being compiled (dojo contract, model contract, starknet contract, ...).
+//! The artifact manager can be completed with the dojo annotations extracted
+//! from the aux data of the generated files, which retain the information about
+//! the nature of the contracts being compiled.
 //!
-//! The plugin aux data are the one that will keep this information mapped to the
-//! qualified path of the compiled contracts.
+//! When using annotations, the qualified path is the link connecting the artifact
+//! to the annotation.
 
 use std::collections::HashMap;
 use std::ops::DerefMut;
@@ -15,24 +16,18 @@ use std::rc::Rc;
 
 use anyhow::{Context, Result};
 use cairo_lang_compiler::db::RootDatabase;
-use cairo_lang_defs::db::DefsGroup;
 use cairo_lang_filesystem::ids::CrateId;
-use cairo_lang_starknet::plugin::aux_data::StarkNetContractAuxData;
 use cairo_lang_starknet_classes::contract_class::ContractClass;
-use dojo_types::naming;
 use scarb::core::Workspace;
 use scarb::flock::Filesystem;
 use starknet::core::types::Felt;
 use tracing::trace;
 
-use crate::aux_data::{AuxDataToAnnotation, ContractAuxData, EventAuxData, ModelAuxData};
+use crate::compiler::compiler::compute_class_hash_of_contract_class;
 use crate::scarb_extensions::WorkspaceExt;
-use crate::{
-    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, EVENTS_DIR,
-    MODELS_DIR, RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
-};
+use crate::{CONTRACTS_DIR, EVENTS_DIR, MODELS_DIR};
 
-use super::annotation::{BaseAnnotation, DojoAnnotation, WorldAnnotation};
+use super::annotation::{AnnotationInfo, DojoAnnotation};
 use super::scarb_internal::debug::SierraToCairoDebugInfo;
 
 #[derive(Debug, Clone)]
@@ -53,8 +48,8 @@ pub struct ArtifactManager<'w> {
     workspace: &'w Workspace<'w>,
     /// The compiled artifacts.
     compiled_artifacts: CompiledArtifactByPath,
-    /// Dojo annotations.
-    dojo_annotations: DojoAnnotation,
+    /// Dojo annotation.
+    dojo_annotation: DojoAnnotation,
 }
 
 impl<'w> ArtifactManager<'w> {
@@ -63,88 +58,22 @@ impl<'w> ArtifactManager<'w> {
         Self {
             workspace,
             compiled_artifacts: HashMap::new(),
-            dojo_annotations: DojoAnnotation::default(),
+            dojo_annotation: DojoAnnotation::default(),
         }
     }
 
     /// Sets the dojo annotations form the aux data extracted from the database.
-    pub fn set_dojo_annotations(&mut self, db: &RootDatabase, crate_ids: &[CrateId]) -> Result<()> {
+    pub fn set_dojo_annotation(&mut self, db: &RootDatabase, crate_ids: &[CrateId]) -> Result<()> {
         // Ensures that the dojo annotations are empty to not keep any stale data.
-        self.dojo_annotations = DojoAnnotation::default();
-
-        for crate_id in crate_ids {
-            for module_id in db.crate_modules(*crate_id).as_ref() {
-                let file_infos = db
-                    .module_generated_file_infos(*module_id)
-                    .unwrap_or(std::sync::Arc::new([]));
-
-                // Skip(1) to avoid internal aux data of Starknet aux data.
-                for aux_data in file_infos
-                    .iter()
-                    .skip(1)
-                    .filter_map(|info| info.as_ref().map(|i| &i.aux_data))
-                    .filter_map(|aux_data| aux_data.as_ref().map(|aux_data| aux_data.0.as_any()))
-                {
-                    let module_path = module_id.full_path(db);
-
-                    if let Some(aux_data) = aux_data.downcast_ref::<ContractAuxData>() {
-                        let annotation = aux_data.to_annotation(self, &module_path)?;
-                        self.dojo_annotations.contracts.push(annotation);
-                        continue;
-                    }
-
-                    if let Some(aux_data) = aux_data.downcast_ref::<ModelAuxData>() {
-                        let annotation = aux_data.to_annotation(self, &module_path)?;
-                        self.dojo_annotations.models.push(annotation);
-                        continue;
-                    }
-
-                    if let Some(aux_data) = aux_data.downcast_ref::<EventAuxData>() {
-                        let annotation = aux_data.to_annotation(self, &module_path)?;
-                        self.dojo_annotations.events.push(annotation);
-                        continue;
-                    }
-
-                    if let Some(aux_data) = aux_data.downcast_ref::<StarkNetContractAuxData>() {
-                        let annotation = aux_data.to_annotation(self, &module_path)?;
-
-                        if annotation.qualified_path == WORLD_QUALIFIED_PATH {
-                            self.dojo_annotations.world = WorldAnnotation {
-                                class_hash: annotation.class_hash,
-                                qualified_path: WORLD_QUALIFIED_PATH.to_string(),
-                                tag: WORLD_CONTRACT_TAG.to_string(),
-                            };
-                        } else if annotation.qualified_path == BASE_QUALIFIED_PATH {
-                            self.dojo_annotations.base = BaseAnnotation {
-                                class_hash: annotation.class_hash,
-                                qualified_path: BASE_QUALIFIED_PATH.to_string(),
-                                tag: BASE_CONTRACT_TAG.to_string(),
-                            };
-                        } else if annotation.qualified_path == RESOURCE_METADATA_QUALIFIED_PATH {
-                            // Skip this annotation as not used in the migration process.
-                            continue;
-                        } else {
-                            self.dojo_annotations.sn_contracts.push(annotation);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Since dojo resources are just starknet contracts under the hood,
-        // we remove them from the sn_contracts list. We can't filter them earlier
-        // as we need to wait all the annotations to be extracted before filtering.
-        let mut filtered_sn_contracts = self.dojo_annotations.sn_contracts.clone();
-
-        filtered_sn_contracts.retain(|sn_contract| {
-            !self
-                .dojo_annotations
-                .is_dojo_resource(&sn_contract.qualified_path)
-        });
-
-        self.dojo_annotations.sn_contracts = filtered_sn_contracts;
+        self.dojo_annotation = DojoAnnotation::default();
+        self.dojo_annotation = DojoAnnotation::from_aux_data(db, crate_ids)?;
 
         Ok(())
+    }
+
+    /// Returns the dojo annotation.
+    pub fn dojo_annotation(&self) -> &DojoAnnotation {
+        &self.dojo_annotation
     }
 
     /// Returns the workspace of the current compilation.
@@ -184,38 +113,112 @@ impl<'w> ArtifactManager<'w> {
 
     /// Writes all the dojo annotations and artifacts to the filesystem.
     pub fn write(&self) -> Result<()> {
-        self.dojo_annotations.write(self.workspace)?;
+        self.dojo_annotation.write(self.workspace)?;
 
         let target_dir = self.workspace.target_dir_profile();
 
-        self.write_sierra_class(WORLD_QUALIFIED_PATH, &target_dir, WORLD_CONTRACT_TAG)?;
-        self.write_sierra_class(BASE_QUALIFIED_PATH, &target_dir, BASE_CONTRACT_TAG)?;
+        self.write_sierra_class(
+            &self.dojo_annotation.world.qualified_path,
+            &target_dir,
+            &self.dojo_annotation.world.filename(),
+        )?;
+        self.write_sierra_class(
+            &self.dojo_annotation.base.qualified_path,
+            &target_dir,
+            &self.dojo_annotation.base.filename(),
+        )?;
 
-        for contract in &self.dojo_annotations.contracts {
-            let filename = naming::get_filename_from_tag(&contract.tag);
+        for contract in &self.dojo_annotation.contracts {
+            let filename = contract.filename();
             let target_dir = target_dir.child(CONTRACTS_DIR);
             self.write_sierra_class(&contract.qualified_path, &target_dir, &filename)?;
         }
 
-        for model in &self.dojo_annotations.models {
-            let filename = naming::get_filename_from_tag(&model.tag);
+        for model in &self.dojo_annotation.models {
+            let filename = model.filename();
             let target_dir = target_dir.child(MODELS_DIR);
             self.write_sierra_class(&model.qualified_path, &target_dir, &filename)?;
         }
 
-        for event in &self.dojo_annotations.events {
-            let filename = naming::get_filename_from_tag(&event.tag);
+        for event in &self.dojo_annotation.events {
+            let filename = event.filename();
             let target_dir = target_dir.child(EVENTS_DIR);
             self.write_sierra_class(&event.qualified_path, &target_dir, &filename)?;
         }
 
-        for sn_contract in &self.dojo_annotations.sn_contracts {
+        for sn_contract in &self.dojo_annotation.sn_contracts {
             // TODO: we might want to use namespace for starknet contracts too.
-            let file_name = sn_contract
-                .qualified_path
-                .replace(CAIRO_PATH_SEPARATOR, "_");
-
+            let file_name = sn_contract.filename();
             self.write_sierra_class(&sn_contract.qualified_path, &target_dir, &file_name)?;
+        }
+
+        Ok(())
+    }
+
+    /// Reads the artifacts from the filesystem by reading the dojo annotations.
+    pub fn read(&mut self, workspace: &'w Workspace) -> Result<()> {
+        self.dojo_annotation = DojoAnnotation::read(workspace)?;
+
+        self.add_artifact(
+            self.dojo_annotation.world.qualified_path.to_string(),
+            self.read_compiled_artifact(
+                &self.dojo_annotation.world.qualified_path,
+                &workspace.target_dir_profile(),
+                &self.dojo_annotation.world.filename(),
+            )?,
+        );
+
+        self.add_artifact(
+            self.dojo_annotation.base.qualified_path.to_string(),
+            self.read_compiled_artifact(
+                &self.dojo_annotation.base.qualified_path,
+                &workspace.target_dir_profile(),
+                &self.dojo_annotation.base.filename(),
+            )?,
+        );
+
+        for contract in self.dojo_annotation.contracts.clone() {
+            let target_dir = workspace.target_dir_profile().child(CONTRACTS_DIR);
+
+            self.add_artifact(
+                contract.qualified_path.to_string(),
+                self.read_compiled_artifact(
+                    &contract.qualified_path,
+                    &target_dir,
+                    &contract.filename(),
+                )?,
+            );
+        }
+
+        for model in self.dojo_annotation.models.clone() {
+            let target_dir = workspace.target_dir_profile().child(MODELS_DIR);
+
+            self.add_artifact(
+                model.qualified_path.to_string(),
+                self.read_compiled_artifact(&model.qualified_path, &target_dir, &model.filename())?,
+            );
+        }
+
+        for event in self.dojo_annotation.events.clone() {
+            let target_dir = workspace.target_dir_profile().child(EVENTS_DIR);
+
+            self.add_artifact(
+                event.qualified_path.to_string(),
+                self.read_compiled_artifact(&event.qualified_path, &target_dir, &event.filename())?,
+            );
+        }
+
+        for sn_contract in self.dojo_annotation.sn_contracts.clone() {
+            let target_dir = workspace.target_dir_profile();
+
+            self.add_artifact(
+                sn_contract.qualified_path.to_string(),
+                self.read_compiled_artifact(
+                    &sn_contract.qualified_path,
+                    &target_dir,
+                    &sn_contract.filename(),
+                )?,
+            );
         }
 
         Ok(())
@@ -229,7 +232,7 @@ impl<'w> ArtifactManager<'w> {
     /// * `qualified_path` - The cairo module qualified path.
     /// * `target_dir` - The target directory to save the artifact to.
     /// * `file_name` - The name of the file to save the artifact to, without extension.
-    pub fn write_sierra_class(
+    fn write_sierra_class(
         &self,
         qualified_path: &str,
         target_dir: &Filesystem,
@@ -265,34 +268,60 @@ impl<'w> ArtifactManager<'w> {
         Ok(())
     }
 
-    /// Saves the ABI of a compiled artifact to a JSON file.
+    /// Reads a Sierra contract class from a JSON file.
+    /// If debug info is available, it will also be read from a separate file.
     ///
     /// # Arguments
     ///
     /// * `qualified_path` - The cairo module qualified path.
     /// * `target_dir` - The target directory to save the artifact to.
     /// * `file_name` - The name of the file to save the artifact to, without extension.
-    pub fn write_abi(
+    fn read_compiled_artifact(
         &self,
         qualified_path: &str,
         target_dir: &Filesystem,
         file_name: &str,
-    ) -> anyhow::Result<()> {
-        trace!(target_dir = ?target_dir, qualified_path, file_name, "Saving abi file.");
+    ) -> anyhow::Result<CompiledArtifact> {
+        trace!(target_dir = ?target_dir, qualified_path, file_name, "Reading compiled artifact.");
 
-        let artifact = self
-            .get_artifact(qualified_path)
-            .context(format!("Artifact file for `{}` not found.", qualified_path))?;
-
-        let mut file = target_dir.open_rw(
+        let mut file = target_dir.open_ro(
             format!("{file_name}.json"),
-            &format!("abi file for `{}`", qualified_path),
+            &format!("sierra class file for `{}`", qualified_path),
             self.workspace.config(),
         )?;
 
-        serde_json::to_writer_pretty(file.deref_mut(), &artifact.contract_class.abi)
-            .with_context(|| format!("failed to serialize abi: {qualified_path}"))?;
+        // Read the class, that must be present, and recompute the class hash.
+        let contract_class: ContractClass = serde_json::from_reader(file.deref_mut())?;
 
-        Ok(())
+        let class_hash =
+            compute_class_hash_of_contract_class(&contract_class).with_context(|| {
+                format!(
+                    "problem computing class hash for contract `{}`",
+                    qualified_path
+                )
+            })?;
+
+        // Debug info may or may not be present.
+        let debug_info = if target_dir.child(format!("{file_name}.debug.json")).exists() {
+            trace!(target_dir = ?target_dir, qualified_path, file_name, "Reading sierra debug info.");
+
+            let mut file = target_dir.open_ro(
+                format!("{file_name}.debug.json"),
+                &format!("sierra debug info for `{}`", qualified_path),
+                self.workspace.config(),
+            )?;
+
+            Some(Rc::new(serde_json::from_reader(file.deref_mut())?))
+        } else {
+            None
+        };
+
+        let compiled_artifact = CompiledArtifact {
+            class_hash,
+            contract_class: Rc::new(contract_class),
+            debug_info,
+        };
+
+        Ok(compiled_artifact)
     }
 }

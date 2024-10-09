@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::fs;
 use std::rc::Rc;
 
@@ -13,7 +12,6 @@ use cairo_lang_starknet::contract::{find_contracts, ContractDeclaration};
 use cairo_lang_starknet_classes::allowed_libfuncs::{AllowedLibfuncsError, ListSelector};
 use cairo_lang_starknet_classes::contract_class::ContractClass;
 use cairo_lang_utils::UpcastMut;
-use dojo_types::naming;
 use itertools::{izip, Itertools};
 use scarb::compiler::helpers::build_compiler_config;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnitAttributes, Compiler};
@@ -28,10 +26,7 @@ use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
 use crate::scarb_extensions::{ProfileSpec, WorkspaceExt};
-use crate::{
-    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, CONTRACTS_DIR, EVENTS_DIR,
-    MODELS_DIR, RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
-};
+use crate::{BASE_QUALIFIED_PATH, WORLD_QUALIFIED_PATH};
 
 use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
@@ -180,7 +175,7 @@ impl Compiler for DojoCompiler {
         let mut artifact_manager =
             compile_contracts(db, &contracts, compiler_config, &ws, self.output_debug_info)?;
 
-        artifact_manager.set_dojo_annotations(db, &main_crate_ids)?;
+        artifact_manager.set_dojo_annotation(db, &main_crate_ids)?;
         artifact_manager.write()?;
 
         Ok(())
@@ -341,7 +336,7 @@ fn compile_contracts<'w>(
 }
 
 /// Computes the class hash of a contract class.
-fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
+pub fn compute_class_hash_of_contract_class(class: &ContractClass) -> Result<Felt> {
     let class_str = serde_json::to_string(&class)?;
     let sierra_class = serde_json::from_str::<SierraClass>(&class_str)
         .map_err(|e| anyhow!("error parsing Sierra class: {e}"))?;
