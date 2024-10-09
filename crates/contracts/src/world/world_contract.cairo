@@ -110,6 +110,14 @@ pub trait IWorldTest<T> {
     );
 
     fn delete_entity_test(ref self: T, model_selector: felt252, index: ModelIndex, layout: Layout);
+
+    fn emit_test(
+        ref self: T,
+        event_selector: felt252,
+        keys: Span<felt252>,
+        values: Span<felt252>,
+        historical: bool
+    );
 }
 
 #[starknet::interface]
@@ -414,6 +422,21 @@ pub mod world {
             ref self: ContractState, model_selector: felt252, index: ModelIndex, layout: Layout
         ) {
             self.delete_entity_internal(model_selector, index, layout);
+        }
+
+        fn emit_test(
+            ref self: ContractState,
+            event_selector: felt252,
+            keys: Span<felt252>,
+            values: Span<felt252>,
+            historical: bool
+        ) {
+            EventEmitter::emit(
+                ref self,
+                EventEmitted {
+                    event_selector, system_address: get_caller_address(), historical, keys, values
+                }
+            );
         }
     }
 
@@ -982,12 +1005,24 @@ pub mod world {
             values: Span<felt252>,
             historical: bool
         ) {
-            EventEmitter::emit(
-                ref self,
-                EventEmitted {
-                    event_selector, system_address: get_caller_address(), historical, keys, values,
-                }
-            );
+            if let Resource::Event((_, _)) = self.resources.read(event_selector) {
+                self.assert_caller_permissions(event_selector, Permission::Writer);
+
+                EventEmitter::emit(
+                    ref self,
+                    EventEmitted {
+                        event_selector,
+                        system_address: get_caller_address(),
+                        historical,
+                        keys,
+                        values,
+                    }
+                );
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{event_selector}"), @"event")
+                );
+            }
         }
 
         /// Gets the values of a model record/entity/member.

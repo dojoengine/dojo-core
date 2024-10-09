@@ -127,6 +127,13 @@ dojo::meta::introspect::Member {
     }
 }
         
+#[generate_trait]
+pub impl MessageEmitterImpl of MessageEmitter {
+    fn emit(self: @Message, world: dojo::world::IWorldDispatcher) {
+        dojo::event::Event::<Message>::emit(self, world);
+    }
+}
+
 pub impl MessageEventImpl of dojo::event::Event<Message> {
 
     fn emit(self: @Message, world: dojo::world::IWorldDispatcher) {
@@ -581,6 +588,13 @@ dojo::meta::introspect::Member {
     }
 }
         
+#[generate_trait]
+pub impl MyEventWithNamespaceEmitterImpl of MyEventWithNamespaceEmitter {
+    fn emit(self: @MyEventWithNamespace, world: dojo::world::IWorldDispatcher) {
+        dojo::event::Event::<MyEventWithNamespace>::emit(self, world);
+    }
+}
+
 pub impl MyEventWithNamespaceEventImpl of dojo::event::Event<MyEventWithNamespace> {
 
     fn emit(self: @MyEventWithNamespace, world: dojo::world::IWorldDispatcher) {
@@ -1033,6 +1047,13 @@ dojo::meta::introspect::Member {
     }
 }
         
+#[generate_trait]
+pub impl MyEventNoHistoricalEmitterImpl of MyEventNoHistoricalEmitter {
+    fn emit(self: @MyEventNoHistorical, world: dojo::world::IWorldDispatcher) {
+        dojo::event::Event::<MyEventNoHistorical>::emit(self, world);
+    }
+}
+
 pub impl MyEventNoHistoricalEventImpl of dojo::event::Event<MyEventNoHistorical> {
 
     fn emit(self: @MyEventNoHistorical, world: dojo::world::IWorldDispatcher) {
@@ -1442,6 +1463,15 @@ impl StorageStorageBaseDrop of core::traits::Drop::<StorageStorageBase>;
 impl StorageStorageBaseCopy of core::traits::Copy::<StorageStorageBase>;
 impl StorageStorageBaseMutDrop of core::traits::Drop::<StorageStorageBaseMut>;
 impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
+}
+pub trait MessageEmitter {
+    fn emit(self: @Message, world: dojo::world::IWorldDispatcher);
+}
+pub trait MyEventWithNamespaceEmitter {
+    fn emit(self: @MyEventWithNamespace, world: dojo::world::IWorldDispatcher);
+}
+pub trait MyEventNoHistoricalEmitter {
+    fn emit(self: @MyEventNoHistorical, world: dojo::world::IWorldDispatcher);
 }
 
 //! > expected_diagnostics

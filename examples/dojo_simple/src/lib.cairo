@@ -22,7 +22,7 @@ pub mod models {
 pub mod events {
     use starknet::ContractAddress;
     
-    #[derive(Drop)]
+    #[derive(Drop, Serde)]
     #[dojo::event]
     pub struct PositionUpdated {
         #[key]
@@ -58,8 +58,6 @@ pub mod actions {
             position.set(world);
 
             emit!(world, PositionUpdated { player: caller, new_x: 1, new_y: 2 });
-
-            
         }
     }
 }

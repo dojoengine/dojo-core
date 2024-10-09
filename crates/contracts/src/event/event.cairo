@@ -40,3 +40,8 @@ pub trait IEvent<T> {
     fn layout(self: @T) -> Layout;
     fn schema(self: @T) -> Ty;
 }
+
+#[cfg(target: "test")]
+pub trait EventTest<T> {
+    fn emit_test(self: @T, world: IWorldDispatcher);
+}

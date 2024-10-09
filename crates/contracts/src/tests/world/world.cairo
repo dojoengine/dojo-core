@@ -12,7 +12,8 @@ use dojo::world::{
 };
 use dojo::tests::helpers::{
     IbarDispatcher, IbarDispatcherTrait, drop_all_events, deploy_world_and_bar, Foo, foo, bar,
-    Character, character, test_contract, test_contract_with_dojo_init_args
+    Character, character, test_contract, test_contract_with_dojo_init_args, SimpleEvent,
+    simple_event, SimpleEventEmitter
 };
 use dojo::utils::test::{spawn_test_world, deploy_with_world_address, GasCounterTrait};
 
@@ -110,23 +111,29 @@ fn test_emit() {
     let bob = starknet::contract_address_const::<0xb0b>();
 
     let world = deploy_world();
+    world.register_event(simple_event::TEST_CLASS_HASH.try_into().unwrap());
+    world.grant_writer(dojo::event::Event::<SimpleEvent>::selector(), bob);
 
     drop_all_events(world.contract_address);
 
     starknet::testing::set_contract_address(bob);
 
-    world.emit(selector!("MyEvent"), [1, 2].span(), [3, 4].span(), true);
+    let simple_event = SimpleEvent { id: 2, data: (3, 4) };
+    simple_event.emit(world);
 
     let event = starknet::testing::pop_log::<Event>(world.contract_address);
 
     assert(event.is_some(), 'no event');
 
     if let Event::EventEmitted(event) = event.unwrap() {
-        assert(event.event_selector == selector!("MyEvent"), 'bad event selector');
+        assert(
+            event.event_selector == dojo::event::Event::<SimpleEvent>::selector(),
+            'bad event selector'
+        );
         assert(event.system_address == bob, 'bad system address');
         assert(event.historical, 'bad historical value');
-        assert(event.keys == [1, 2].span(), 'bad keys');
-        assert(event.values == [3, 4].span(), 'bad keys');
+        assert(event.keys == [2].span(), 'bad keys');
+        assert(event.values == [3, 4].span(), 'bad values');
     } else {
         core::panic_with_felt252('no EventEmitted event');
     }

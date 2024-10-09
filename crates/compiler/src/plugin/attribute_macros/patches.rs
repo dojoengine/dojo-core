@@ -524,6 +524,13 @@ pub mod $contract_name$ {
 ";
 
 pub const EVENT_PATCH: &str = "
+#[generate_trait]
+pub impl $type_name$EmitterImpl of $type_name$Emitter {
+    fn emit(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
+        dojo::event::Event::<$type_name$>::emit(self, world);
+    }
+}
+
 pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
 
     fn emit(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
@@ -603,6 +610,22 @@ pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
+    }
+}
+
+#[cfg(target: \"test\")]
+pub impl $type_name$EventImplTest of dojo::event::EventTest<$type_name$> {
+    fn emit_test(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
+        let world_test = dojo::world::IWorldTestDispatcher { contract_address: \
+             world.contract_address };
+
+        dojo::world::IWorldTestDispatcherTrait::emit_test(
+            world_test,
+            dojo::event::Event::<$type_name$>::selector(),
+            dojo::event::Event::<$type_name$>::keys(self),
+            dojo::event::Event::<$type_name$>::values(self),
+            dojo::event::Event::<$type_name$>::historical()
+        );
     }
 }
 

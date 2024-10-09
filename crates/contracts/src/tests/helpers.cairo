@@ -6,6 +6,14 @@ use dojo::model::Model;
 use dojo::utils::test::{deploy_with_world_address, spawn_test_world};
 
 #[derive(Copy, Drop, Serde, Debug)]
+#[dojo::event]
+pub struct SimpleEvent {
+    #[key]
+    pub id: u32,
+    pub data: (felt252, felt252),
+}
+
+#[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
 pub struct Foo {
     #[key]
