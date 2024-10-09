@@ -223,7 +223,6 @@ pub mod world {
 
     #[derive(Drop, starknet::Event)]
     pub struct WorldSpawned {
-        pub address: ContractAddress,
         pub creator: ContractAddress
     }
 
@@ -232,68 +231,76 @@ pub mod world {
         pub class_hash: ClassHash,
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct ContractDeployed {
+        #[key]
+        pub selector: felt252,
+        pub address: ContractAddress,
+        pub class_hash: ClassHash,
         pub salt: felt252,
-        pub class_hash: ClassHash,
-        pub address: ContractAddress,
-        pub namespace: ByteArray,
-        pub name: ByteArray
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct ContractUpgraded {
+        #[key]
+        pub selector: felt252,
         pub class_hash: ClassHash,
-        pub address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct ContractInitialized {
+        #[key]
         pub selector: felt252,
         pub init_calldata: Span<felt252>,
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct MetadataUpdate {
+        #[key]
         pub resource: felt252,
         pub uri: ByteArray
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct NamespaceRegistered {
+        #[key]
         pub namespace: ByteArray,
         pub hash: felt252
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct ModelRegistered {
+        #[key]
         pub name: ByteArray,
+        #[key]
         pub namespace: ByteArray,
         pub class_hash: ClassHash,
         pub address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct ModelUpgraded {
-        pub name: ByteArray,
-        pub namespace: ByteArray,
+        #[key]
+        pub selector: felt252,
         pub class_hash: ClassHash,
         pub address: ContractAddress,
         pub prev_address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct EventRegistered {
+        #[key]
         pub name: ByteArray,
+        #[key]
         pub namespace: ByteArray,
         pub class_hash: ClassHash,
         pub address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug, PartialEq)]
+    #[derive(Drop, starknet::Event)]
     pub struct EventUpgraded {
-        pub name: ByteArray,
-        pub namespace: ByteArray,
+        #[key]
+        pub selector: felt252,
         pub class_hash: ClassHash,
         pub address: ContractAddress,
         pub prev_address: ContractAddress,
@@ -301,7 +308,9 @@ pub mod world {
 
     #[derive(Drop, starknet::Event)]
     pub struct StoreSetRecord {
+        #[key]
         pub table: felt252,
+        #[key]
         pub entity_id: felt252,
         pub keys: Span<felt252>,
         pub values: Span<felt252>,
@@ -309,36 +318,47 @@ pub mod world {
 
     #[derive(Drop, starknet::Event)]
     pub struct StoreUpdateRecord {
+        #[key]
         pub table: felt252,
+        #[key]
         pub entity_id: felt252,
         pub values: Span<felt252>,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct StoreUpdateMember {
+        #[key]
         pub table: felt252,
+        #[key]
         pub entity_id: felt252,
+        #[key]
         pub member_selector: felt252,
         pub values: Span<felt252>,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct StoreDelRecord {
+        #[key]
         pub table: felt252,
+        #[key]
         pub entity_id: felt252,
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct WriterUpdated {
+        #[key]
         pub resource: felt252,
+        #[key]
         pub contract: ContractAddress,
         pub value: bool
     }
 
     #[derive(Drop, starknet::Event)]
     pub struct OwnerUpdated {
-        pub address: ContractAddress,
+        #[key]
         pub resource: felt252,
+        #[key]
+        pub contract: ContractAddress,
         pub value: bool,
     }
 
@@ -402,7 +422,7 @@ pub mod world {
 
         self.config.initializer(creator);
 
-        EventEmitter::emit(ref self, WorldSpawned { address: get_contract_address(), creator });
+        EventEmitter::emit(ref self, WorldSpawned { creator });
     }
 
     #[cfg(target: "test")]
@@ -515,7 +535,7 @@ pub mod world {
 
             self.owners.write((resource, address), true);
 
-            EventEmitter::emit(ref self, OwnerUpdated { address, resource, value: true });
+            EventEmitter::emit(ref self, OwnerUpdated { contract: address, resource, value: true });
         }
 
         /// Revokes owner permission to the contract for the resource.
@@ -536,7 +556,9 @@ pub mod world {
 
             self.owners.write((resource, address), false);
 
-            EventEmitter::emit(ref self, OwnerUpdated { address, resource, value: false });
+            EventEmitter::emit(
+                ref self, OwnerUpdated { contract: address, resource, value: false }
+            );
         }
 
         /// Checks if the provided contract has writer permission for the resource.
@@ -695,8 +717,7 @@ pub mod world {
             EventEmitter::emit(
                 ref self,
                 EventUpgraded {
-                    name: new_descriptor.name().clone(),
-                    namespace: new_descriptor.namespace().clone(),
+                    selector: new_descriptor.selector(),
                     prev_address,
                     address: new_contract_address,
                     class_hash,
@@ -804,8 +825,7 @@ pub mod world {
             EventEmitter::emit(
                 ref self,
                 ModelUpgraded {
-                    name: new_descriptor.name().clone(),
-                    namespace: new_descriptor.namespace().clone(),
+                    selector: new_descriptor.selector(),
                     prev_address,
                     address: new_contract_address,
                     class_hash,
@@ -890,11 +910,7 @@ pub mod world {
             EventEmitter::emit(
                 ref self,
                 ContractDeployed {
-                    salt,
-                    class_hash,
-                    address: contract_address,
-                    namespace: descriptor.namespace().clone(),
-                    name: descriptor.name().clone()
+                    salt, class_hash, address: contract_address, selector: descriptor.selector()
                 }
             );
 
@@ -935,7 +951,7 @@ pub mod world {
 
                 IUpgradeableDispatcher { contract_address }.upgrade(class_hash);
                 EventEmitter::emit(
-                    ref self, ContractUpgraded { class_hash, address: contract_address }
+                    ref self, ContractUpgraded { class_hash, selector: new_descriptor.selector() }
                 );
 
                 class_hash
