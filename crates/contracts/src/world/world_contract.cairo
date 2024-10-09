@@ -192,7 +192,7 @@ pub mod world {
     impl ConfigInternalImpl = Config::InternalImpl<ContractState>;
 
     #[event]
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub enum Event {
         WorldSpawned: WorldSpawned,
         ContractDeployed: ContractDeployed,
@@ -216,22 +216,22 @@ pub mod world {
         EventEmitted: EventEmitted
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct StateUpdated {
         pub da_hash: felt252,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct WorldSpawned {
         pub creator: ContractAddress
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct WorldUpgraded {
         pub class_hash: ClassHash,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct ContractDeployed {
         #[key]
         pub selector: felt252,
@@ -240,35 +240,35 @@ pub mod world {
         pub salt: felt252,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct ContractUpgraded {
         #[key]
         pub selector: felt252,
         pub class_hash: ClassHash,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct ContractInitialized {
         #[key]
         pub selector: felt252,
         pub init_calldata: Span<felt252>,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct MetadataUpdate {
         #[key]
         pub resource: felt252,
         pub uri: ByteArray
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct NamespaceRegistered {
         #[key]
         pub namespace: ByteArray,
         pub hash: felt252
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct ModelRegistered {
         #[key]
         pub name: ByteArray,
@@ -278,7 +278,7 @@ pub mod world {
         pub address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct ModelUpgraded {
         #[key]
         pub selector: felt252,
@@ -287,7 +287,7 @@ pub mod world {
         pub prev_address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct EventRegistered {
         #[key]
         pub name: ByteArray,
@@ -297,7 +297,7 @@ pub mod world {
         pub address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct EventUpgraded {
         #[key]
         pub selector: felt252,
@@ -306,7 +306,7 @@ pub mod world {
         pub prev_address: ContractAddress,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct StoreSetRecord {
         #[key]
         pub table: felt252,
@@ -316,7 +316,7 @@ pub mod world {
         pub values: Span<felt252>,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct StoreUpdateRecord {
         #[key]
         pub table: felt252,
@@ -325,7 +325,7 @@ pub mod world {
         pub values: Span<felt252>,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct StoreUpdateMember {
         #[key]
         pub table: felt252,
@@ -336,7 +336,7 @@ pub mod world {
         pub values: Span<felt252>,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct StoreDelRecord {
         #[key]
         pub table: felt252,
@@ -344,7 +344,7 @@ pub mod world {
         pub entity_id: felt252,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct WriterUpdated {
         #[key]
         pub resource: felt252,
@@ -353,7 +353,7 @@ pub mod world {
         pub value: bool
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct OwnerUpdated {
         #[key]
         pub resource: felt252,
@@ -362,7 +362,7 @@ pub mod world {
         pub value: bool,
     }
 
-    #[derive(Drop, starknet::Event, Debug)]
+    #[derive(Drop, starknet::Event)]
     pub struct EventEmitted {
         #[key]
         pub event_selector: felt252,
