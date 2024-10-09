@@ -1,38 +1,21 @@
 use dojo::{
     utils::find_model_field_layout,
-    model::{Layout, ModelIndex},
+    meta::Layout,
+    model::{attributes::ModelIndex, ModelAttributes},
     world::{IWorldDispatcher, IWorldDispatcherTrait}
 };
-use core::{
-    array::ArrayTrait,
-    option::OptionTrait,
-    panic_with_felt252,
-    serde::Serde,
-};
+use core::panic_with_felt252;
 
 
 
 pub trait MemberTrait<T> {
-    fn serialize(value: @T) -> Span<felt252>;
+    fn serialize(value: T) -> Span<felt252>;
     fn deserialize(values: Span<felt252>) -> T;
 }
 
-pub trait MemberStore<T> {
-    fn get_member(
-        world: IWorldDispatcher,
-        entity_id: felt252,
-        model_id: felt252,
-        member_id: felt252,
-        layout: Layout,
-    ) -> T;
-    fn update_member(
-        world: IWorldDispatcher,
-        entity_id: felt252,
-        model_id: felt252,
-        member_id: felt252,
-        layout: Layout,
-        value: T,
-    );
+pub trait MemberStore<M, T> {
+    fn get_member(self: @IWorldDispatcher, member_id: felt252, entity_id: felt252,) -> T;
+    fn update_member(self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T);
 }
 
 
@@ -100,25 +83,30 @@ pub impl MemberImpl<T, +Serde<T>, +Drop<T>> of MemberTrait<T> {
 }
 
 pub mod key {
-    use super::MemberImpl;
+    use super::MemberTrait;
+    use dojo::utils::entity_id_from_keys;
 
-    pub trait KeyTrait<K> {
-        fn serialize(key: @K) -> Span<felt252>;
-        fn deserialize(keys: Span<felt252>) -> K;
-        fn to_entity_id(key: @K) -> felt252;
+    pub trait KeyParserTrait<M, K>{
+        fn key(self: @M) -> K;
     }
 
-    pub impl KeyImpl<K, +MemberTrait<K>> of KeyTrait<K> {
-        fn serialize(key: @K) -> Span<felt252> {
-            MemberTrait::<K>::serialize(key)
+    pub trait KeyTrait<K> {
+        fn serialize(self: @K) -> Span<felt252>;
+        fn deserialize(keys: Span<felt252>) -> K;
+        fn to_entity_id(self: @K) -> felt252;
+    }
+
+    pub impl KeyImpl<K, +MemberTrait<K>, +Copy<K>> of KeyTrait<K> {
+        fn serialize(self: @K) -> Span<felt252> {
+            MemberTrait::<K>::serialize(*self)
         }
     
         fn deserialize(keys: Span<felt252>) -> K {
             MemberTrait::<K>::deserialize(keys)
         }
     
-        fn to_entity_id(key: @K) -> felt252 {
-            poseidon_hash_span(MemberTrait::<K>::serialize(key))
+        fn to_entity_id(self: @K) -> felt252 {
+            entity_id_from_keys(Self::serialize(self))
         }
     }
 }
@@ -126,28 +114,19 @@ pub mod key {
 
 
 
-pub impl MemberStoreImpl<T, M, +ModelAttributes<M>, +MemberStore<T>> of MemberStore<T> {
-    fn get_member(
-        self: @IWorldDispatcher,
-        entity_id: felt252,
-        model_id: felt252,
-        member_id: felt252,
-        layout: Layout,
-    ) -> T {
-        Member::deserialize(get_serialized_member(
-            self, ModelAttributes::M>::SELECTOR, member_id, ModelAttributes::M>::layout(), entity_id
+pub impl MemberStoreImpl<M, T, +ModelAttributes<M>, +MemberTrait<T>, +Drop<T>, +Drop<M>> of MemberStore<M, T> {
+    fn get_member(self: @IWorldDispatcher, member_id: felt252, entity_id: felt252,) -> T {
+        MemberTrait::<T>::deserialize(get_serialized_member(
+            *self, ModelAttributes::<M>::selector(), member_id, ModelAttributes::<M>::layout(), entity_id
         ))
     }
     fn update_member(
-        self: IWorldDispatcher,
-        model_id: felt252,
-        member_id: felt252,
-        layout: Layout,
-        entity_id: felt252,
-        value: T,
+        self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T,
     ) {
         
-        set_serialized_member(self, entity_id, model_id, member_id, layout, Member::serialize(value))
+        update_serialized_member(
+            self, ModelAttributes::<M>::selector(), member_id, ModelAttributes::<M>::layout(), entity_id, MemberTrait::<T>::serialize(value)
+        )
     }
 }
 

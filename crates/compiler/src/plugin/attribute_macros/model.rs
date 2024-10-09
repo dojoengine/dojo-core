@@ -67,10 +67,9 @@ impl DojoModel {
             .get_text(db)
             .trim()
             .to_string();
-        let model_name_snake = RewriteNode::Text(model_type.to_case(Case::Snake));
-        let model_name_snake_upper = RewriteNode::Text(model_type.to_case(Case::UpperSnake));
+        let model_name_snake = model_type.to_case(Case::Snake);
 
-        let model_namespace = compute_namespace(&model_name, &parameters, namespace_config);
+        let model_namespace = compute_namespace(&model_type, &parameters, namespace_config);
 
         for (id, value) in [("name", &model_type), ("namespace", &model_namespace)] {
             if !NamespaceConfig::is_name_valid(value) {
@@ -107,35 +106,35 @@ impl DojoModel {
             ),
         };
 
-        let mut members: Vec<Member> = vec![];
         let mut values: Vec<Member> = vec![];
         let mut keys: Vec<Member> = vec![];
 
         let mut members_values: Vec<RewriteNode> = vec![];
-        let mut param_keys: Vec<String> = vec![];
 
-        let mut key_names: Vec<String> = vec![];
         let mut key_types: Vec<String> = vec![];
         let mut key_attrs: Vec<String> = vec![];
 
-        let mut field_accessors: Vec<RewriteNode> = vec![];
+        let mut serialized_keys: Vec<RewriteNode> = vec![];
+        let mut serialized_values: Vec<RewriteNode> = vec![];
 
-        let elements = struct_ast.members(db).elements(db);
+        let members = parse_members(db, &struct_ast.members(db).elements(db), &mut diagnostics);
 
-        elements.iter().for_each(|member_ast| {
-            let member = ast_to_member(db, member_ast);
-            members.push(member);
+        members.iter().for_each(|member| {
             if member.key {
-                validate_key_member(&member, db, member_ast, &mut diagnostics);
-                keys.push(member);
+                keys.push(member.clone());
                 key_types.push(member.ty.clone());
                 key_attrs.push(format!("*self.{}", member.name.clone()))
             } else {
-                values.push(member);
+                values.push(member.clone());
+                serialized_values.push(serialize_member_ty(member, true));
+                members_values.push(RewriteNode::Text(format!(
+                    "pub {}: {},\n",
+                    member.name, member.ty
+                )));
             }
         });
 
-        let (key_attr, key_type) = if keys.len() > 1 {
+        let (keys_to_tuple, key_type) = if keys.len() > 1 {
             (
                 format!("({})", key_attrs.join(", ")),
                 format!("({})", key_types.join(", ")),
@@ -146,21 +145,6 @@ impl DojoModel {
                 key_types.first().unwrap().to_string(),
             )
         };
-
-        members.iter().filter(|m| !m.key).for_each(|member| {
-            field_accessors.push(generate_field_accessors(
-                model_type.clone(),
-                param_keys.clone(),
-                keys.clone(),
-                serialized_param_keys.clone(),
-                member,
-            ));
-            entity_field_accessors
-                .push(generate_entity_field_accessors(model_type.clone(), member));
-        });
-        let members = parse_members(db, &struct_ast.members(db).elements(db), &mut diagnostics);
-        let mut serialized_keys: Vec<RewriteNode> = vec![];
-        let mut serialized_values: Vec<RewriteNode> = vec![];
 
         serialize_keys_and_values(&members, &mut serialized_keys, &mut serialized_values);
 
@@ -179,53 +163,6 @@ impl DojoModel {
                 severity: Severity::Error,
             });
         }
-
-        let mut deserialized_keys: Vec<RewriteNode> = vec![];
-        let mut deserialized_values: Vec<RewriteNode> = vec![];
-
-        deserialize_keys_and_values(
-            &members,
-            "keys",
-            &mut deserialized_keys,
-            "values",
-            &mut deserialized_values,
-        );
-
-        let mut member_key_names: Vec<RewriteNode> = vec![];
-        let mut member_value_names: Vec<RewriteNode> = vec![];
-        let mut members_values: Vec<RewriteNode> = vec![];
-        let mut param_keys: Vec<String> = vec![];
-        let mut serialized_param_keys: Vec<RewriteNode> = vec![];
-
-        members.iter().for_each(|member| {
-            if member.key {
-                param_keys.push(format!("{}: {}", member.name, member.ty));
-                serialized_param_keys.push(serialize_member_ty(member, false));
-                member_key_names.push(RewriteNode::Text(format!("{},\n", member.name.clone())));
-            } else {
-                members_values.push(RewriteNode::Text(format!(
-                    "pub {}: {},\n",
-                    member.name, member.ty
-                )));
-                member_value_names.push(RewriteNode::Text(format!("{},\n", member.name.clone())));
-            }
-        });
-
-        let param_keys = param_keys.join(", ");
-
-        let mut field_accessors: Vec<RewriteNode> = vec![];
-        let mut entity_field_accessors: Vec<RewriteNode> = vec![];
-
-        members.iter().filter(|m| !m.key).for_each(|member| {
-            field_accessors.push(generate_field_accessors(
-                model_name.clone(),
-                param_keys.clone(),
-                serialized_param_keys.clone(),
-                member,
-            ));
-            entity_field_accessors
-                .push(generate_entity_field_accessors(model_name.clone(), member));
-        });
 
         let mut derive_attr_names = extract_derive_attr_names(
             db,
@@ -253,39 +190,13 @@ impl DojoModel {
             MODEL_CODE_STRING,
             &UnorderedHashMap::from([
                 (
-                    "model_name_snake".to_string(),
-                    RewriteNode::Text(model_name_snake),
-                ),
-                (
-                    "type_name".to_string(),
+                    "model_type".to_string(),
                     RewriteNode::Text(model_type.clone()),
                 ),
                 (
-                    "member_key_names".to_string(),
-                    RewriteNode::new_modified(member_key_names),
+                    "model_name_snake".to_string(),
+                    RewriteNode::Text(model_name_snake),
                 ),
-                (
-                    "member_value_names".to_string(),
-                    RewriteNode::new_modified(member_value_names),
-                ),
-                (
-                    "serialized_keys".to_string(),
-                    RewriteNode::new_modified(serialized_keys),
-                ),
-                (
-                    "serialized_values".to_string(),
-                    RewriteNode::new_modified(serialized_values),
-                ),
-                (
-                    "deserialized_keys".to_string(),
-                    RewriteNode::new_modified(deserialized_keys),
-                ),
-                (
-                    "deserialized_values".to_string(),
-                    RewriteNode::new_modified(deserialized_values),
-                ),
-                ("model_version".to_string(), model_version),
-                ("model_selector".to_string(), model_selector),
                 (
                     "model_namespace".to_string(),
                     RewriteNode::Text(model_namespace.clone()),
@@ -302,19 +213,22 @@ impl DojoModel {
                     "model_tag".to_string(),
                     RewriteNode::Text(model_tag.clone()),
                 ),
+                ("model_version".to_string(), model_version),
+                ("model_selector".to_string(), model_selector),
+                (
+                    "serialized_values".to_string(),
+                    RewriteNode::new_modified(serialized_values),
+                ),
+                (
+                    "keys_to_tuple".to_string(),
+                    RewriteNode::Text(keys_to_tuple),
+                ),
+                ("key_type".to_string(), RewriteNode::Text(key_type)),
                 (
                     "members_values".to_string(),
                     RewriteNode::new_modified(members_values),
                 ),
-                ("keys".to_string(), RewriteNode::Text(keys)),
-                (
-                    "field_accessors".to_string(),
-                    RewriteNode::new_modified(field_accessors),
-                ),
-                (
-                    "entity_field_accessors".to_string(),
-                    RewriteNode::new_modified(entity_field_accessors),
-                ),
+                /////////////////////////////
             ]),
         );
 
@@ -344,62 +258,6 @@ impl DojoModel {
             diagnostics,
             remove_original_item: false,
         }
-    }
-}
-
-fn ast_to_member(db: &dyn SyntaxGroup, member: &MemberAst) -> Member {
-    Member {
-        name: member.name(db).text(db).to_string(),
-        ty: member
-            .type_clause(db)
-            .ty(db)
-            .as_syntax_node()
-            .get_text(db)
-            .trim()
-            .to_string(),
-        key: member.has_attr(db, "key"),
-    }
-}
-
-/// Validates that the key member is valid.
-/// # Arguments
-///
-/// * member: The member to validate.
-/// * diagnostics: The diagnostics to push to, if the member is an invalid key.
-fn validate_key_member(
-    member: &Member,
-    db: &dyn SyntaxGroup,
-    member_ast: &MemberAst,
-    diagnostics: &mut Vec<PluginDiagnostic>,
-) {
-    if member.ty == "u256" {
-        diagnostics.push(PluginDiagnostic {
-            message: "Key is only supported for core types that are 1 felt long once serialized. \
-                      `u256` is a struct of 2 u128, hence not supported."
-                .into(),
-            stable_ptr: member_ast.name(db).stable_ptr().untyped(),
-            severity: Severity::Error,
-        });
-    }
-}
-
-/// Creates a [`RewriteNode`] for the member type serialization.
-///
-/// # Arguments
-///
-/// * member: The member to serialize.
-fn serialize_member_ty(member: &Member, with_self: bool) -> RewriteNode {
-    match member.ty.as_str() {
-        "felt252" => RewriteNode::Text(format!(
-            "core::array::ArrayTrait::append(ref serialized, {}{});\n",
-            if with_self { "*self." } else { "" },
-            member.name
-        )),
-        _ => RewriteNode::Text(format!(
-            "core::serde::Serde::serialize({}{}, ref serialized);\n",
-            if with_self { "self." } else { "@" },
-            member.name
-        )),
     }
 }
 

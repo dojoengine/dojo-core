@@ -6,12 +6,37 @@ pub struct $model_type$Entity {
 
 type $model_type$KeyType = $key_type$;
 
+pub impl $model_type$ModelKeyImpl of dojo::model::members::keys::KeyParserTrait<$model_type$, $model_type$KeyType>{
+    fn key(self: @$model_type$) -> $model_type$KeyType {
+        $keys_to_tuple$
+    }
+} 
+
+pub impl $model_type$KeyImpl = dojo::model::KeyImpl<$model_type$KeyType>;
+
 // Impl to get the static attributes of a model
 pub impl $model_type$AttributesImpl<T> of dojo::model::ModelAttributes<T>{
-    const VERSION: u8 = $model_version$;
-    const SELECTOR: felt252 = $model_selector$;
-    const NAME_HASH: felt252 = $model_name_hash$;
-    const NAMESPACE_HASH: felt252 = $model_namespace_hash$;
+    
+    #[inline(always)]
+    fn version() -> u8 {
+        $model_version$
+    }
+   
+    #[inline(always)]
+    fn selector() -> felt252 {
+        $model_selector$
+    }
+    
+    #[inline(always)]
+    fn name_hash() -> felt252 {
+        $model_name_hash$
+    }
+
+    #[inline(always)]
+    fn namespace_hash() -> felt252 {
+        $model_namespace_hash$
+    }
+
     #[inline(always)]
     fn name() -> ByteArray {
         "$model_type$"
@@ -33,16 +58,17 @@ pub impl $model_type$AttributesImpl<T> of dojo::model::ModelAttributes<T>{
     }
 }
 
+
 pub impl $model_type$Attributes = $model_type$AttributesImpl<$model_type$>;
 pub impl $model_type$EntityAttributes = $model_type$AttributesImpl<$model_type$Entity>;
-pub impl $model_type$KeyImpl = dojo::model::KeyImpl<$model_type$KeyType>;
 
 pub impl $model_type$ModelSerde of dojo::model::model::ModelSerde<$model_type$>{
-    fn keys(self: @$model_type$) -> Span<felt252> {
-        let mut serialized = core::array::ArrayTrait::new();
-        $model_type$KeyImpl::serialize($key_attr$)
+    fn _keys<$model_type$KeyType>(self: @$model_type$) -> Span<felt252> {
+        MemberTrait::<$model_type$KeyType>::serialize(
+            @$model_type$ModelKeyImpl::key(self)
+        )
     }
-    fn values(self: @$model_type$) -> Span<felt252> {
+    fn _values(self: @$model_type$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
@@ -61,23 +87,25 @@ pub impl $model_type$EntitySerde of dojo::model::model::EntitySerde<$model_type$
 }
 
 
-pub impl $model_type$ModelImpl = dojo::model::ModelImpl<$model_type$, $model_type$Entity, $model_type$KeyType>;
-pub impl $model_type$EntityImpl = dojo::model::EntityImpl<$model_type$, $model_type$Entity, $model_type$KeyType>;
-pub impl $model_type$WorldStore = dojo::model::WorldStore<$model_type$, $model_type$Entity, $model_type$KeyType>;
+pub impl $model_type$ModelImpl = dojo::model::model::ModelImpl<$model_type$>;
+pub impl $model_type$Store = dojo::model::model::model::ModelStoreImpl<$model_type$, $model_type$KeyType>;
+
+pub impl $model_type$EntityImpl = dojo::model::entity::EntityImpl<$model_type$Entity>;
+pub impl $model_type$EntityStore = dojo::model::entity::EntityStoreImpl<$model_type$Entity>;
 
 
 //////
 
 
 #[starknet::interface]
-pub trait I$contract_name$<T> {
+pub trait I$model_type$<T> {
     fn ensure_abi(self: @T, model: $model_type$);
 }
 
 #[starknet::contract]
-pub mod $contract_name$ {
+pub mod $model_name_snake$ {
     use super::$model_type$;
-    use super::I$contract_name$;
+    use super::I$model_type$;
     use super::$model_type$Attributes;
     use super::$model_type$ModelImpl;
     #[storage]
@@ -118,11 +146,11 @@ pub mod $contract_name$ {
         }
 
         fn packed_size(self: @ContractState) -> Option<usize> {
-            $model_type$ModelImpl::packed_size()
+            dojo::meta::layout::compute_packed_size(Self::layout())
         }
 
         fn layout(self: @ContractState) -> dojo::model::Layout {
-            $model_type$ModelImpl::layout()
+            $model_type$Attributes::layout()
         }
 
         fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
@@ -131,7 +159,7 @@ pub mod $contract_name$ {
     }
 
     #[abi(embed_v0)]
-    impl $contract_name$Impl of I$contract_name$<ContractState>{
+    impl $model_type$Impl of I$model_type$<ContractState>{
         fn ensure_abi(self: @ContractState, model: $model_type$) {
         }
     }

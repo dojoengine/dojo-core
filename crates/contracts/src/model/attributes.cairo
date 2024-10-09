@@ -1,4 +1,4 @@
-use dojo::model::layout::Layout;
+use dojo::meta::Layout;
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub enum ModelIndex {
@@ -9,13 +9,12 @@ pub enum ModelIndex {
 }
 
 pub trait ModelAttributes<T> {
-    const VERSION: u8;
-    const SELECTOR: felt252;
-    const NAME_HASH: felt252;
-    const NAMESPACE_HASH: felt252;
-
     fn name() -> ByteArray;
     fn namespace() -> ByteArray;
     fn tag() -> ByteArray;
+    fn version() -> u8;
+    fn selector() -> felt252;
+    fn name_hash() -> felt252;
+    fn namespace_hash() -> felt252;
     fn layout() -> Layout;
 }

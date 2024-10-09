@@ -8,7 +8,7 @@ use core::byte_array::ByteArray;
 use core::poseidon::poseidon_hash_span;
 use core::serde::Serde;
 
-use dojo::model::{Model, ModelIndex, FieldLayout, model::ModelImpl};
+use dojo::model::{ModelIndex, model::{ModelImpl, ModelSerde}, members::key::{KeyParserTrait, KeyImpl}};
 use dojo::meta::introspect::{Introspect, Ty, Struct, Member};
 use dojo::meta::{Layout, FieldLayout};
 use dojo::utils;
@@ -31,80 +31,19 @@ pub struct ResourceMetadata {
     pub metadata_uri: ByteArray,
 }
 
-#[generate_trait]
-pub impl ResourceMetadataImpl of ResourceMetadataTrait {
-    fn from_values(resource_id: felt252, ref values: Span<felt252>) -> Option<ResourceMetadata> {
-        let metadata_uri = Serde::<ByteArray>::deserialize(ref values)?;
-        Option::Some(ResourceMetadata { resource_id, metadata_uri })
-    }
-}
-
-// pub impl ResourceMetadataModel = ModelImpl<ResourceMetadata>;
-pub impl ResourceMetadataModel of Model<ResourceMetadata> {
-    fn get(world: IWorldDispatcher, keys: Span<felt252>) -> ResourceMetadata {
-        if keys.len() != 1 {
-            panic!("Model `ResourceMetadata`: bad keys length.");
-        };
-
-        let mut values = world.entity(Self::selector(), ModelIndex::Keys(keys), Self::layout());
-
-        match ResourceMetadataTrait::from_values(*keys.at(0), ref values) {
-            Option::Some(x) => x,
-            Option::None => panic!("Model `ResourceMetadata`: deserialization failed.")
-        }
-    }
-
-    fn set_model(self: @ResourceMetadata, world: IWorldDispatcher,) {
-        IWorldDispatcherTrait::set_entity(
-            world, Self::selector(), ModelIndex::Keys(self.keys()), self.values(), Self::layout()
-        );
-    }
-
-    fn delete_model(self: @ResourceMetadata, world: IWorldDispatcher,) {
-        world.delete_entity(Self::selector(), ModelIndex::Keys(self.keys()), Self::layout());
-    }
-
-    fn get_member(
-        world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252
-    ) -> Span<felt252> {
-        match utils::find_model_field_layout(Self::layout(), member_id) {
-            Option::Some(field_layout) => {
-                let entity_id = utils::entity_id_from_keys(keys);
-                world
-                    .entity(
-                        Self::selector(), ModelIndex::MemberId((entity_id, member_id)), field_layout
-                    )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
-    }
-
-    fn set_member(
-        world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252, values: Span<felt252>
-    ) {
-        match utils::find_model_field_layout(Self::layout(), member_id) {
-            Option::Some(field_layout) => {
-                world
-                    .set_entity(
-                        Self::selector(),
-                        ModelIndex::MemberId((utils::entity_id_from_keys(keys), member_id)),
-                        values,
-                        field_layout
-                    )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
-    }
-
+pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<ResourceMetadata>{
+    
     #[inline(always)]
     fn name() -> ByteArray {
         "ResourceMetadata"
     }
-
+    
+    #[inline(always)]
     fn namespace() -> ByteArray {
         "__DOJO__"
     }
-
+    
+    #[inline(always)]
     fn tag() -> ByteArray {
         "__DOJO__-ResourceMetadata"
     }
@@ -113,59 +52,62 @@ pub impl ResourceMetadataModel of Model<ResourceMetadata> {
     fn version() -> u8 {
         1
     }
-
+   
     #[inline(always)]
     fn selector() -> felt252 {
         poseidon_hash_span([Self::namespace_hash(), Self::name_hash()].span())
     }
-
+    
     #[inline(always)]
-    fn instance_selector(self: @ResourceMetadata) -> felt252 {
-        Self::selector()
-    }
-
     fn name_hash() -> felt252 {
         utils::bytearray_hash(@Self::name())
     }
 
+    #[inline(always)]
     fn namespace_hash() -> felt252 {
         utils::bytearray_hash(@Self::namespace())
-    }
-
-    #[inline(always)]
-    fn entity_id(self: @ResourceMetadata) -> felt252 {
-        poseidon_hash_span(self.keys())
-    }
-
-    #[inline(always)]
-    fn keys(self: @ResourceMetadata) -> Span<felt252> {
-        let mut serialized = ArrayTrait::new();
-        ArrayTrait::append(ref serialized, *self.resource_id);
-        ArrayTrait::span(@serialized)
-    }
-
-    #[inline(always)]
-    fn values(self: @ResourceMetadata) -> Span<felt252> {
-        let mut serialized = ArrayTrait::new();
-        Serde::serialize(self.metadata_uri, ref serialized);
-        ArrayTrait::span(@serialized)
     }
 
     #[inline(always)]
     fn layout() -> Layout {
         Introspect::<ResourceMetadata>::layout()
     }
+}
 
-    #[inline(always)]
-    fn instance_layout(self: @ResourceMetadata) -> Layout {
-        Self::layout()
+
+
+
+pub impl ResourceMetadataModelKeyImpl of KeyParserTrait<ResourceMetadata, felt252>{
+    fn key(self: @ResourceMetadata) -> felt252 {
+        *self.resource_id
     }
+} 
 
-    #[inline(always)]
-    fn packed_size() -> Option<usize> {
-        Option::None
+pub impl ResourceMetadataKeyImpl = KeyImpl<felt252>;
+
+pub impl ResourceMetadataModelSerde of ModelSerde<ResourceMetadata>{
+    fn _keys(self: @ResourceMetadata) -> Span<felt252> {
+        let mut serialized = ArrayTrait::new();
+        ArrayTrait::append(ref serialized, *self.resource_id);
+        ArrayTrait::span(@serialized)
+    }
+    fn _values(self: @ResourceMetadata) -> Span<felt252> {
+        let mut serialized = ArrayTrait::new();
+        Serde::serialize(self.metadata_uri, ref serialized);
+        ArrayTrait::span(@serialized)
+    }
+    fn _keys_values(self: @ResourceMetadata) -> (Span<felt252>, Span<felt252>) {
+        let mut serialized_keys = ArrayTrait::new();
+        ArrayTrait::append(ref serialized_keys, *self.resource_id);
+        
+        let mut serialized_values = ArrayTrait::new();
+        Serde::serialize(self.metadata_uri, ref serialized_values);
+        (ArrayTrait::span(@serialized_keys), ArrayTrait::span(@serialized_values))
     }
 }
+
+pub impl ResourceMetadataModelImpl = ModelImpl<ResourceMetadata>;
+
 
 pub impl ResourceMetadataIntrospect<> of Introspect<ResourceMetadata<>> {
     #[inline(always)]
@@ -197,8 +139,7 @@ pub impl ResourceMetadataIntrospect<> of Introspect<ResourceMetadata<>> {
 
 #[starknet::contract]
 pub mod resource_metadata {
-    use super::ResourceMetadata;
-    use super::ResourceMetadataModel;
+    use super::{ResourceMetadata, ResourceMetadataAttributesImpl};
 
     use dojo::meta::introspect::{Introspect, Ty};
     use dojo::meta::Layout;
@@ -208,19 +149,19 @@ pub mod resource_metadata {
 
     #[external(v0)]
     fn selector(self: @ContractState) -> felt252 {
-        ResourceMetadataModel::selector()
+        ResourceMetadataAttributesImpl::selector()
     }
 
     fn name(self: @ContractState) -> ByteArray {
-        ResourceMetadataModel::name()
+        ResourceMetadataAttributesImpl::name()
     }
 
     fn version(self: @ContractState) -> u8 {
-        ResourceMetadataModel::version()
+        ResourceMetadataAttributesImpl::version()
     }
 
     fn namespace(self: @ContractState) -> ByteArray {
-        ResourceMetadataModel::namespace()
+        ResourceMetadataAttributesImpl::namespace()
     }
 
     #[external(v0)]
@@ -230,12 +171,12 @@ pub mod resource_metadata {
 
     #[external(v0)]
     fn packed_size(self: @ContractState) -> Option<usize> {
-        ResourceMetadataModel::packed_size()
+        dojo::meta::layout::compute_packed_size(Introspect::<ResourceMetadata>::layout())
     }
 
     #[external(v0)]
     fn layout(self: @ContractState) -> Layout {
-        ResourceMetadataModel::layout()
+        Introspect::<ResourceMetadata>::layout()
     }
 
     #[external(v0)]

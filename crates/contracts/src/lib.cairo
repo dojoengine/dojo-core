@@ -23,23 +23,27 @@ pub mod meta {
 }
 
 pub mod model {
+    pub mod attributes;
+    pub use attributes::{ModelIndex, ModelAttributes};
+
+    pub mod members;
+    pub use members::{MemberStore};
+
     pub mod model;
-    pub use model::{
-        Model, ModelIndex, ModelEntity, 
-        ModelAttributes
-    };
+    pub use model::{ModelStore};
+
+    pub mod entity;
+    pub use entity::{EntityStore};
 
     pub mod interface;
-    pub use interface::{IModelTest, IModelTestDispatcher, IModelTestDispatcherTrait};
-    #[cfg(target: "test")]
-    pub use model::{ModelTest, ModelEntityTest};
-
+    pub use interface::{IModel, IModelDispatcher, IModelDispatcherTrait};
+    
     pub mod metadata;
-    pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
+    pub use metadata::{ResourceMetadata, resource_metadata};
     pub(crate) use metadata::{initial_address, initial_class_hash};
 
-    pub mod world_store;
-    pub use world_store::{WorldStore};
+    #[cfg(target: "test")]
+    pub use model::{ModelTest, ModelEntityTest};
 }
 
 pub(crate) mod storage {

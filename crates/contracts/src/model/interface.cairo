@@ -1,4 +1,4 @@
-use dojo::model::{Layout, introspect::Ty};
+use dojo::meta::{Layout, introspect::Ty};
 
 #[starknet::interface]
 pub trait IModel<T> {
