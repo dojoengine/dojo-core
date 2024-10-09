@@ -173,7 +173,7 @@ impl Compiler for DojoCompiler {
         )?;
 
         let mut artifact_manager =
-            compile_contracts(db, &contracts, compiler_config, &ws, self.output_debug_info)?;
+            compile_contracts(db, &contracts, compiler_config, ws, self.output_debug_info)?;
 
         artifact_manager.set_dojo_annotation(db, &main_crate_ids)?;
         artifact_manager.write()?;
@@ -254,7 +254,7 @@ fn find_project_contracts(
 fn compile_contracts<'w>(
     db: &mut RootDatabase,
     contracts: &[ContractDeclaration],
-    compiler_config: CompilerConfig,
+    compiler_config: CompilerConfig<'_>,
     ws: &'w Workspace<'w>,
     do_output_debug_info: bool,
 ) -> Result<ArtifactManager<'w>> {
@@ -351,7 +351,7 @@ pub fn collect_main_crate_ids(
     db: &RootDatabase,
     with_dojo_core: bool,
 ) -> Vec<CrateId> {
-    let mut main_crate_ids = scarb::compiler::helpers::collect_main_crate_ids(&unit, db);
+    let mut main_crate_ids = scarb::compiler::helpers::collect_main_crate_ids(unit, db);
 
     if unit.main_package_id.name.to_string() != "dojo" && with_dojo_core {
         let core_crate_ids: Vec<CrateId> = collect_crates_ids_from_selectors(

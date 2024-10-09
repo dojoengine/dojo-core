@@ -53,6 +53,7 @@ pub fn verify_cairo_version_compatibility(manifest_path: &Utf8PathBuf) -> Result
 }
 
 /// Checks if the package has a compatible version of dojo-core.
+///
 /// In case of a workspace with multiple packages, each package is individually checked
 /// and the workspace manifest path is returned in case of virtual workspace.
 pub fn check_package_dojo_version(ws: &Workspace<'_>, package: &Package) -> anyhow::Result<()> {

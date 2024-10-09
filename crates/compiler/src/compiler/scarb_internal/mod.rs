@@ -28,7 +28,7 @@ use crate::namespace_config::{
     NamespaceConfig, DEFAULT_NAMESPACE_CFG_KEY, DOJO_ANNOTATIONS_DIR_CFG_KEY, NAMESPACE_CFG_PREFIX,
     WORKSPACE_CURRENT_PROFILE_CFG_KEY,
 };
-use crate::plugin::plugin::dojo_plugin_suite;
+use crate::plugin::cairo_plugin::dojo_plugin_suite;
 use crate::scarb_extensions::WorkspaceExt;
 
 pub mod debug;

@@ -23,7 +23,7 @@ use scarb::flock::Filesystem;
 use starknet::core::types::Felt;
 use tracing::trace;
 
-use crate::compiler::compiler::compute_class_hash_of_contract_class;
+use crate::compiler::cairo_compiler::compute_class_hash_of_contract_class;
 use crate::scarb_extensions::WorkspaceExt;
 use crate::{CONTRACTS_DIR, EVENTS_DIR, MODELS_DIR};
 
@@ -43,6 +43,7 @@ pub struct CompiledArtifact {
 /// A type alias for a map of compiled artifacts by their path.
 type CompiledArtifactByPath = HashMap<String, CompiledArtifact>;
 
+#[derive(Debug)]
 pub struct ArtifactManager<'w> {
     /// The workspace of the current compilation.
     workspace: &'w Workspace<'w>,
@@ -54,7 +55,7 @@ pub struct ArtifactManager<'w> {
 
 impl<'w> ArtifactManager<'w> {
     /// Creates a new artifact manager.
-    pub fn new(workspace: &'w Workspace) -> Self {
+    pub fn new(workspace: &'w Workspace<'_>) -> Self {
         Self {
             workspace,
             compiled_artifacts: HashMap::new(),
@@ -77,7 +78,7 @@ impl<'w> ArtifactManager<'w> {
     }
 
     /// Returns the workspace of the current compilation.
-    pub fn workspace(&self) -> &Workspace {
+    pub fn workspace(&self) -> &Workspace<'_> {
         self.workspace
     }
 
@@ -156,7 +157,7 @@ impl<'w> ArtifactManager<'w> {
     }
 
     /// Reads the artifacts from the filesystem by reading the dojo annotations.
-    pub fn read(&mut self, workspace: &'w Workspace) -> Result<()> {
+    pub fn read(&mut self, workspace: &'w Workspace<'_>) -> Result<()> {
         self.dojo_annotation = DojoAnnotation::read(workspace)?;
 
         self.add_artifact(

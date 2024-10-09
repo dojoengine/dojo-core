@@ -49,3 +49,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - run: >
           scripts/docs.sh
+
+  clippy:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dojoengine/dojo-core-dev:5995840
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Swatinem/rust-cache@v2
+      - run: scripts/clippy.sh
