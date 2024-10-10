@@ -28,6 +28,8 @@ use super::element::{
 use super::patches::MODEL_PATCH;
 use super::DOJO_MODEL_ATTR;
 
+use std::fs;
+
 const MODEL_CODE_STRING: &str = include_str!("./templates/model_store.generate.cairo");
 const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");
 const ENTITY_FIELD_CODE_STRING: &str =
@@ -114,7 +116,6 @@ impl DojoModel {
         let mut key_types: Vec<String> = vec![];
         let mut key_attrs: Vec<String> = vec![];
 
-        let mut serialized_keys: Vec<RewriteNode> = vec![];
         let mut serialized_values: Vec<RewriteNode> = vec![];
 
         let members = parse_members(db, &struct_ast.members(db).elements(db), &mut diagnostics);
@@ -146,9 +147,7 @@ impl DojoModel {
             )
         };
 
-        serialize_keys_and_values(&members, &mut serialized_keys, &mut serialized_values);
-
-        if serialized_keys.is_empty() {
+        if keys.is_empty() {
             diagnostics.push(PluginDiagnostic {
                 message: "Model must define at least one #[key] attribute".into(),
                 stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
@@ -156,7 +155,7 @@ impl DojoModel {
             });
         }
 
-        if serialized_values.is_empty() {
+        if values.is_empty() {
             diagnostics.push(PluginDiagnostic {
                 message: "Model must define at least one member that is not a key".into(),
                 stable_ptr: struct_ast.name(db).stable_ptr().untyped(),
@@ -195,7 +194,7 @@ impl DojoModel {
                 ),
                 (
                     "model_name_snake".to_string(),
-                    RewriteNode::Text(model_name_snake),
+                    RewriteNode::Text(model_name_snake.clone()),
                 ),
                 (
                     "model_namespace".to_string(),
@@ -241,6 +240,11 @@ impl DojoModel {
         builder.add_modified(node);
 
         let (code, code_mappings) = builder.build();
+        fs::write(
+            format!("./{}_model.cairo", model_name_snake.clone()),
+            code.clone(),
+        )
+        .expect("could now write");
 
         let aux_data = ModelAuxData {
             name: model_type.clone(),

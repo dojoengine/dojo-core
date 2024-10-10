@@ -8,7 +8,9 @@ use core::byte_array::ByteArray;
 use core::poseidon::poseidon_hash_span;
 use core::serde::Serde;
 
-use dojo::model::{ModelIndex, model::{ModelImpl, ModelSerde}, members::key::{KeyParserTrait, KeyImpl}};
+use dojo::model::{
+    ModelIndex, model::{ModelImpl, ModelSerde}, members::key::{KeyParserTrait, KeyImpl}
+};
 use dojo::meta::introspect::{Introspect, Ty, Struct, Member};
 use dojo::meta::{Layout, FieldLayout};
 use dojo::utils;
@@ -31,18 +33,17 @@ pub struct ResourceMetadata {
     pub metadata_uri: ByteArray,
 }
 
-pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<ResourceMetadata>{
-    
+pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<ResourceMetadata> {
     #[inline(always)]
     fn name() -> ByteArray {
         "ResourceMetadata"
     }
-    
+
     #[inline(always)]
     fn namespace() -> ByteArray {
         "__DOJO__"
     }
-    
+
     #[inline(always)]
     fn tag() -> ByteArray {
         "__DOJO__-ResourceMetadata"
@@ -52,12 +53,12 @@ pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<Resource
     fn version() -> u8 {
         1
     }
-   
+
     #[inline(always)]
     fn selector() -> felt252 {
         poseidon_hash_span([Self::namespace_hash(), Self::name_hash()].span())
     }
-    
+
     #[inline(always)]
     fn name_hash() -> felt252 {
         utils::bytearray_hash(@Self::name())
@@ -75,17 +76,15 @@ pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<Resource
 }
 
 
-
-
-pub impl ResourceMetadataModelKeyImpl of KeyParserTrait<ResourceMetadata, felt252>{
-    fn key(self: @ResourceMetadata) -> felt252 {
+pub impl ResourceMetadataModelKeyImpl of KeyParserTrait<ResourceMetadata, felt252> {
+    fn _key(self: @ResourceMetadata) -> felt252 {
         *self.resource_id
     }
-} 
+}
 
 pub impl ResourceMetadataKeyImpl = KeyImpl<felt252>;
 
-pub impl ResourceMetadataModelSerde of ModelSerde<ResourceMetadata>{
+pub impl ResourceMetadataModelSerde of ModelSerde<ResourceMetadata> {
     fn _keys(self: @ResourceMetadata) -> Span<felt252> {
         let mut serialized = ArrayTrait::new();
         ArrayTrait::append(ref serialized, *self.resource_id);
@@ -99,7 +98,7 @@ pub impl ResourceMetadataModelSerde of ModelSerde<ResourceMetadata>{
     fn _keys_values(self: @ResourceMetadata) -> (Span<felt252>, Span<felt252>) {
         let mut serialized_keys = ArrayTrait::new();
         ArrayTrait::append(ref serialized_keys, *self.resource_id);
-        
+
         let mut serialized_values = ArrayTrait::new();
         Serde::serialize(self.metadata_uri, ref serialized_values);
         (ArrayTrait::span(@serialized_keys), ArrayTrait::span(@serialized_values))

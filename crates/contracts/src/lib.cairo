@@ -17,7 +17,7 @@ pub mod event {
 pub mod meta {
     pub mod introspect;
     pub use introspect::Introspect;
-    
+
     pub mod layout;
     pub use layout::{Layout, FieldLayout};
 }
@@ -30,14 +30,14 @@ pub mod model {
     pub use members::{MemberStore};
 
     pub mod model;
-    pub use model::{ModelStore};
+    pub use model::{Model, ModelStore};
 
     pub mod entity;
-    pub use entity::{EntityStore};
+    pub use entity::{Entity, EntityStore};
 
     pub mod interface;
     pub use interface::{IModel, IModelDispatcher, IModelDispatcherTrait};
-    
+
     pub mod metadata;
     pub use metadata::{ResourceMetadata, resource_metadata};
     pub(crate) use metadata::{initial_address, initial_class_hash};

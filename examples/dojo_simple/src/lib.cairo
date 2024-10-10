@@ -29,7 +29,7 @@ pub mod models {
 
 pub mod events {
     use starknet::ContractAddress;
-    
+
     #[derive(Drop, Serde)]
     #[dojo::event]
     pub struct PositionUpdated {
@@ -47,7 +47,8 @@ pub trait IActions {
 
 #[dojo::contract]
 pub mod actions {
-    use super::{IActions, models::{Position, PositionStore}, events::PositionUpdated};
+    use dojo::model::ModelStore;
+    use super::{IActions, models::{Position}, events::PositionUpdated};
 
     #[derive(Drop, Serde)]
     #[dojo::model]
@@ -63,7 +64,8 @@ pub mod actions {
             let caller = starknet::get_caller_address();
 
             let position = Position { player: caller, x: 1, y: 2 };
-            position.set(world);
+            let position: Position = world.get(caller);
+            world.set(position);
 
             emit!(world, PositionUpdated { player: caller, new_x: 1, new_y: 2 });
         }
