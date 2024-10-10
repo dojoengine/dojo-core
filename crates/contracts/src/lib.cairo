@@ -57,16 +57,25 @@ pub mod utils {
     #[cfg(target: "test")]
     pub mod test;
 
-    pub mod utils;
-    pub use utils::{
-        bytearray_hash, entity_id_from_keys, find_field_layout, find_model_field_layout, any_none,
-        sum, combine_key, selector_from_names, is_name_valid
-    };
-
     pub mod descriptor;
     pub use descriptor::{
         Descriptor, DescriptorTrait, IDescriptorDispatcher, IDescriptorDispatcherTrait
     };
+
+    pub mod hash;
+    pub use hash::{bytearray_hash, selector_from_names};
+
+    pub mod key;
+    pub use key::{entity_id_from_keys, combine_key};
+
+    pub mod layout;
+    pub use layout::{find_field_layout, find_model_field_layout};
+
+    pub mod misc;
+    pub use misc::{any_none, sum};
+
+    pub mod naming;
+    pub use naming::is_name_valid;
 }
 
 pub mod world {
@@ -114,5 +123,11 @@ mod tests {
         mod resources;
         mod world;
     }
-    mod utils;
+    mod utils {
+        mod hash;
+        mod key;
+        mod layout;
+        mod misc;
+        mod naming;
+    }
 }

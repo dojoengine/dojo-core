@@ -61,12 +61,12 @@ pub mod foo_invalid_name {
             Option::None
         }
 
-        fn layout(self: @ContractState) -> dojo::model::Layout {
-            dojo::model::Layout::Fixed([].span())
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::meta::Layout::Fixed([].span())
         }
-        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
-            dojo::model::introspect::Ty::Struct(
-                dojo::model::introspect::Struct {
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
+            dojo::meta::introspect::Ty::Struct(
+                dojo::meta::introspect::Struct {
                     name: 'foo', attrs: [].span(), children: [].span()
                 }
             )
@@ -114,12 +114,12 @@ pub mod foo_invalid_namespace {
             Option::None
         }
 
-        fn layout(self: @ContractState) -> dojo::model::Layout {
-            dojo::model::Layout::Fixed([].span())
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::meta::Layout::Fixed([].span())
         }
-        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
-            dojo::model::introspect::Ty::Struct(
-                dojo::model::introspect::Struct {
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
+            dojo::meta::introspect::Ty::Struct(
+                dojo::meta::introspect::Struct {
                     name: 'foo', attrs: [].span(), children: [].span()
                 }
             )
