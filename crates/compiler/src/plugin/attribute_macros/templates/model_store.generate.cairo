@@ -102,7 +102,7 @@ pub impl $model_type$EntitySerdeImpl of dojo::model::entity::EntitySerde<$model_
 pub impl $model_type$ModelImpl = dojo::model::model::ModelImpl<$model_type$>;
 pub impl $model_type$Store = dojo::model::model::ModelStoreImpl<$model_type$>;
 
-pub impl $model_type$EntityImpl = dojo::model::entity::EntityImpl<$model_type$Entity>;
+pub impl $model_type$EntityImpl = dojo::model::entity::Entity<$model_type$Entity>;
 pub impl $model_type$EntityStore = dojo::model::entity::EntityStoreImpl<$model_type$Entity>;
 
 
