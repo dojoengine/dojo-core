@@ -13,6 +13,7 @@ use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 use convert_case::{Case, Casing};
 use dojo_types::naming;
 use starknet::core::utils::get_selector_from_name;
+use tracing::field;
 
 use crate::aux_data::ModelAuxData;
 use crate::compiler::annotation::Member;
@@ -32,9 +33,6 @@ use std::fs;
 
 const MODEL_CODE_STRING: &str = include_str!("./templates/model_store.generate.cairo");
 const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");
-const ENTITY_FIELD_CODE_STRING: &str =
-    include_str!("./templates/entity_field_store.generate.cairo");
-
 type ModelParameters = CommonStructParameters;
 
 #[derive(Debug, Clone, Default)]
@@ -117,6 +115,7 @@ impl DojoModel {
         let mut key_attrs: Vec<String> = vec![];
 
         let mut serialized_values: Vec<RewriteNode> = vec![];
+        let mut field_accessors: Vec<RewriteNode> = vec![];
 
         let members = parse_members(db, &struct_ast.members(db).elements(db), &mut diagnostics);
 
@@ -132,6 +131,7 @@ impl DojoModel {
                     "pub {}: {},\n",
                     member.name, member.ty
                 )));
+                field_accessors.push(generate_field_accessors(model_type.clone(), member));
             }
         });
 
@@ -227,7 +227,10 @@ impl DojoModel {
                     "members_values".to_string(),
                     RewriteNode::new_modified(members_values),
                 ),
-                /////////////////////////////
+                (
+                    "field_accessors".to_string(),
+                    RewriteNode::new_modified(field_accessors),
+                ),
             ]),
         );
 
@@ -244,7 +247,7 @@ impl DojoModel {
         //     format!("./{}_model.cairo", model_name_snake.clone()),
         //     code.clone(),
         // )
-        // .expect("could now write");
+        // .expect("could not write code");
 
         let aux_data = ModelAuxData {
             name: model_type.clone(),
@@ -277,58 +280,11 @@ impl DojoModel {
 ///
 /// # Returns
 /// A [`RewriteNode`] containing accessors code.
-fn generate_field_accessors(
-    model_name: String,
-    param_keys: String,
-    keys: String,
-    serialized_param_keys: Vec<RewriteNode>,
-    member: &Member,
-) -> RewriteNode {
+fn generate_field_accessors(model_type: String, member: &Member) -> RewriteNode {
     RewriteNode::interpolate_patched(
         MODEL_FIELD_CODE_STRING,
         &UnorderedHashMap::from([
-            ("model_name".to_string(), RewriteNode::Text(model_name)),
-            (
-                "field_selector".to_string(),
-                RewriteNode::Text(
-                    get_selector_from_name(&member.name)
-                        .expect("invalid member name")
-                        .to_string(),
-                ),
-            ),
-            (
-                "field_name".to_string(),
-                RewriteNode::Text(member.name.clone()),
-            ),
-            (
-                "field_type".to_string(),
-                RewriteNode::Text(member.ty.clone()),
-            ),
-            ("param_keys".to_string(), RewriteNode::Text(param_keys)),
-            ("keys".to_string(), RewriteNode::Text(keys)),
-            (
-                "serialized_param_keys".to_string(),
-                RewriteNode::new_modified(serialized_param_keys),
-            ),
-        ]),
-    )
-}
-
-/// Generates field accessors (`get_[field_name]` and `set_[field_name]`) for every
-/// fields of a model entity.
-///
-/// # Arguments
-///
-/// * `model_name` - the model name.
-/// * `member` - information about the field for which to generate accessors.
-///
-/// # Returns
-/// A [`RewriteNode`] containing accessors code.
-fn generate_entity_field_accessors(model_name: String, member: &Member) -> RewriteNode {
-    RewriteNode::interpolate_patched(
-        ENTITY_FIELD_CODE_STRING,
-        &UnorderedHashMap::from([
-            ("model_name".to_string(), RewriteNode::Text(model_name)),
+            ("model_type".to_string(), RewriteNode::Text(model_type)),
             (
                 "field_selector".to_string(),
                 RewriteNode::Text(

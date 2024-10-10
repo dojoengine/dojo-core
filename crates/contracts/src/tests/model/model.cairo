@@ -113,14 +113,14 @@ fn test_get_and_set_field_name() {
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
     world.set(foo);
 
-    let v1 = FooEntityStore::get_v1(world, foo.entity_id());
+    let v1 = FooMembersStore::get_v1_from_id(@world, foo.entity_id());
     assert!(foo.v1 == v1);
 
     let _entity: FooEntity = world.get_entity(foo.entity_id());
 
-    FooEntityStore::set_v1(world, foo.entity_id(), 42);
+    FooMembersStore::set_v1(world, foo.entity_id(), 42);
 
-    let v1 = FooEntityStore::get_v1(world, foo.entity_id());
+    let v1 = FooMembersStore::get_v1_from_id(@world, foo.entity_id());
     assert!(v1 == 42);
 }
 
@@ -187,12 +187,12 @@ fn test_get_and_set_field_name_from_model() {
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
     world.set(foo);
 
-    let v1 = FooStore::get_v1(world, foo.k1, foo.k2);
+    let v1 = FooMembersStore::get_v1(world, (foo.k1, foo.k2));
     assert!(v1 == 3);
 
-    FooStore::set_v1(world, foo.k1, foo.k2, 42);
+    FooMembersStore::set_v1(world, foo.k1, foo.k2, 42);
 
-    let v1 = FooStore::get_v1(world, foo.k1, foo.k2);
+    let v1 = FooMembersStore::get_v1(world, (foo.k1, foo.k2));
     assert!(v1 == 42);
 }
 

@@ -106,7 +106,10 @@ pub impl $model_type$EntityImpl = dojo::model::entity::EntityImpl<$model_type$En
 pub impl $model_type$EntityStore = dojo::model::entity::EntityStoreImpl<$model_type$Entity>;
 
 
-//////
+#[generate_trait]
+pub impl $model_type$MembersStoreImpl of $model_type$MembersStore {
+$field_accessors$
+}
 
 
 #[starknet::interface]
