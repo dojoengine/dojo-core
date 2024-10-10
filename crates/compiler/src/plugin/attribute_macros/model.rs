@@ -19,7 +19,8 @@ use crate::aux_data::ModelAuxData;
 use crate::compiler::annotation::Member;
 use crate::namespace_config::NamespaceConfig;
 use crate::plugin::derive_macros::{
-    extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
+    extract_derive_attr_names, handle_derive_attrs, DOJO_COPY_DERIVE, DOJO_INTROSPECT_DERIVE,
+    DOJO_PACKED_DERIVE,
 };
 
 use super::element::{
@@ -34,6 +35,7 @@ use std::fs;
 const MODEL_CODE_STRING: &str = include_str!("./templates/model_store.generate.cairo");
 const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");
 type ModelParameters = CommonStructParameters;
+const ENTITY_DERIVE_IGNORE: [&str; 2] = [DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE];
 
 #[derive(Debug, Clone, Default)]
 pub struct DojoModel {}
@@ -170,6 +172,13 @@ impl DojoModel {
         );
 
         // Ensures models always derive Introspect if not already derived.
+        let derive_tags = derive_attr_names
+            .iter()
+            .map(|tag| tag.as_str())
+            .filter(|&tag| !ENTITY_DERIVE_IGNORE.contains(&tag))
+            .collect::<Vec<&str>>()
+            .join(", ");
+
         if !derive_attr_names.contains(&DOJO_INTROSPECT_DERIVE.to_string())
             && !derive_attr_names.contains(&DOJO_PACKED_DERIVE.to_string())
         {
@@ -231,6 +240,7 @@ impl DojoModel {
                     "field_accessors".to_string(),
                     RewriteNode::new_modified(field_accessors),
                 ),
+                ("derive_tags".to_string(), RewriteNode::Text(derive_tags)),
             ]),
         );
 

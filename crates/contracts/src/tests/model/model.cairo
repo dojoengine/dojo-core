@@ -15,6 +15,7 @@ struct Foo {
     v2: u32
 }
 
+
 #[test]
 fn test_id() {
     let mvalues = FooEntity { __id: 1, v1: 3, v2: 4 };
@@ -78,7 +79,7 @@ fn test_delete_entity() {
 
     let entity_id = foo.entity_id();
     let mut entity: FooEntity = world.get_entity(entity_id);
-    EntityStore::<FooEntity>::delete_from_id(world, entity.id());
+    EntityStore::delete_entity(world, entity);
 
     let read_values: FooEntity = world.get_entity(entity_id);
     assert!(read_values.v1 == 0 && read_values.v2 == 0);
@@ -118,7 +119,7 @@ fn test_get_and_set_field_name() {
 
     let _entity: FooEntity = world.get_entity(foo.entity_id());
 
-    FooMembersStore::set_v1(world, foo.entity_id(), 42);
+    FooMembersStore::update_v1_from_id(world, foo.entity_id(), 42);
 
     let v1 = FooMembersStore::get_v1_from_id(@world, foo.entity_id());
     assert!(v1 == 42);
@@ -149,7 +150,7 @@ fn test_delete_from_model() {
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
     world.set(foo);
-    ModelStore::<Foo>::delete(world, (foo.k1, foo.k2));
+    world.delete(foo);
 
     let read_entity: Foo = world.get((foo.k1, foo.k2));
     assert!(
@@ -166,16 +167,14 @@ fn test_get_and_set_member_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    let keys = [foo.k1.into(), foo.k2.into()].span();
     world.set(foo);
+    let key: (u8, felt252) = foo.key();
+    let v1: u128 = ModelStore::<Foo>::get_member(@world, selector!("v1"), key);
 
-    let v1_raw_value = Model::<Foo>::get_member(world, keys, selector!("v1"));
+    assert!(v1 == 3);
 
-    assert!(v1_raw_value.len() == 1);
-    assert!(*v1_raw_value.at(0) == 3);
-
-    FooModelImpl::set_member(world, keys, selector!("v1"), [42].span());
-    let foo = FooStore::get(world, foo.k1, foo.k2);
+    ModelStore::<Foo>::update_member(world, selector!("v1"), key, 42);
+    let foo: Foo = world.get((foo.k1, foo.k2));
     assert!(foo.v1 == 42);
 }
 
@@ -187,12 +186,12 @@ fn test_get_and_set_field_name_from_model() {
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
     world.set(foo);
 
-    let v1 = FooMembersStore::get_v1(world, (foo.k1, foo.k2));
+    let v1 = FooMembersStore::get_v1(@world, (foo.k1, foo.k2));
     assert!(v1 == 3);
 
-    FooMembersStore::set_v1(world, foo.k1, foo.k2, 42);
+    FooMembersStore::update_v1(world, (foo.k1, foo.k2), 42);
 
-    let v1 = FooMembersStore::get_v1(world, (foo.k1, foo.k2));
+    let v1 = FooMembersStore::get_v1(@world, (foo.k1, foo.k2));
     assert!(v1 == 42);
 }
 
