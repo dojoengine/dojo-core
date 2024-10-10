@@ -250,7 +250,7 @@ impl DojoModel {
         let (code, code_mappings) = builder.build();
 
         crate::debug_expand(
-            &format!("MODEL PATCH: {model_namespace}-{model_name}"),
+            &format!("MODEL PATCH: {model_namespace}-{model_type}"),
             &code,
         );
 
