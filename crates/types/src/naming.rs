@@ -51,14 +51,6 @@ pub fn split_tag(tag: &str) -> Result<(String, String)> {
     }
 }
 
-pub fn ensure_namespace(tag: &str, default_namespace: &str) -> String {
-    if tag.contains(TAG_SEPARATOR) {
-        tag.to_string()
-    } else {
-        get_tag(default_namespace, tag)
-    }
-}
-
 pub fn get_filename_from_tag(tag: &str) -> String {
     if [
         format!("dojo{TAG_SEPARATOR}world").as_str(),
@@ -126,15 +118,6 @@ mod tests {
         assert!(split_tag("invalid:namespace").is_err());
         assert!(split_tag("invalid namespace").is_err());
         assert!(split_tag("inv-alid-namespace").is_err());
-    }
-
-    #[test]
-    fn test_ensure_namespace_success() {
-        assert_eq!(
-            ensure_namespace("namespace-name", "default"),
-            "namespace-name"
-        );
-        assert_eq!(ensure_namespace("name", "default"), "default-name");
     }
 
     #[test]

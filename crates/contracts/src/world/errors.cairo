@@ -73,3 +73,7 @@ pub fn no_model_write_access(tag: @ByteArray, caller: ContractAddress) -> ByteAr
 pub fn no_world_owner(caller: ContractAddress, target: @ByteArray) -> ByteArray {
     format!("Caller `{:?}` can't {} (not world owner)", caller, target)
 }
+
+pub fn invalid_naming(kind: ByteArray, what: @ByteArray) -> ByteArray {
+    format!("{kind} `{what}` is invalid according to Dojo naming rules")
+}

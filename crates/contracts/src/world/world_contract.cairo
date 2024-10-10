@@ -520,6 +520,9 @@ pub mod world {
 
             let descriptor = DescriptorTrait::from_contract_assert(contract_address);
 
+            self.assert_namespace(descriptor.namespace());
+            self.assert_name(descriptor.name());
+
             if !self.is_namespace_registered(descriptor.namespace_hash()) {
                 panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
             }
@@ -563,6 +566,9 @@ pub mod world {
             self.models_salt.write(salt + 1);
 
             let new_descriptor = DescriptorTrait::from_contract_assert(new_contract_address);
+
+            self.assert_namespace(new_descriptor.namespace());
+            self.assert_name(new_descriptor.name());
 
             if !self.is_namespace_registered(new_descriptor.namespace_hash()) {
                 panic_with_byte_array(
@@ -612,6 +618,8 @@ pub mod world {
         }
 
         fn register_namespace(ref self: ContractState, namespace: ByteArray) {
+            self.assert_namespace(@namespace);
+
             let caller = get_caller_address();
 
             let hash = bytearray_hash(@namespace);
@@ -646,6 +654,9 @@ pub mod world {
                 .unwrap_syscall();
 
             let descriptor = DescriptorTrait::from_contract_assert(contract_address);
+
+            self.assert_namespace(descriptor.namespace());
+            self.assert_name(descriptor.name());
 
             let maybe_existing_contract = self.resources.read(descriptor.selector());
             if !maybe_existing_contract.is_unregistered() {
@@ -693,6 +704,9 @@ pub mod world {
                 .unwrap_syscall();
 
             let new_descriptor = DescriptorTrait::from_contract_assert(check_address);
+
+            self.assert_namespace(new_descriptor.namespace());
+            self.assert_name(new_descriptor.name());
 
             if let Resource::Contract((contract_address, _)) = self
                 .resources
@@ -889,6 +903,20 @@ pub mod world {
             }
 
             self.panic_with_details(caller, resource_selector, permission)
+        }
+
+        ///
+        fn assert_name(self: @ContractState, name: @ByteArray) {
+            if !dojo::utils::is_name_valid(name) {
+                panic_with_byte_array(@errors::invalid_naming("Name", name))
+            }
+        }
+
+        ///
+        fn assert_namespace(self: @ContractState, namespace: @ByteArray) {
+            if !dojo::utils::is_name_valid(namespace) {
+                panic_with_byte_array(@errors::invalid_naming("Namespace", namespace))
+            }
         }
 
         /// Panics with the caller details.
