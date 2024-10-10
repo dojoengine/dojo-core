@@ -10,7 +10,7 @@ pub mod contract {
 
 pub mod event {
     pub mod event;
-    pub use event::{Event, IEvent, IEventDispatcher, IEventDispatcherTrait};
+    pub use event::{Event, EventDefinition, IEvent, IEventDispatcher, IEventDispatcherTrait};
 
     #[cfg(target: "test")]
     pub use event::{EventTest};
@@ -25,7 +25,8 @@ pub mod meta {
 pub mod model {
     pub mod model;
     pub use model::{
-        Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
+        Model, ModelDefinition, ModelIndex, ModelEntity, IModel, IModelDispatcher,
+        IModelDispatcherTrait,
     };
 
     #[cfg(target: "test")]
@@ -92,6 +93,10 @@ pub mod world {
 mod tests {
     mod meta {
         mod introspect;
+    }
+
+    mod event {
+        mod event;
     }
 
     mod model {
