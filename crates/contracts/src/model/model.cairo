@@ -10,9 +10,9 @@ use dojo::{
 };
 
 pub trait ModelSerde<M> {
-    fn _keys(self: @M) -> Span<felt252>;
-    fn _values(self: @M) -> Span<felt252>;
-    fn _keys_values(self: @M) -> (Span<felt252>, Span<felt252>);
+    fn serde_keys(self: @M) -> Span<felt252>;
+    fn serde_values(self: @M) -> Span<felt252>;
+    fn serde_keys_values(self: @M) -> (Span<felt252>, Span<felt252>);
 }
 
 pub trait Model<M> {
@@ -38,9 +38,9 @@ pub trait ModelStore<M> {
     // Get a model from the world
     fn get<K, +KeyTrait<K>, +Drop<K>>(self: @IWorldDispatcher, key: K) -> M;
     // Set a model in the world
-    fn set(self: IWorldDispatcher, model: M);
+    fn set(self: IWorldDispatcher, model: @M);
     // Get a member of a model from the world
-    fn delete(self: IWorldDispatcher, model: M);
+    fn delete(self: IWorldDispatcher, model: @M);
     // Delete a model from the world from its key
     fn delete_from_key<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K);
     // Get a member of a model from the world
@@ -55,16 +55,16 @@ pub trait ModelStore<M> {
 
 pub impl ModelImpl<M, +ModelSerde<M>, +Serde<M>, +ModelAttributes<M>> of Model<M> {
     fn key<K, +KeyParserTrait<M, K>>(self: @M) -> K {
-        KeyParserTrait::<M, K>::_key(self)
+        KeyParserTrait::<M, K>::serde_key(self)
     }
     fn entity_id<K, +KeyTrait<K>, +KeyParserTrait<M, K>, +Drop<K>>(self: @M) -> felt252 {
         KeyTrait::<K>::to_entity_id(@Self::key::<K>(self))
     }
     fn keys(self: @M) -> Span<felt252> {
-        ModelSerde::<M>::_keys(self)
+        ModelSerde::<M>::serde_keys(self)
     }
     fn values(self: @M) -> Span<felt252> {
-        ModelSerde::<M>::_values(self)
+        ModelSerde::<M>::serde_values(self)
     }
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M> {
         let mut serialized: Array<felt252> = keys.into();
@@ -127,19 +127,19 @@ pub impl ModelStoreImpl<
         }
     }
 
-    fn set(self: IWorldDispatcher, model: M) {
-        let (keys, values) = ModelSerde::<M>::_keys_values(@model);
+    fn set(self: IWorldDispatcher, model: @M) {
+        let (keys, values) = ModelSerde::<M>::serde_keys_values(model);
 
         IWorldDispatcherTrait::set_entity(
             self, Model::<M>::selector(), ModelIndex::Keys(keys), values, Model::<M>::layout()
         );
     }
 
-    fn delete(self: IWorldDispatcher, model: M) {
+    fn delete(self: IWorldDispatcher, model: @M) {
         IWorldDispatcherTrait::delete_entity(
             self,
             Model::<M>::selector(),
-            ModelIndex::Keys(ModelSerde::<M>::_keys(@model)),
+            ModelIndex::Keys(ModelSerde::<M>::serde_keys(model)),
             Model::<M>::layout()
         );
     }

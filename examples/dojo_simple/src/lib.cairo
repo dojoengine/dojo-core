@@ -65,7 +65,7 @@ pub mod actions {
 
             let position = Position { player: caller, x: 1, y: 2 };
 
-            world.set(position);
+            world.set(@position);
             let _position: Position = world.get(caller);
             emit!(world, PositionUpdated { player: caller, new_x: 1, new_y: 2 });
         }

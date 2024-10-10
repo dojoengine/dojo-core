@@ -77,7 +77,7 @@ pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<Resource
 
 
 pub impl ResourceMetadataModelKeyImpl of KeyParserTrait<ResourceMetadata, felt252> {
-    fn _key(self: @ResourceMetadata) -> felt252 {
+    fn serde_key(self: @ResourceMetadata) -> felt252 {
         *self.resource_id
     }
 }
@@ -85,17 +85,17 @@ pub impl ResourceMetadataModelKeyImpl of KeyParserTrait<ResourceMetadata, felt25
 pub impl ResourceMetadataKeyImpl = KeyImpl<felt252>;
 
 pub impl ResourceMetadataModelSerde of ModelSerde<ResourceMetadata> {
-    fn _keys(self: @ResourceMetadata) -> Span<felt252> {
+    fn serde_keys(self: @ResourceMetadata) -> Span<felt252> {
         let mut serialized = ArrayTrait::new();
         ArrayTrait::append(ref serialized, *self.resource_id);
         ArrayTrait::span(@serialized)
     }
-    fn _values(self: @ResourceMetadata) -> Span<felt252> {
+    fn serde_values(self: @ResourceMetadata) -> Span<felt252> {
         let mut serialized = ArrayTrait::new();
         Serde::serialize(self.metadata_uri, ref serialized);
         ArrayTrait::span(@serialized)
     }
-    fn _keys_values(self: @ResourceMetadata) -> (Span<felt252>, Span<felt252>) {
+    fn serde_keys_values(self: @ResourceMetadata) -> (Span<felt252>, Span<felt252>) {
         let mut serialized_keys = ArrayTrait::new();
         ArrayTrait::append(ref serialized_keys, *self.resource_id);
 

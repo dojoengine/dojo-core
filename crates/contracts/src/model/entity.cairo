@@ -9,10 +9,11 @@ use dojo::{
 
 // Needs to be generated
 pub trait EntitySerde<E> {
-    fn _id(self: @E) -> felt252;
-    fn _values(self: @E) -> Span<felt252>;
-    fn _id_values(self: @E) -> (felt252, Span<felt252>);
+    fn serde_id(self: @E) -> felt252;
+    fn serde_values(self: @E) -> Span<felt252>;
+    fn serde_id_values(self: @E) -> (felt252, Span<felt252>);
 }
+
 
 pub trait Entity<E> {
     fn id(self: @E) -> felt252;
@@ -37,9 +38,9 @@ pub trait EntityStore<E> {
     // Get an entity from the world using its entity id
     fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E;
     // Update an entity in the world
-    fn update(self: IWorldDispatcher, entity: E);
+    fn update(self: IWorldDispatcher, entity: @E);
     // Delete an entity from the
-    fn delete_entity(self: IWorldDispatcher, entity: E);
+    fn delete_entity(self: IWorldDispatcher, entity: @E);
     // Delete an entity from the world from its entity id
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252);
     // Get a member of a model from the world using its entity id
@@ -54,10 +55,10 @@ pub trait EntityStore<E> {
 
 pub impl EntityImpl<E, +EntitySerde<E>, +Serde<E>, +ModelAttributes<E>> of Entity<E> {
     fn id(self: @E) -> felt252 {
-        EntitySerde::<E>::_id(self)
+        EntitySerde::<E>::serde_id(self)
     }
     fn values(self: @E) -> Span<felt252> {
-        EntitySerde::<E>::_values(self)
+        EntitySerde::<E>::serde_values(self)
     }
     fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E> {
         let mut serialized: Array<felt252> = array![entity_id];
@@ -122,8 +123,8 @@ pub impl EntityStoreImpl<
         }
     }
 
-    fn update(self: IWorldDispatcher, entity: E) {
-        let (entity_id, values) = EntitySerde::<E>::_id_values(@entity);
+    fn update(self: IWorldDispatcher, entity: @E) {
+        let (entity_id, values) = EntitySerde::<E>::serde_id_values(entity);
         IWorldDispatcherTrait::set_entity(
             self,
             ModelAttributes::<E>::selector(),
@@ -132,8 +133,8 @@ pub impl EntityStoreImpl<
             ModelAttributes::<E>::layout()
         );
     }
-    fn delete_entity(self: IWorldDispatcher, entity: E) {
-        Self::delete_from_id(self, Entity::<E>::id(@entity));
+    fn delete_entity(self: IWorldDispatcher, entity: @E) {
+        Self::delete_from_id(self, Entity::<E>::id(entity));
     }
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252) {
         IWorldDispatcherTrait::delete_entity(

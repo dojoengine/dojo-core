@@ -7,7 +7,8 @@ pub struct $model_type$Entity {
 type $model_type$KeyType = $key_type$;
 
 pub impl $model_type$ModelKeyImpl of dojo::model::members::key::KeyParserTrait<$model_type$, $model_type$KeyType>{
-    fn _key(self: @$model_type$) -> $model_type$KeyType {
+    #[inline(always)]
+    fn serde_key(self: @$model_type$) -> $model_type$KeyType {
         $keys_to_tuple$
     }
 } 
@@ -18,7 +19,6 @@ pub impl $model_type$KeyImpl = dojo::model::members::key::KeyImpl<$model_type$Ke
 pub mod $model_name_snake$_attributes {
     use super::$model_type$;
     pub impl $model_type$AttributesImpl<T> of dojo::model::ModelAttributes<T>{
-    
         #[inline(always)]
         fn version() -> u8 {
             $model_version$
@@ -67,34 +67,34 @@ pub impl $model_type$Attributes = $model_name_snake$_attributes::$model_type$Att
 pub impl $model_type$EntityAttributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$Entity>;
 
 pub impl $model_type$ModelSerdeImpl of dojo::model::model::ModelSerde<$model_type$>{
-    fn _keys(self: @$model_type$) -> Span<felt252> {
+    fn serde_keys(self: @$model_type$) -> Span<felt252> {
         dojo::model::members::MemberTrait::<$model_type$KeyType>::serialize(
-            @$model_type$ModelKeyImpl::_key(self)
+            @$model_type$ModelKeyImpl::serde_key(self)
         )
     }
-    fn _values(self: @$model_type$) -> Span<felt252> {
+    fn serde_values(self: @$model_type$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
     }
-    fn _keys_values(self: @$model_type$) -> (Span<felt252>, Span<felt252>) {
+    fn serde_keys_values(self: @$model_type$) -> (Span<felt252>, Span<felt252>) {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
-        (Self::_keys(self), core::array::ArrayTrait::span(@serialized))
+        (Self::serde_keys(self), core::array::ArrayTrait::span(@serialized))
     }
 }
 
 pub impl $model_type$EntitySerdeImpl of dojo::model::entity::EntitySerde<$model_type$Entity>{
-    fn _id(self: @$model_type$Entity) -> felt252 {
+    fn serde_id(self: @$model_type$Entity) -> felt252 {
         *self.__id
     }
-    fn _values(self: @$model_type$Entity) -> Span<felt252> {
+    fn serde_values(self: @$model_type$Entity) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
     }
-    fn _id_values(self: @$model_type$Entity) -> (felt252, Span<felt252>) {
-        (*self.__id, Self::_values(self))
+    fn serde_id_values(self: @$model_type$Entity) -> (felt252, Span<felt252>) {
+        (*self.__id, Self::serde_values(self))
     }
 }
 

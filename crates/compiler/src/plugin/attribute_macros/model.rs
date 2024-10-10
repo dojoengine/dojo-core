@@ -13,24 +13,19 @@ use cairo_lang_utils::unordered_hash_map::UnorderedHashMap;
 use convert_case::{Case, Casing};
 use dojo_types::naming;
 use starknet::core::utils::get_selector_from_name;
-use tracing::field;
 
 use crate::aux_data::ModelAuxData;
 use crate::compiler::annotation::Member;
 use crate::namespace_config::NamespaceConfig;
 use crate::plugin::derive_macros::{
-    extract_derive_attr_names, handle_derive_attrs, DOJO_COPY_DERIVE, DOJO_INTROSPECT_DERIVE,
-    DOJO_PACKED_DERIVE,
+    extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
 };
 
 use super::element::{
-    compute_namespace, deserialize_keys_and_values, parse_members, serialize_keys_and_values,
-    serialize_member_ty, CommonStructParameters, StructParameterParser, DEFAULT_VERSION,
+    compute_namespace, parse_members, serialize_member_ty, CommonStructParameters,
+    StructParameterParser, DEFAULT_VERSION,
 };
-use super::patches::MODEL_PATCH;
 use super::DOJO_MODEL_ATTR;
-
-use std::fs;
 
 const MODEL_CODE_STRING: &str = include_str!("./templates/model_store.generate.cairo");
 const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");

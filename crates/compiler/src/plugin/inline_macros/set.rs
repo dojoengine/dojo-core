@@ -108,11 +108,10 @@ impl InlineMacroExprPlugin for SetMacro {
         for entity in bundle {
             builder.add_str(&format!(
                 "
-                let __set_model_instance__ = {};
-                dojo::model::Model::set_model(@__set_model_instance__, {});
+                dojo::model::ModelStore::set({}, @{});
                 ",
-                entity,
                 world.as_syntax_node().get_text(db),
+                entity,
             ));
         }
         builder.add_str("}");

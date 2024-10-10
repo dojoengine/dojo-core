@@ -54,7 +54,7 @@ fn test_get_and_update_entity() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
 
     let entity_id = foo.entity_id();
     let mut entity: FooEntity = world.get_entity(entity_id);
@@ -63,7 +63,7 @@ fn test_get_and_update_entity() {
     entity.v1 = 12;
     entity.v2 = 18;
 
-    world.update(entity);
+    world.update(@entity);
 
     let read_values: FooEntity = world.get_entity(entity_id);
     assert!(read_values.v1 == entity.v1 && read_values.v2 == entity.v2);
@@ -75,11 +75,11 @@ fn test_delete_entity() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
 
     let entity_id = foo.entity_id();
     let mut entity: FooEntity = world.get_entity(entity_id);
-    EntityStore::delete_entity(world, entity);
+    EntityStore::delete_entity(world, @entity);
 
     let read_values: FooEntity = world.get_entity(entity_id);
     assert!(read_values.v1 == 0 && read_values.v2 == 0);
@@ -91,7 +91,7 @@ fn test_get_and_set_member_from_entity() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
 
     let v1: u128 = EntityStore::<
         FooEntity
@@ -112,7 +112,7 @@ fn test_get_and_set_field_name() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
 
     let v1 = FooMembersStore::get_v1_from_id(@world, foo.entity_id());
     assert!(foo.v1 == v1);
@@ -131,7 +131,7 @@ fn test_get_and_set_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
 
     let read_entity: Foo = world.get((foo.k1, foo.k2));
 
@@ -149,8 +149,8 @@ fn test_delete_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
-    world.delete(foo);
+    world.set(@foo);
+    world.delete(@foo);
 
     let read_entity: Foo = world.get((foo.k1, foo.k2));
     assert!(
@@ -167,7 +167,7 @@ fn test_get_and_set_member_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
     let key: (u8, felt252) = foo.key();
     let v1: u128 = ModelStore::<Foo>::get_member(@world, selector!("v1"), key);
 
@@ -184,7 +184,7 @@ fn test_get_and_set_field_name_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    world.set(foo);
+    world.set(@foo);
 
     let v1 = FooMembersStore::get_v1(@world, (foo.k1, foo.k2));
     assert!(v1 == 3);

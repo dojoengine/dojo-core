@@ -697,11 +697,9 @@ fn test_delete_entity_with_unexpected_array_model_layout() {
     world.register_model(struct_simple_array_model::TEST_CLASS_HASH.try_into().unwrap());
 
     let layout = Layout::Array([Introspect::<felt252>::layout()].span());
-
-    world
-        .delete_entity(
-            Model::<StructSimpleArrayModel>::selector(), ModelIndex::Keys([].span()), layout
-        );
+    IWorldDispatcherTrait::delete_entity(
+        world, Model::<StructSimpleArrayModel>::selector(), ModelIndex::Keys([].span()), layout
+    );
 }
 
 #[test]
@@ -712,10 +710,9 @@ fn test_delete_entity_with_unexpected_tuple_model_layout() {
 
     let layout = Layout::Tuple([Introspect::<felt252>::layout()].span());
 
-    world
-        .delete_entity(
-            Model::<StructSimpleArrayModel>::selector(), ModelIndex::Keys([].span()), layout
-        );
+    IWorldDispatcherTrait::delete_entity(
+        world, Model::<StructSimpleArrayModel>::selector(), ModelIndex::Keys([].span()), layout
+    );
 }
 
 #[test]

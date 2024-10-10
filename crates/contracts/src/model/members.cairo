@@ -74,7 +74,7 @@ pub mod key {
     use dojo::utils::entity_id_from_keys;
 
     pub trait KeyParserTrait<M, K> {
-        fn _key(self: @M) -> K;
+        fn serde_key(self: @M) -> K;
     }
 
     pub trait KeyTrait<K> {
