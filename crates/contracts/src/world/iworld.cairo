@@ -76,10 +76,16 @@ pub trait IWorld<T> {
     ///
     /// * `salt` - The salt use for contract deployment.
     /// * `class_hash` - The class hash of the contract.
-    /// * `constructor_calldata` - The calldata of the contract constructor.
-    fn register_contract(
-        ref self: T, salt: felt252, class_hash: ClassHash, constructor_calldata: Span<felt252>
-    ) -> ContractAddress;
+    fn register_contract(ref self: T, salt: felt252, class_hash: ClassHash) -> ContractAddress;
+
+    /// Initializes a contract associated registered in the world.
+    ///
+    /// As a constructor call, the initialization function can be called only once, and only
+    /// callable by the world itself.
+    ///
+    /// Also, the caller of this function must have the writer owner permission for the contract
+    /// resource.
+    fn init_contract(ref self: T, selector: felt252, init_calldata: Span<felt252>);
 
     /// Upgrades an event in the world.
     ///

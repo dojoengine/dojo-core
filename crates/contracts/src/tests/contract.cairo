@@ -115,7 +115,7 @@ fn test_upgrade_from_world() {
     let world = deploy_world();
 
     let base_address = world
-        .register_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+        .register_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap());
     let new_class_hash: ClassHash = test_contract_upgrade::TEST_CLASS_HASH.try_into().unwrap();
 
     world.upgrade_contract(new_class_hash);
@@ -132,8 +132,7 @@ fn test_upgrade_from_world() {
 fn test_upgrade_from_world_not_world_provider() {
     let world = deploy_world();
 
-    let _ = world
-        .register_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+    let _ = world.register_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap());
     let new_class_hash: ClassHash = contract_invalid_upgrade::TEST_CLASS_HASH.try_into().unwrap();
 
     world.upgrade_contract(new_class_hash);
@@ -146,7 +145,7 @@ fn test_upgrade_direct() {
     let world = deploy_world();
 
     let base_address = world
-        .register_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+        .register_contract('salt', test_contract::TEST_CLASS_HASH.try_into().unwrap());
     let new_class_hash: ClassHash = test_contract_upgrade::TEST_CLASS_HASH.try_into().unwrap();
 
     let upgradeable_dispatcher = IUpgradeableDispatcher { contract_address: base_address };
@@ -296,8 +295,7 @@ mod invalid_model_world {
 fn test_deploy_from_world_invalid_model() {
     let world = deploy_world();
 
-    let _ = world
-        .register_contract(0, test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+    let _ = world.register_contract(0, test_contract::TEST_CLASS_HASH.try_into().unwrap());
 
     world.register_model(invalid_model::TEST_CLASS_HASH.try_into().unwrap());
 }
