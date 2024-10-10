@@ -39,8 +39,10 @@ pub trait ModelStore<M> {
     fn get<K, +KeyTrait<K>, +Drop<K>>(self: @IWorldDispatcher, key: K) -> M;
     // Set a model in the world
     fn set(self: IWorldDispatcher, model: M);
+    // Get a member of a model from the world
+    fn delete(self: IWorldDispatcher, model: M);
     // Delete a model from the world from its key
-    fn delete<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K);
+    fn delete_from_key<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K);
     // Get a member of a model from the world
     fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +KeyTrait<K>, +Drop<K>>(
         self: @IWorldDispatcher, member_id: felt252, key: K
@@ -129,20 +131,25 @@ pub impl ModelStoreImpl<
         let (keys, values) = ModelSerde::<M>::_keys_values(@model);
 
         IWorldDispatcherTrait::set_entity(
-            self,
-            ModelAttributes::<M>::selector(),
-            ModelIndex::Keys(keys),
-            values,
-            ModelAttributes::<M>::layout()
+            self, Model::<M>::selector(), ModelIndex::Keys(keys), values, Model::<M>::layout()
         );
     }
 
-    fn delete<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K) {
+    fn delete(self: IWorldDispatcher, model: M) {
         IWorldDispatcherTrait::delete_entity(
             self,
-            ModelAttributes::<M>::selector(),
+            Model::<M>::selector(),
+            ModelIndex::Keys(ModelSerde::<M>::_keys(@model)),
+            Model::<M>::layout()
+        );
+    }
+
+    fn delete_from_key<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K) {
+        IWorldDispatcherTrait::delete_entity(
+            self,
+            Model::<M>::selector(),
             ModelIndex::Keys(KeyTrait::<K>::serialize(@key)),
-            ModelAttributes::<M>::layout()
+            Model::<M>::layout()
         );
     }
 

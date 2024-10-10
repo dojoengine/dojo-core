@@ -38,6 +38,8 @@ pub trait EntityStore<E> {
     fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E;
     // Update an entity in the world
     fn update(self: IWorldDispatcher, entity: E);
+    // Delete an entity from the
+    fn delete_entity(self: IWorldDispatcher, entity: E);
     // Delete an entity from the world from its entity id
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252);
     // Get a member of a model from the world using its entity id
@@ -130,7 +132,9 @@ pub impl EntityStoreImpl<
             ModelAttributes::<E>::layout()
         );
     }
-
+    fn delete_entity(self: IWorldDispatcher, entity: E) {
+        Self::delete_from_id(self, Entity::<E>::id(@entity));
+    }
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252) {
         IWorldDispatcherTrait::delete_entity(
             self,
