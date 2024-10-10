@@ -1,4 +1,4 @@
-use dojo::model::{Model, ModelEntity};
+use dojo::model::{Model, Entity, ModelStore, EntityStore};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use dojo::tests::helpers::{deploy_world};
@@ -26,7 +26,7 @@ fn test_values() {
     let mvalues = FooEntity { __id: 1, v1: 3, v2: 4 };
     let expected_values = [3, 4].span();
 
-    let values = ModelEntity::<FooEntity>::values(@mvalues);
+    let values = mvalues.values();
     assert!(expected_values == values);
 }
 
@@ -34,8 +34,7 @@ fn test_values() {
 fn test_from_values() {
     let mut values = [3, 4].span();
 
-    let model_entity = ModelEntity::<FooEntity>::from_values(1, values);
-    let model_entity = ModelEntity::<FooEntity>::from_values(1, ref values);
+    let model_entity: Option<FooEntity> = Entity::from_values(1, ref values);
     assert!(model_entity.is_some());
     let model_entity = model_entity.unwrap();
     assert!(model_entity.__id == 1 && model_entity.v1 == 3 && model_entity.v2 == 4);
@@ -44,8 +43,7 @@ fn test_from_values() {
 #[test]
 fn test_from_values_bad_data() {
     let mut values = [3].span();
-    let _ = ModelEntity::<FooEntity>::from_values(1, values);
-    let res = ModelEntity::<FooEntity>::from_values(1, ref values);
+    let res: Option<FooEntity> = Entity::from_values(1, ref values);
     assert!(res.is_none());
 }
 
@@ -55,18 +53,18 @@ fn test_get_and_update_entity() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
+    world.set(foo);
 
     let entity_id = foo.entity_id();
-    let mut entity = FooEntityStore::get(world, entity_id);
+    let mut entity: FooEntity = world.get_entity(entity_id);
     assert!(entity.__id == entity_id && entity.v1 == entity.v1 && entity.v2 == entity.v2);
 
     entity.v1 = 12;
     entity.v2 = 18;
 
-    entity.update(world);
+    world.update(entity);
 
-    let read_values = FooEntityStore::get(world, entity_id);
+    let read_values: FooEntity = world.get_entity(entity_id);
     assert!(read_values.v1 == entity.v1 && read_values.v2 == entity.v2);
 }
 
@@ -76,13 +74,13 @@ fn test_delete_entity() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
+    world.set(foo);
 
     let entity_id = foo.entity_id();
-    let mut entity: FooEntity = ModelEntity::get(world, entity_id);
-    entity.delete(world);
+    let mut entity: FooEntity = world.get_entity(entity_id);
+    EntityStore::<FooEntity>::delete_from_id(world, entity.id());
 
-    let read_values = FooEntityStore::get(world, entity_id);
+    let read_values: FooEntity = world.get_entity(entity_id);
     assert!(read_values.v1 == 0 && read_values.v2 == 0);
 }
 
@@ -92,19 +90,18 @@ fn test_get_and_set_member_from_entity() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
+    world.set(foo);
 
-    let v1_raw_value: Span<felt252> = ModelEntity::<
+    let v1: u128 = EntityStore::<
         FooEntity
-    >::get_member(world, foo.entity_id(), selector!("v1"));
+    >::get_member_from_id(@world, foo.entity_id(), selector!("v1"));
 
-    assert!(v1_raw_value.len() == 1);
-    assert!(*v1_raw_value.at(0) == 3);
+    assert!(v1 == 3);
 
-    let entity: FooEntity = ModelEntity::get(world, foo.entity_id());
-    FooModelEntityImpl::set_member(world, entity.__id, selector!("v1"), [42].span());
+    let entity: FooEntity = world.get_entity(foo.entity_id());
+    EntityStore::<FooEntity>::update_member_from_id(world, entity.id(), selector!("v1"), 42);
 
-    let entity: FooEntity = ModelEntity::get(world, foo.entity_id());
+    let entity: FooEntity = world.get_entity(foo.entity_id());
     assert!(entity.v1 == 42);
 }
 
@@ -114,12 +111,12 @@ fn test_get_and_set_field_name() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
+    world.set(foo);
 
     let v1 = FooEntityStore::get_v1(world, foo.entity_id());
     assert!(foo.v1 == v1);
 
-    let _entity: FooEntity = ModelEntity::get(world, foo.entity_id());
+    let _entity: FooEntity = world.get_entity(foo.entity_id());
 
     FooEntityStore::set_v1(world, foo.entity_id(), 42);
 
@@ -133,9 +130,9 @@ fn test_get_and_set_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
+    world.set(foo);
 
-    let read_entity = FooStore::get(world, foo.k1, foo.k2);
+    let read_entity: Foo = world.get((foo.k1, foo.k2));
 
     assert!(
         foo.k1 == read_entity.k1
@@ -151,10 +148,10 @@ fn test_delete_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
-    foo.delete(world);
+    world.set(foo);
+    ModelStore::<Foo>::delete(world, (foo.k1, foo.k2));
 
-    let read_entity = FooStore::get(world, foo.k1, foo.k2);
+    let read_entity: Foo = world.get((foo.k1, foo.k2));
     assert!(
         read_entity.k1 == foo.k1
             && read_entity.k2 == foo.k2
@@ -170,14 +167,14 @@ fn test_get_and_set_member_from_model() {
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
     let keys = [foo.k1.into(), foo.k2.into()].span();
-    foo.set(world);
+    world.set(foo);
 
     let v1_raw_value = Model::<Foo>::get_member(world, keys, selector!("v1"));
 
     assert!(v1_raw_value.len() == 1);
     assert!(*v1_raw_value.at(0) == 3);
 
-    FooModelImpl::set_member(world, keys,selector!("v1"), [42].span());
+    FooModelImpl::set_member(world, keys, selector!("v1"), [42].span());
     let foo = FooStore::get(world, foo.k1, foo.k2);
     assert!(foo.v1 == 42);
 }
@@ -188,7 +185,7 @@ fn test_get_and_set_field_name_from_model() {
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
 
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
-    foo.set(world);
+    world.set(foo);
 
     let v1 = FooStore::get_v1(world, foo.k1, foo.k2);
     assert!(v1 == 3);

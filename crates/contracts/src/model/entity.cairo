@@ -15,9 +15,18 @@ pub trait EntitySerde<E> {
 }
 
 pub trait Entity<E> {
-    fn entity_id(self: @E) -> felt252;
+    fn id(self: @E) -> felt252;
     fn values(self: @E) -> Span<felt252>;
-    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> E;
+    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E>;
+
+    fn name() -> ByteArray;
+    fn namespace() -> ByteArray;
+    fn tag() -> ByteArray;
+    fn version() -> u8;
+    fn selector() -> felt252;
+    fn layout() -> Layout;
+    fn name_hash() -> felt252;
+    fn namespace_hash() -> felt252;
     fn instance_selector(self: @E) -> felt252;
     fn instance_layout(self: @E) -> Layout;
 }
@@ -42,25 +51,42 @@ pub trait EntityStore<E> {
 }
 
 pub impl EntityImpl<E, +EntitySerde<E>, +Serde<E>, +ModelAttributes<E>> of Entity<E> {
-    fn entity_id(self: @E) -> felt252 {
+    fn id(self: @E) -> felt252 {
         EntitySerde::<E>::_id(self)
     }
     fn values(self: @E) -> Span<felt252> {
         EntitySerde::<E>::_values(self)
     }
-    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> E {
+    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E> {
         let mut serialized: Array<felt252> = array![entity_id];
         serialized.append_span(values);
         let mut span = serialized.span();
 
-        match Serde::<E>::deserialize(ref span) {
-            Option::Some(model) => model,
-            Option::None => {
-                panic!(
-                    "Entity: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
-                )
-            }
-        }
+        Serde::<E>::deserialize(ref span)
+    }
+    fn name() -> ByteArray {
+        ModelAttributes::<E>::name()
+    }
+    fn namespace() -> ByteArray {
+        ModelAttributes::<E>::namespace()
+    }
+    fn tag() -> ByteArray {
+        ModelAttributes::<E>::tag()
+    }
+    fn version() -> u8 {
+        ModelAttributes::<E>::version()
+    }
+    fn selector() -> felt252 {
+        ModelAttributes::<E>::selector()
+    }
+    fn layout() -> Layout {
+        ModelAttributes::<E>::layout()
+    }
+    fn name_hash() -> felt252 {
+        ModelAttributes::<E>::name_hash()
+    }
+    fn namespace_hash() -> felt252 {
+        ModelAttributes::<E>::namespace_hash()
     }
     fn instance_selector(self: @E) -> felt252 {
         ModelAttributes::<E>::selector()
@@ -84,7 +110,14 @@ pub impl EntityStoreImpl<
             ModelIndex::Id(entity_id),
             ModelAttributes::<E>::layout()
         );
-        Entity::<E>::from_values(entity_id, ref values)
+        match Entity::<E>::from_values(entity_id, ref values) {
+            Option::Some(model) => model,
+            Option::None => {
+                panic!(
+                    "Entity: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
+                )
+            }
+        }
     }
 
     fn update(self: IWorldDispatcher, entity: E) {
@@ -117,5 +150,42 @@ pub impl EntityStoreImpl<
         self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T
     ) {
         MemberStore::<E, T>::update_member(self, member_id, entity_id, value);
+    }
+}
+
+#[cfg(target: "test")]
+pub trait ModelEntityTest<E> {
+    fn update_test(self: @E, world: IWorldDispatcher);
+    fn delete_test(self: @E, world: IWorldDispatcher);
+}
+
+
+#[cfg(target: "test")]
+pub impl ModelEntityTestImpl<E, +Entity<E>> of ModelEntityTest<E> {
+    fn update_test(self: @E, world: IWorldDispatcher) {
+        let world_test = dojo::world::IWorldTestDispatcher {
+            contract_address: world.contract_address
+        };
+
+        dojo::world::IWorldTestDispatcherTrait::set_entity_test(
+            world_test,
+            Entity::<E>::selector(),
+            ModelIndex::Id(Entity::<E>::id(self)),
+            Entity::<E>::values(self),
+            Entity::<E>::layout()
+        );
+    }
+
+    fn delete_test(self: @E, world: IWorldDispatcher) {
+        let world_test = dojo::world::IWorldTestDispatcher {
+            contract_address: world.contract_address
+        };
+
+        dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
+            world_test,
+            Entity::<E>::selector(),
+            ModelIndex::Id(Entity::<E>::id(self)),
+            Entity::<E>::layout()
+        );
     }
 }

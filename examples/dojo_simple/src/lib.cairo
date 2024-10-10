@@ -64,9 +64,9 @@ pub mod actions {
             let caller = starknet::get_caller_address();
 
             let position = Position { player: caller, x: 1, y: 2 };
-            let position: Position = world.get(caller);
-            world.set(position);
 
+            world.set(position);
+            let _position: Position = world.get(caller);
             emit!(world, PositionUpdated { player: caller, new_x: 1, new_y: 2 });
         }
     }

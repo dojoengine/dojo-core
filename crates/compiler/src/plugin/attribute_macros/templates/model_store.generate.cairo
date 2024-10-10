@@ -102,7 +102,7 @@ pub impl $model_type$EntitySerdeImpl of dojo::model::entity::EntitySerde<$model_
 pub impl $model_type$ModelImpl = dojo::model::model::ModelImpl<$model_type$>;
 pub impl $model_type$Store = dojo::model::model::ModelStoreImpl<$model_type$>;
 
-pub impl $model_type$EntityImpl = dojo::model::entity::Entity<$model_type$Entity>;
+pub impl $model_type$EntityImpl = dojo::model::entity::EntityImpl<$model_type$Entity>;
 pub impl $model_type$EntityStore = dojo::model::entity::EntityStoreImpl<$model_type$Entity>;
 
 
@@ -179,65 +179,7 @@ pub mod $model_name_snake$ {
 
 
 #[cfg(target: "test")]
-pub impl $model_type$ModelTestImpl of dojo::model::ModelTest<$model_type$> {
-   fn set_test(
-        self: @$model_type$,
-        world: dojo::world::IWorldDispatcher
-    ) {
-        let world_test = dojo::world::IWorldTestDispatcher { contract_address: 
-             world.contract_address };
-
-        dojo::world::IWorldTestDispatcherTrait::set_entity_test(
-            world_test,
-            $model_type$Attributes::selector(),
-            dojo::model::ModelIndex::Keys($model_type$ModelStore::keys(self)),
-            $model_type$ModelStore::values(self),
-            dojo::model::introspect::<$model_type$>::layout()
-
-        );
-    }
-
-    fn delete_test(
-        self: @$model_type$,
-        world: dojo::world::IWorldDispatcher
-    ) {
-        let world_test = dojo::world::IWorldTestDispatcher { contract_address: 
-             world.contract_address };
-
-        dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
-            world_test,
-            $model_type$Attributes::selector(),
-            dojo::model::ModelIndex::Keys(dojo::model::Model::keys(self)),
-            dojo::model::introspect::<$model_type$>::layout()
-
-        );
-    }
-}
+pub impl $model_type$ModelTestImpl = dojo::model::model::ModelTestImpl<$model_type$>;
 
 #[cfg(target: "test")]
-pub impl $model_type$ModelEntityTestImpl of dojo::model::ModelEntityTest<$model_type$Entity> {
-    fn update_test(self: @$model_type$Entity, world: dojo::world::IWorldDispatcher) {
-        let world_test = dojo::world::IWorldTestDispatcher { contract_address: 
-             world.contract_address };
-
-        dojo::world::IWorldTestDispatcherTrait::set_entity_test(
-            world_test,
-            $model_type$Attributes::selector(),
-            dojo::model::ModelIndex::Id($model_type$EntityStore::id(self)),
-            $model_type$ModelEntityImpl::values(self),
-            dojo::model::introspect::<$model_type$>::layout()
-        );
-    }
-
-    fn delete_test(self: @$model_type$Entity, world: dojo::world::IWorldDispatcher) {
-        let world_test = dojo::world::IWorldTestDispatcher { contract_address: 
-             world.contract_address };
-
-        dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
-            world_test,
-            $model_type$Attributes::selector(),
-            dojo::model::ModelIndex::Id($model_type$EntityStore::id(self)),
-            dojo::model::introspect::<$model_type$>::layout()
-        );
-    }
-}
+pub impl $model_type$ModelEntityTestImpl = dojo::model::entity::ModelEntityTestImpl<$model_type$Entity>;

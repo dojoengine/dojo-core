@@ -167,8 +167,7 @@ pub mod world {
     use dojo::meta::Layout;
     use dojo::event::{IEventDispatcher, IEventDispatcherTrait};
     use dojo::model::{
-        ModelAttributes, IModelDispatcher, IModelDispatcherTrait, ResourceMetadata,
-        metadata, model::ModelImpl
+        Model, IModelDispatcher, IModelDispatcherTrait, ResourceMetadata, metadata, model::ModelImpl
     };
     use dojo::storage;
     use dojo::utils::{
@@ -387,9 +386,9 @@ pub mod world {
         self
             .resources
             .write(
-                ModelAttributes::<ResourceMetadata>::selector(),
+                Model::<ResourceMetadata>::selector(),
                 Resource::Model(
-                    (metadata::initial_address(), ModelAttributes::<ResourceMetadata>::namespace_hash())
+                    (metadata::initial_address(), Model::<ResourceMetadata>::namespace_hash())
                 )
             );
         self.owners.write((WORLD, creator), true);
@@ -450,12 +449,15 @@ pub mod world {
         fn metadata(self: @ContractState, resource_selector: felt252) -> ResourceMetadata {
             let mut values = self
                 .read_model_entity(
-                    ModelAttributes::<ResourceMetadata>::selector(),
+                    Model::<ResourceMetadata>::selector(),
                     entity_id_from_keys([resource_selector].span()),
-                    ModelAttributes::<ResourceMetadata>::layout()
+                    Model::<ResourceMetadata>::layout()
                 );
-            let mut keys = array![resource_selector].span();
-            ModelImpl::<ResourceMetadata>::from_values(ref keys, ref values)
+            let mut keys = [resource_selector].span();
+            match ModelImpl::<ResourceMetadata>::from_values(ref keys, ref values) {
+                Option::Some(x) => x,
+                Option::None => panic!("Model `ResourceMetadata`: deserialization failed.")
+            }
         }
 
         /// Sets the metadata of the resource.

@@ -14,7 +14,7 @@ use starknet::syscalls::{storage_read_syscall, storage_write_syscall};
 
 use dojo::meta::Layout;
 use dojo::meta::introspect::Introspect;
-use dojo::model::{Model, ModelIndex};
+use dojo::model::{Model, ModelIndex, ModelStore};
 use dojo::storage::{database, storage};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
@@ -493,15 +493,15 @@ fn test_benchmark_set_entity() {
     gas.end("World::SetEntity::ComplexModel");
 
     let gas = GasCounterTrait::start();
-    simple_entity_packed.set(world);
+    world.set(simple_entity_packed);
     gas.end("Model::Set::SimplePacked");
 
     let gas = GasCounterTrait::start();
-    simple_entity_not_packed.set(world);
+    world.set(simple_entity_not_packed);
     gas.end("Model::Set::SimpleNotPacked");
 
     let gas = GasCounterTrait::start();
-    complex_entity.set(world);
+    world.set(complex_entity);
     gas.end("Model::Set::ComplexModel");
 
     let gas = GasCounterTrait::start();

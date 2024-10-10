@@ -20,7 +20,16 @@ pub trait Model<M> {
     fn entity_id<K, +KeyTrait<K>, +KeyParserTrait<M, K>, +Drop<K>>(self: @M) -> felt252;
     fn keys(self: @M) -> Span<felt252>;
     fn values(self: @M) -> Span<felt252>;
-    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> M;
+    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>;
+
+    fn name() -> ByteArray;
+    fn namespace() -> ByteArray;
+    fn tag() -> ByteArray;
+    fn version() -> u8;
+    fn selector() -> felt252;
+    fn layout() -> Layout;
+    fn name_hash() -> felt252;
+    fn namespace_hash() -> felt252;
     fn instance_selector(self: @M) -> felt252;
     fn instance_layout(self: @M) -> Layout;
 }
@@ -55,19 +64,37 @@ pub impl ModelImpl<M, +ModelSerde<M>, +Serde<M>, +ModelAttributes<M>> of Model<M
     fn values(self: @M) -> Span<felt252> {
         ModelSerde::<M>::_values(self)
     }
-    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> M {
+    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M> {
         let mut serialized: Array<felt252> = keys.into();
         serialized.append_span(values);
         let mut span = serialized.span();
 
-        match Serde::<M>::deserialize(ref span) {
-            Option::Some(model) => model,
-            Option::None => {
-                panic!(
-                    "Model: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
-                )
-            }
-        }
+        Serde::<M>::deserialize(ref span)
+    }
+
+    fn name() -> ByteArray {
+        ModelAttributes::<M>::name()
+    }
+    fn namespace() -> ByteArray {
+        ModelAttributes::<M>::namespace()
+    }
+    fn tag() -> ByteArray {
+        ModelAttributes::<M>::tag()
+    }
+    fn version() -> u8 {
+        ModelAttributes::<M>::version()
+    }
+    fn selector() -> felt252 {
+        ModelAttributes::<M>::selector()
+    }
+    fn layout() -> Layout {
+        ModelAttributes::<M>::layout()
+    }
+    fn name_hash() -> felt252 {
+        ModelAttributes::<M>::name_hash()
+    }
+    fn namespace_hash() -> felt252 {
+        ModelAttributes::<M>::namespace_hash()
     }
     fn instance_selector(self: @M) -> felt252 {
         ModelAttributes::<M>::selector()
@@ -88,7 +115,14 @@ pub impl ModelStoreImpl<
             ModelIndex::Keys(keys),
             ModelAttributes::<M>::layout()
         );
-        Model::<M>::from_values(ref keys, ref values)
+        match Model::<M>::from_values(ref keys, ref values) {
+            Option::Some(model) => model,
+            Option::None => {
+                panic!(
+                    "Model: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
+                )
+            }
+        }
     }
 
     fn set(self: IWorldDispatcher, model: M) {
@@ -134,8 +168,32 @@ pub trait ModelTest<T> {
     fn delete_test(self: @T, world: IWorldDispatcher);
 }
 
+
 #[cfg(target: "test")]
-pub trait ModelEntityTest<T> {
-    fn update_test(self: @T, world: IWorldDispatcher);
-    fn delete_test(self: @T, world: IWorldDispatcher);
+pub impl ModelTestImpl<M, +Model<M>> of ModelTest<M> {
+    fn set_test(self: @M, world: dojo::world::IWorldDispatcher) {
+        let world_test = dojo::world::IWorldTestDispatcher {
+            contract_address: world.contract_address
+        };
+        dojo::world::IWorldTestDispatcherTrait::set_entity_test(
+            world_test,
+            Model::<M>::selector(),
+            ModelIndex::Keys(Model::<M>::keys(self)),
+            Model::<M>::values(self),
+            Model::<M>::layout()
+        );
+    }
+
+    fn delete_test(self: @M, world: dojo::world::IWorldDispatcher) {
+        let world_test = dojo::world::IWorldTestDispatcher {
+            contract_address: world.contract_address
+        };
+
+        dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
+            world_test,
+            Model::<M>::selector(),
+            ModelIndex::Keys(dojo::model::Model::keys(self)),
+            Model::<M>::layout()
+        );
+    }
 }

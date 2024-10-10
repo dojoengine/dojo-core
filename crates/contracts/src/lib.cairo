@@ -43,7 +43,10 @@ pub mod model {
     pub(crate) use metadata::{initial_address, initial_class_hash};
 
     #[cfg(target: "test")]
-    pub use model::{ModelTest, ModelEntityTest};
+    pub use model::{ModelTest};
+
+    #[cfg(target: "test")]
+    pub use entity::{ModelEntityTest};
 }
 
 pub(crate) mod storage {
