@@ -5,7 +5,6 @@ use core::traits::{Into, TryInto};
 
 use starknet::{ClassHash, ContractAddress, syscalls::deploy_syscall, get_caller_address};
 
-use dojo::contract::base;
 use dojo::model::resource_metadata;
 use dojo::storage::packing::{shl, shr};
 use dojo::world::{world, IWorldDispatcher, IWorldDispatcherTrait};
@@ -56,7 +55,7 @@ pub fn spawn_test_world(namespaces: Span<ByteArray>, models: Span<felt252>) -> I
     let (world_address, _) = deploy_syscall(
         world::TEST_CLASS_HASH.try_into().unwrap(),
         salt.into(),
-        [base::TEST_CLASS_HASH].span(),
+        [world::TEST_CLASS_HASH].span(),
         false
     )
         .unwrap();

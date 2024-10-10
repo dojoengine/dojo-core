@@ -1,9 +1,11 @@
 pub mod contract {
-    mod base_contract;
-    pub use base_contract::base;
     pub mod contract;
     pub use contract::{IContract, IContractDispatcher, IContractDispatcherTrait};
-    pub mod upgradeable;
+
+    pub mod components {
+        pub mod upgradeable;
+        pub mod world_provider;
+    }
 }
 
 pub mod event {
@@ -54,6 +56,7 @@ pub(crate) mod storage {
     pub(crate) mod packing;
     pub(crate) mod layout;
     pub(crate) mod storage;
+    pub(crate) mod entity_model;
 }
 
 pub mod utils {
@@ -82,21 +85,22 @@ pub mod utils {
 }
 
 pub mod world {
-    pub(crate) mod update;
-    pub(crate) mod config;
     pub(crate) mod errors;
 
-    mod world_contract;
-    pub use world_contract::{
-        world, IWorld, IWorldDispatcher, IWorldDispatcherTrait, IWorldProvider,
-        IWorldProviderDispatcher, IWorldProviderDispatcherTrait, Resource,
-    };
-    pub(crate) use world_contract::{
-        IUpgradeableWorld, IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait
+    mod resource;
+    pub use resource::{Resource, ResourceIsNoneTrait};
+
+    mod iworld;
+    pub use iworld::{
+        IWorld, IWorldDispatcher, IWorldDispatcherTrait, IUpgradeableWorld,
+        IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait
     };
 
     #[cfg(target: "test")]
-    pub use world_contract::{IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait};
+    pub use iworld::{IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait};
+
+    mod world_contract;
+    pub use world_contract::world;
 }
 
 #[cfg(test)]
@@ -113,7 +117,7 @@ mod tests {
         mod packing;
         mod storage;
     }
-    mod base;
+    mod contract;
     mod benchmarks;
     mod expanded {
         pub(crate) mod selector_attack;

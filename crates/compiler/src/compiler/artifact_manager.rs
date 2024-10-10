@@ -123,11 +123,6 @@ impl<'w> ArtifactManager<'w> {
             &target_dir,
             &self.dojo_annotation.world.filename(),
         )?;
-        self.write_sierra_class(
-            &self.dojo_annotation.base.qualified_path,
-            &target_dir,
-            &self.dojo_annotation.base.filename(),
-        )?;
 
         for contract in &self.dojo_annotation.contracts {
             let filename = contract.filename();
@@ -166,15 +161,6 @@ impl<'w> ArtifactManager<'w> {
                 &self.dojo_annotation.world.qualified_path,
                 &workspace.target_dir_profile(),
                 &self.dojo_annotation.world.filename(),
-            )?,
-        );
-
-        self.add_artifact(
-            self.dojo_annotation.base.qualified_path.to_string(),
-            self.read_compiled_artifact(
-                &self.dojo_annotation.base.qualified_path,
-                &workspace.target_dir_profile(),
-                &self.dojo_annotation.base.filename(),
             )?,
         );
 

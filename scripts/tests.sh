@@ -16,6 +16,7 @@ fi
 # generated on the fly.
 if [ "$1" == "--fix" ]; then
     ./target/release/dojo-abigen
+    ./scripts/rust_fmt.sh
 else
     ./target/release/dojo-abigen --check
 fi
