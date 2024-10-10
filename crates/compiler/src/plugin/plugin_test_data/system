@@ -229,20 +229,9 @@ mod MyNominalContract {
 }
 
 #[dojo::contract]
-mod init_test {
-    fn dojo_init(
-        world: IWorldDispatcher,
-        actions_address: ContractAddress,
-        actions_class: ClassHash,
-        value: u8
-    ) {
-        emit!(
-            world,
-            ContractInitialized {
-                contract_address: actions_address, contract_class: actions_class, value
-            }
-        );
-    }
+mod constructor_test {
+    #[constructor]
+    fn constructor(ref self: ContractState, _value: u8) {}
 }
 
 #[dojo::contract]
@@ -4032,7 +4021,7 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
                 }
 
                 #[starknet::contract]
-                pub mod init_test {
+                pub mod constructor_test {
                     use dojo::world;
                     use dojo::world::IWorldDispatcher;
                     use dojo::world::IWorldDispatcherTrait;
@@ -4052,7 +4041,7 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
                     #[abi(embed_v0)]
                     pub impl ContractImpl of IContract<ContractState> {
                         fn name(self: @ContractState) -> ByteArray {
-                            "init_test"
+                            "constructor_test"
                         }
 
                         fn namespace(self: @ContractState) -> ByteArray {
@@ -4060,11 +4049,11 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
                         }
 
                         fn tag(self: @ContractState) -> ByteArray {
-                            "dojo_test-init_test"
+                            "dojo_test-constructor_test"
                         }
 
                         fn name_hash(self: @ContractState) -> felt252 {
-                            1673722391095039242574232979635399085098867563460816803458086922970092209409
+                            1448040114967332260450680311232069198633143381246182440670306454820750021442
                         }
 
                         fn namespace_hash(self: @ContractState) -> felt252 {
@@ -4072,29 +4061,16 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
                         }
 
                         fn selector(self: @ContractState) -> felt252 {
-                            3030310726300416277764466172753931798577418912153146471062249714457767216078
+                            1847799915277474306008813139960743801242059631426321875100588125825381611082
                         }
                     }
 
-                        fn dojo_init(
-        world: IWorldDispatcher,
-        actions_address: ContractAddress,
-        actions_class: ClassHash,
-        value: u8
-    ) {
-        emit!(
-            world,
-            ContractInitialized {
-                contract_address: actions_address, contract_class: actions_class, value
-            }
-        );
-    }
-
-                    #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
                     
+                #[constructor]
+                fn constructor(ref self: ContractState, _value: u8) {
+                    self.world_provider.initializer();
+                }
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
@@ -4357,13 +4333,16 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
+    let __arg__value = core::option::OptionTraitImpl::expect(
+        core::serde::Serde::<u8>::deserialize(ref data),
+        'Failed to deserialize param #1'
+    );
     assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
     core::option::OptionTraitImpl::expect(
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    constructor(ref contract_state, );
+    constructor(ref contract_state, __arg__value);
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
