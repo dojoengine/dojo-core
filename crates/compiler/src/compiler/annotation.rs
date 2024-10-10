@@ -27,8 +27,8 @@ use serde_with::serde_as;
 use crate::aux_data::{AuxDataToAnnotation, ContractAuxData, EventAuxData, ModelAuxData};
 use crate::scarb_extensions::WorkspaceExt;
 use crate::{
-    BASE_CONTRACT_TAG, BASE_QUALIFIED_PATH, CAIRO_PATH_SEPARATOR, RESOURCE_METADATA_QUALIFIED_PATH,
-    WORLD_CONTRACT_TAG, WORLD_QUALIFIED_PATH,
+    CAIRO_PATH_SEPARATOR, RESOURCE_METADATA_QUALIFIED_PATH, WORLD_CONTRACT_TAG,
+    WORLD_QUALIFIED_PATH,
 };
 
 const DOJO_ANNOTATION_FILE_NAME: &str = "annotations";
@@ -101,25 +101,6 @@ impl Default for WorldAnnotation {
     }
 }
 
-/// Represents the base contract annotation.
-#[serde_as]
-#[derive(Clone, Debug, Serialize, Deserialize)]
-#[cfg_attr(test, derive(PartialEq))]
-#[serde(tag = "kind", rename = "DojoBase")]
-pub struct BaseAnnotation {
-    pub qualified_path: String,
-    pub tag: String,
-}
-
-impl Default for BaseAnnotation {
-    fn default() -> Self {
-        Self {
-            qualified_path: BASE_QUALIFIED_PATH.to_string(),
-            tag: BASE_CONTRACT_TAG.to_string(),
-        }
-    }
-}
-
 /// Represents the annotations of a starknet contract.
 #[serde_as]
 #[derive(Clone, Default, Debug, Serialize, Deserialize)]
@@ -160,17 +141,10 @@ impl AnnotationInfo for WorldAnnotation {
     }
 }
 
-impl AnnotationInfo for BaseAnnotation {
-    fn filename(&self) -> String {
-        BASE_CONTRACT_TAG.to_string()
-    }
-}
-
 /// An abstract representation of the annotations of dojo resources.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct DojoAnnotation {
     pub world: WorldAnnotation,
-    pub base: BaseAnnotation,
     pub contracts: Vec<ContractAnnotation>,
     pub models: Vec<ModelAnnotation>,
     pub events: Vec<EventAnnotation>,
@@ -178,11 +152,10 @@ pub struct DojoAnnotation {
 }
 
 impl DojoAnnotation {
-    /// Creates a new abstract base manifest.
+    /// Creates a new dojo annotation.
     pub fn new() -> Self {
         Self {
             world: WorldAnnotation::default(),
-            base: BaseAnnotation::default(),
             contracts: vec![],
             models: vec![],
             events: vec![],
@@ -204,7 +177,6 @@ impl DojoAnnotation {
                 .iter()
                 .any(|e| e.qualified_path == qualified_path)
             || self.world.qualified_path == qualified_path
-            || self.base.qualified_path == qualified_path
     }
 
     /// Sets the dojo annotations form the aux data extracted from the database.
@@ -251,11 +223,6 @@ impl DojoAnnotation {
                             annotations.world = WorldAnnotation {
                                 qualified_path: WORLD_QUALIFIED_PATH.to_string(),
                                 tag: WORLD_CONTRACT_TAG.to_string(),
-                            };
-                        } else if annotation.qualified_path == BASE_QUALIFIED_PATH {
-                            annotations.base = BaseAnnotation {
-                                qualified_path: BASE_QUALIFIED_PATH.to_string(),
-                                tag: BASE_CONTRACT_TAG.to_string(),
                             };
                         } else if annotation.qualified_path == RESOURCE_METADATA_QUALIFIED_PATH {
                             // Skip this annotation as not used in the migration process.

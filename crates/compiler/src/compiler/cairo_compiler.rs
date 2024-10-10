@@ -26,7 +26,7 @@ use starknet::core::types::Felt;
 use tracing::{trace, trace_span};
 
 use crate::scarb_extensions::{ProfileSpec, WorkspaceExt};
-use crate::{BASE_QUALIFIED_PATH, WORLD_QUALIFIED_PATH};
+use crate::WORLD_QUALIFIED_PATH;
 
 use super::artifact_manager::{ArtifactManager, CompiledArtifact};
 use super::contract_selector::ContractSelector;
@@ -356,10 +356,7 @@ pub fn collect_main_crate_ids(
     if unit.main_package_id.name.to_string() != "dojo" && with_dojo_core {
         let core_crate_ids: Vec<CrateId> = collect_crates_ids_from_selectors(
             db,
-            &[
-                ContractSelector::new(WORLD_QUALIFIED_PATH.to_string()),
-                ContractSelector::new(BASE_QUALIFIED_PATH.to_string()),
-            ],
+            &[ContractSelector::new(WORLD_QUALIFIED_PATH.to_string())],
         );
 
         main_crate_ids.extend(core_crate_ids);

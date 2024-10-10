@@ -250,6 +250,11 @@ impl DojoEvent {
 
         let (code, code_mappings) = builder.build();
 
+        crate::debug_expand(
+            &format!("EVENT PATCH: {event_namespace}-{event_name}"),
+            &code,
+        );
+
         let aux_data = EventAuxData {
             name: event_name.clone(),
             namespace: event_namespace.clone(),

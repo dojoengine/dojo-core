@@ -57,6 +57,11 @@ pub mod actions {
         pub a: u8,
     }
 
+    #[constructor]
+    fn constructor(ref self: ContractState, a: u32) {
+        let _b = a + 1;
+    }
+
     #[abi(embed_v0)]
     impl ActionsImpl of IActions<ContractState> {
         fn spawn(ref world: IWorldDispatcher) {

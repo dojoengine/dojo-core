@@ -1,39 +1,25 @@
-pub const DEFAULT_INIT_PATCH: &str = "
-#[starknet::interface]
-pub trait IDojoInit<ContractState> {
-    fn $init_name$(self: @ContractState);
-}
-
-#[abi(embed_v0)]
-pub impl IDojoInitImpl of IDojoInit<ContractState> {
-    fn $init_name$(self: @ContractState) {
-        if starknet::get_caller_address() != self.world().contract_address {
-            core::panics::panic_with_byte_array(
-                @format!(\"Only the world can init contract `{}`, but caller \
- is `{:?}`\",
-                self.tag(),
-                starknet::get_caller_address(),
-            ));
-        }
-    }
-}
-";
-
 pub const CONTRACT_PATCH: &str = "
                 #[starknet::contract]
                 pub mod $name$ {
                     use dojo::world;
                     use dojo::world::IWorldDispatcher;
                     use dojo::world::IWorldDispatcherTrait;
-                    use dojo::world::IWorldProvider;
+                    use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
+                    use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
                     use starknet::storage::{
                         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, \
-                     StoragePointerWriteAccess
+                        StoragePointerWriteAccess
                     };
 
-                    component!(path: dojo::contract::upgradeable::upgradeable, storage: \
-                     upgradeable, event: UpgradeableEvent);
+                    component!(path: world_provider_cpt, storage: world_provider, event: WorldProviderEvent);
+                    component!(path: upgradeable_cpt, storage: upgradeable, event: UpgradeableEvent);
+
+                    #[abi(embed_v0)]
+                    impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
+                    
+                    #[abi(embed_v0)]
+                    impl UpgradeableImpl = upgradeable_cpt::UpgradeableImpl<ContractState>;
 
                     #[abi(embed_v0)]
                     pub impl ContractImpl of IContract<ContractState> {
@@ -61,17 +47,6 @@ pub const CONTRACT_PATCH: &str = "
                             $contract_selector$
                         }
                     }
-
-                    #[abi(embed_v0)]
-                    impl WorldProviderImpl of IWorldProvider<ContractState> {
-                        fn world(self: @ContractState) -> IWorldDispatcher {
-                            self.world_dispatcher.read()
-                        }
-                    }
-
-                    #[abi(embed_v0)]
-                    impl UpgradableImpl = \
-                     dojo::contract::upgradeable::upgradeable::UpgradableImpl<ContractState>;
 
                     $body$
                 }
@@ -534,7 +509,7 @@ pub impl $type_name$EmitterImpl of $type_name$Emitter {
 pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
 
     fn emit(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
-        dojo::world::IWorldDispatcherTrait::emit(
+        dojo::world::IWorldDispatcherTrait::emit_event(
             world,
             Self::selector(),
             Self::keys(self),
@@ -619,7 +594,7 @@ pub impl $type_name$EventImplTest of dojo::event::EventTest<$type_name$> {
         let world_test = dojo::world::IWorldTestDispatcher { contract_address: \
              world.contract_address };
 
-        dojo::world::IWorldTestDispatcherTrait::emit_test(
+        dojo::world::IWorldTestDispatcherTrait::emit_event_test(
             world_test,
             dojo::event::Event::<$type_name$>::selector(),
             dojo::event::Event::<$type_name$>::keys(self),
