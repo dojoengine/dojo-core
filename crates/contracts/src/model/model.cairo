@@ -5,6 +5,18 @@ use dojo::meta::introspect::Ty;
 use dojo::world::IWorldDispatcher;
 use dojo::utils::{Descriptor, DescriptorTrait};
 
+#[derive(Drop, Serde, Debug, PartialEq)]
+pub struct ModelDefinition {
+    pub name: ByteArray,
+    pub namespace: ByteArray,
+    pub namespace_selector: felt252,
+    pub version: u8,
+    pub layout: Layout,
+    pub schema: Ty,
+    pub packed_size: Option<u32>,
+    pub unpacked_size: Option<u32>
+}
+
 #[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub enum ModelIndex {
     Keys: Span<felt252>,
@@ -72,6 +84,9 @@ pub trait Model<T> {
     fn layout() -> Layout;
     fn instance_layout(self: @T) -> Layout;
     fn packed_size() -> Option<usize>;
+
+    fn schema() -> Ty;
+    fn definition() -> ModelDefinition;
 }
 
 #[starknet::interface]
@@ -88,6 +103,7 @@ pub trait IModel<T> {
     fn packed_size(self: @T) -> Option<usize>;
     fn layout(self: @T) -> Layout;
     fn schema(self: @T) -> Ty;
+    fn definition(self: @T) -> ModelDefinition;
 }
 
 #[cfg(target: "test")]
