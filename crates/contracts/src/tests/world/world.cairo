@@ -1,8 +1,6 @@
 use starknet::{contract_address_const, ContractAddress, get_caller_address};
 
 use dojo::world::Resource;
-use dojo::world::config::Config::{DifferProgramHashUpdate, FactsRegistryUpdate};
-use dojo::world::config::{IConfigDispatcher, IConfigDispatcherTrait};
 use dojo::world::world::{Event, EventEmitted};
 use dojo::model::{Model, ResourceMetadata};
 use dojo::utils::bytearray_hash;
@@ -12,7 +10,7 @@ use dojo::world::{
 };
 use dojo::tests::helpers::{
     IbarDispatcher, IbarDispatcherTrait, drop_all_events, deploy_world_and_bar, Foo, foo, bar,
-    Character, character, test_contract, test_contract_with_dojo_init_args, SimpleEvent,
+    Character, character, test_contract, test_contract_with_constructor_args, SimpleEvent,
     simple_event, SimpleEventEmitter
 };
 use dojo::utils::test::{spawn_test_world, deploy_with_world_address, GasCounterTrait};
@@ -95,7 +93,7 @@ fn test_contract_getter() {
     let world = deploy_world();
 
     let address = world
-        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(),);
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
 
     if let Resource::Contract((contract_address, namespace_hash)) = world
         .resource(selector_from_tag!("dojo-test_contract")) {
@@ -296,140 +294,22 @@ fn test_upgradeable_world_from_non_owner() {
     upgradeable_world_dispatcher.upgrade(worldupgrade::TEST_CLASS_HASH.try_into().unwrap());
 }
 
-
 #[test]
 #[available_gas(6000000)]
-fn test_differ_program_hash_event_emit() {
-    let world = deploy_world();
-    drop_all_events(world.contract_address);
-    let config = IConfigDispatcher { contract_address: world.contract_address };
-
-    config.set_differ_program_hash(program_hash: 98758347158781475198374598718743);
-
-    assert_eq!(
-        starknet::testing::pop_log(world.contract_address),
-        Option::Some(DifferProgramHashUpdate { program_hash: 98758347158781475198374598718743 })
-    );
-}
-
-#[test]
-#[available_gas(6000000)]
-fn test_facts_registry_event_emit() {
-    let world = deploy_world();
-    drop_all_events(world.contract_address);
-    let config = IConfigDispatcher { contract_address: world.contract_address };
-
-    config.set_facts_registry(contract_address_const::<0x12>());
-
-    assert_eq!(
-        starknet::testing::pop_log(world.contract_address),
-        Option::Some(FactsRegistryUpdate { address: contract_address_const::<0x12>() })
-    );
-}
-
-use test_contract::IDojoInitDispatcherTrait;
-
-#[test]
-#[available_gas(6000000)]
-#[should_panic(
-    expected: (
-        "Only the world can init contract `dojo-test_contract`, but caller is `0`",
-        'ENTRYPOINT_FAILED'
-    )
-)]
-fn test_can_call_init_only_world() {
-    let world = deploy_world();
-    let address = world
-        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
-
-    let d = test_contract::IDojoInitDispatcher { contract_address: address };
-    d.dojo_init();
-}
-
-#[test]
-#[available_gas(6000000)]
-#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
-fn test_can_call_init_only_owner() {
+fn test_constructor_default() {
     let world = deploy_world();
     let _address = world
-        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
-
-    let bob = starknet::contract_address_const::<0x1337>();
-    starknet::testing::set_contract_address(bob);
-
-    world.init_contract(selector_from_tag!("dojo-test_contract"), [].span());
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
 }
 
 #[test]
 #[available_gas(6000000)]
-fn test_can_call_init_default() {
+fn test_constructor_with_args() {
     let world = deploy_world();
     let _address = world
-        .deploy_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
-
-    world.init_contract(selector_from_tag!("dojo-test_contract"), [].span());
-}
-
-#[test]
-#[available_gas(6000000)]
-fn test_can_call_init_args() {
-    let world = deploy_world();
-    let _address = world
-        .deploy_contract(
-            'salt1', test_contract_with_dojo_init_args::TEST_CLASS_HASH.try_into().unwrap()
+        .register_contract(
+            'salt1',
+            test_contract_with_constructor_args::TEST_CLASS_HASH.try_into().unwrap(),
+            [1, 2].span()
         );
-
-    world.init_contract(selector_from_tag!("dojo-test_contract_with_dojo_init_args"), [1].span());
-}
-
-use test_contract_with_dojo_init_args::IDojoInitDispatcherTrait as IDojoInitArgs;
-
-#[test]
-#[available_gas(6000000)]
-#[should_panic(
-    expected: (
-        "Only the world can init contract `dojo-test_contract_with_dojo_init_args`, but caller is `0`",
-        'ENTRYPOINT_FAILED'
-    )
-)]
-fn test_can_call_init_only_world_args() {
-    let world = deploy_world();
-    let address = world
-        .deploy_contract(
-            'salt1', test_contract_with_dojo_init_args::TEST_CLASS_HASH.try_into().unwrap()
-        );
-
-    let d = test_contract_with_dojo_init_args::IDojoInitDispatcher { contract_address: address };
-    d.dojo_init(123);
-}
-
-use dojo::world::update::IUpgradeableStateDispatcherTrait;
-
-#[test]
-#[available_gas(6000000)]
-#[should_panic(
-    expected: ("Caller `4919` can't upgrade state (not world owner)", 'ENTRYPOINT_FAILED')
-)]
-fn test_upgrade_state_not_owner() {
-    let world = deploy_world();
-
-    let not_owner = starknet::contract_address_const::<0x1337>();
-    starknet::testing::set_contract_address(not_owner);
-    starknet::testing::set_account_contract_address(not_owner);
-
-    let output = dojo::world::update::ProgramOutput {
-        prev_state_root: 0,
-        new_state_root: 0,
-        block_number: 0,
-        block_hash: 0,
-        config_hash: 0,
-        world_da_hash: 0,
-        message_to_starknet_segment: [].span(),
-        message_to_appchain_segment: [].span(),
-    };
-
-    let d = dojo::world::update::IUpgradeableStateDispatcher {
-        contract_address: world.contract_address
-    };
-    d.upgrade_state([].span(), output, 0);
 }

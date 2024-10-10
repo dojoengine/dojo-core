@@ -6,14 +6,15 @@ pub trait IUpgradeable<T> {
 }
 
 #[starknet::component]
-pub mod upgradeable {
+pub mod upgradeable_cpt {
     use core::num::traits::Zero;
     use core::starknet::SyscallResultTrait;
 
     use starknet::{ClassHash, ContractAddress, get_caller_address};
     use starknet::syscalls::replace_class_syscall;
 
-    use dojo::world::{IWorldProvider, IWorldProviderDispatcher, IWorldDispatcher};
+    use dojo::world::IWorldDispatcher;
+    use dojo::contract::components::world_provider::{IWorldProvider, IWorldProviderDispatcher};
 
     #[storage]
     pub struct Storage {}
@@ -36,8 +37,8 @@ pub mod upgradeable {
         pub const INVALID_WORLD_ADDRESS: felt252 = 'invalid world address';
     }
 
-    #[embeddable_as(UpgradableImpl)]
-    impl Upgradable<
+    #[embeddable_as(UpgradeableImpl)]
+    impl Upgradeable<
         TContractState, +HasComponent<TContractState>, +IWorldProvider<TContractState>
     > of super::IUpgradeable<ComponentState<TContractState>> {
         fn upgrade(ref self: ComponentState<TContractState>, new_class_hash: ClassHash) {
