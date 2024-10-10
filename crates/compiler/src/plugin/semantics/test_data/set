@@ -82,59 +82,49 @@ set!(world, (Health{id: 0xb0b, health: 79}))
 Block(
     ExprBlock {
         statements: [
-            Let(
-                StatementLet {
-                    pattern: Variable(
-                        __set_model_instance__,
-                    ),
-                    expr: StructCtor(
-                        ExprStructCtor {
-                            concrete_struct_id: test::Health,
-                            members: [
-                                (
-                                    MemberId(test::id),
-                                    Literal(
-                                        ExprLiteral {
-                                            value: 2827,
-                                            ty: core::integer::u32,
-                                        },
-                                    ),
-                                ),
-                                (
-                                    MemberId(test::health),
-                                    Literal(
-                                        ExprLiteral {
-                                            value: 79,
-                                            ty: core::integer::u16,
-                                        },
-                                    ),
-                                ),
-                            ],
-                            base_struct: None,
-                            ty: test::Health,
-                        },
-                    ),
-                },
-            ),
             Expr(
                 StatementExpr {
                     expr: FunctionCall(
                         ExprFunctionCall {
-                            function: ?6::set_model,
+                            function: ?4::set,
                             args: [
-                                Value(
-                                    Snapshot(
-                                        ExprSnapshot {
-                                            inner: Var(
-                                                LocalVarId(test::__set_model_instance__),
-                                            ),
-                                            ty: @test::Health,
-                                        },
-                                    ),
-                                ),
                                 Value(
                                     Var(
                                         LocalVarId(test::world),
+                                    ),
+                                ),
+                                Value(
+                                    Snapshot(
+                                        ExprSnapshot {
+                                            inner: StructCtor(
+                                                ExprStructCtor {
+                                                    concrete_struct_id: test::Health,
+                                                    members: [
+                                                        (
+                                                            MemberId(test::id),
+                                                            Literal(
+                                                                ExprLiteral {
+                                                                    value: 2827,
+                                                                    ty: core::integer::u32,
+                                                                },
+                                                            ),
+                                                        ),
+                                                        (
+                                                            MemberId(test::health),
+                                                            Literal(
+                                                                ExprLiteral {
+                                                                    value: 79,
+                                                                    ty: core::integer::u16,
+                                                                },
+                                                            ),
+                                                        ),
+                                                    ],
+                                                    base_struct: None,
+                                                    ty: test::Health,
+                                                },
+                                            ),
+                                            ty: @test::Health,
+                                        },
                                     ),
                                 ),
                             ],
@@ -161,7 +151,7 @@ warning[E0001]: Unused variable. Consider ignoring by prefixing with `_`.
 fn test_func() { let key: felt252 = 0xb0b;
                      ^*^
 
-error: Trait has no implementation in context: dojo::model::model::Model::<test::Health>.
+error: Trait has no implementation in context: dojo::model::model::ModelStore::<test::Health>.
  --> lib.cairo:12:1
 set!(world, (Health{id: 0xb0b, health: 79}))
 ^******************************************^

@@ -58,7 +58,9 @@ fn test_get_and_update_entity() {
 
     let entity_id = foo.entity_id();
     let mut entity: FooEntity = world.get_entity(entity_id);
-    assert!(entity.__id == entity_id && entity.v1 == entity.v1 && entity.v2 == entity.v2);
+    assert_eq!(entity.__id, entity_id);
+    assert_eq!(entity.v1, entity.v1);
+    assert_eq!(entity.v2, entity.v2);
 
     entity.v1 = 12;
     entity.v2 = 18;
