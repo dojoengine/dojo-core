@@ -253,11 +253,6 @@ impl DojoModel {
         builder.add_modified(node);
 
         let (code, code_mappings) = builder.build();
-        // fs::write(
-        //     format!("./{}_model.cairo", model_name_snake.clone()),
-        //     code.clone(),
-        // )
-        // .expect("could not write code");
 
         let aux_data = ModelAuxData {
             name: model_type.clone(),
