@@ -85,15 +85,17 @@ pub trait IWorld<T> {
     ///
     /// # Arguments
     ///
+    /// * `selector` - The selector of the model to be upgraded.
     /// * `class_hash` - The class hash of the event to be upgraded.
-    fn upgrade_event(ref self: T, class_hash: ClassHash);
+    fn upgrade_event(ref self: T, selector: felt252, class_hash: ClassHash);
 
     /// Upgrades a model in the world.
     ///
     /// # Arguments
     ///
+    /// * `selector` - The selector of the model to be upgraded.
     /// * `class_hash` - The class hash of the model to be upgraded.
-    fn upgrade_model(ref self: T, class_hash: ClassHash);
+    fn upgrade_model(ref self: T, selector: felt252, class_hash: ClassHash);
 
     /// Upgrades an already deployed contract associated with the world and returns the new class
     /// hash.

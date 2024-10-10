@@ -236,7 +236,6 @@ fn test_set_entity_admin() {
 
     let foo: Foo = get!(world, alice, Foo);
 
-    println!("foo: {:?}", foo);
     assert(foo.a == 420, 'data not stored');
     assert(foo.b == 1337, 'data not stored');
 }

@@ -25,7 +25,7 @@ use crate::plugin::derive_macros::{
     extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
 };
 
-use super::element::{
+use super::common::{
     compute_namespace, parse_members, serialize_keys_and_values, CommonStructParameters,
     StructParameterParser,
 };

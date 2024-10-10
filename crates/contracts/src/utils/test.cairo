@@ -45,11 +45,14 @@ pub fn deploy_with_world_address(class_hash: felt252, world: IWorldDispatcher) -
 ///
 /// * `namespaces` - Namespaces to register.
 /// * `models` - Models to register.
+/// * `events` - Events to register.
 ///
 /// # Returns
 ///
 /// * World dispatcher
-pub fn spawn_test_world(namespaces: Span<ByteArray>, models: Span<felt252>) -> IWorldDispatcher {
+pub fn spawn_test_world(
+    namespaces: Span<ByteArray>, models: Span<felt252>, events: Span<felt252>
+) -> IWorldDispatcher {
     let salt = core::testing::get_available_gas();
 
     let (world_address, _) = deploy_syscall(
@@ -75,6 +78,16 @@ pub fn spawn_test_world(namespaces: Span<ByteArray>, models: Span<felt252>) -> I
             break ();
         }
         world.register_model((*models[index]).try_into().unwrap());
+        index += 1;
+    };
+
+    // Register all events.
+    let mut index = 0;
+    loop {
+        if index == events.len() {
+            break ();
+        }
+        world.register_event((*events[index]).try_into().unwrap());
         index += 1;
     };
 

@@ -2,8 +2,8 @@
 //!
 //! An attribute macros is a macro that is used to generate code generally for a struct, enum, module or trait.
 
+pub mod common;
 pub mod contract;
-pub mod element;
 pub mod event;
 pub mod interface;
 pub mod model;

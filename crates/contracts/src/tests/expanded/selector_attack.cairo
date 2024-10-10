@@ -101,8 +101,8 @@ pub mod attacker_model {
             dojo::meta::Layout::Fixed([].span())
         }
 
-        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::introspect::Ty::Primitive('felt252')
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Struct {
+            dojo::meta::introspect::Struct { name: 'm1', attrs: [].span(), children: [].span() }
         }
     }
 }

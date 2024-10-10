@@ -391,6 +391,16 @@ pub impl $type_name$ModelImpl of dojo::model::Model<$type_name$> {
     }
 
     #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Struct {
+        if let dojo::meta::introspect::Ty::Struct(s) = dojo::meta::introspect::Introspect::<$type_name$>::ty() {
+            s
+        }
+        else {
+            panic!(\"Model `$type_name$`: invalid schema.\")
+        }
+    }
+
+    #[inline(always)]
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
@@ -440,8 +450,38 @@ pub mod $contract_name$ {
     use super::$type_name$;
     use super::I$contract_name$;
 
+    use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
+    use dojo::contract::components::upgradeable::upgradeable_cpt;
+
+    component!(path: world_provider_cpt, storage: world_provider, event: WorldProviderEvent);
+    component!(path: upgradeable_cpt, storage: upgradeable, event: UpgradeableEvent);
+
+    #[abi(embed_v0)]
+    impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
+    
+    #[abi(embed_v0)]
+    impl UpgradeableImpl = upgradeable_cpt::UpgradeableImpl<ContractState>;
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        UpgradeableEvent: upgradeable_cpt::Event,
+        WorldProviderEvent: world_provider_cpt::Event,
+    }
+
     #[storage]
-    struct Storage {}
+    struct Storage {
+        #[substorage(v0)]
+        upgradeable: upgradeable_cpt::Storage,
+
+        #[substorage(v0)]
+        world_provider: world_provider_cpt::Storage,
+    }
+
+    #[constructor]
+    fn constructor(ref self: ContractState) {
+        self.world_provider.initializer();
+    }
 
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
@@ -485,8 +525,8 @@ pub mod $contract_name$ {
             dojo::model::Model::<$type_name$>::layout()
         }
 
-        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::introspect::Introspect::<$type_name$>::ty()
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Struct {
+            dojo::model::Model::<$type_name$>::schema()
         }
     }
 
@@ -544,11 +584,6 @@ pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
     }
 
     #[inline(always)]
-    fn instance_selector(self: @$type_name$) -> felt252 {
-        Self::selector()
-    }
-
-    #[inline(always)]
     fn name_hash() -> felt252 {
         $event_name_hash$
     }
@@ -564,8 +599,13 @@ pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
     }
 
     #[inline(always)]
-    fn schema(self: @$type_name$) -> dojo::meta::introspect::Ty {
-        dojo::meta::introspect::Introspect::<$type_name$>::ty()
+    fn schema() -> dojo::meta::introspect::Struct {
+        if let dojo::meta::introspect::Ty::Struct(s) = dojo::meta::introspect::Introspect::<$type_name$>::ty() {
+            s
+        }
+        else {
+            panic!(\"Event `$type_name$`: invalid schema.\")
+        }
     }
 
     #[inline(always)]
@@ -608,8 +648,38 @@ pub impl $type_name$EventImplTest of dojo::event::EventTest<$type_name$> {
 pub mod $contract_name$ {
     use super::$type_name$;
 
+    use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
+    use dojo::contract::components::upgradeable::upgradeable_cpt;
+
+    component!(path: world_provider_cpt, storage: world_provider, event: WorldProviderEvent);
+    component!(path: upgradeable_cpt, storage: upgradeable, event: UpgradeableEvent);
+
+    #[abi(embed_v0)]
+    impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
+    
+    #[abi(embed_v0)]
+    impl UpgradeableImpl = upgradeable_cpt::UpgradeableImpl<ContractState>;
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        UpgradeableEvent: upgradeable_cpt::Event,
+        WorldProviderEvent: world_provider_cpt::Event,
+    }
+
     #[storage]
-    struct Storage {}
+    struct Storage {
+        #[substorage(v0)]
+        upgradeable: upgradeable_cpt::Storage,
+
+        #[substorage(v0)]
+        world_provider: world_provider_cpt::Storage,
+    }
+
+    #[constructor]
+    fn constructor(ref self: ContractState) {
+        self.world_provider.initializer();
+    }
 
     #[abi(embed_v0)]
     impl DojoEventImpl of dojo::event::IEvent<ContractState>{
@@ -645,8 +715,8 @@ pub mod $contract_name$ {
             dojo::event::Event::<$type_name$>::layout()
         }
 
-        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::introspect::Introspect::<$type_name$>::ty()
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Struct {
+            dojo::event::Event::<$type_name$>::schema()
         }
     }
 }

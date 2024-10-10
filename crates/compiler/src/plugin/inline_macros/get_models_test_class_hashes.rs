@@ -8,7 +8,7 @@ use cairo_lang_diagnostics::Severity;
 use cairo_lang_syntax::node::{ast, TypedStablePtr, TypedSyntaxNode};
 
 use super::unsupported_arg_diagnostic;
-use super::utils::{extract_namespaces, load_manifest_models_and_namespaces};
+use super::utils::{extract_namespaces, load_resources_and_namespaces_from_annotations};
 
 #[derive(Debug, Default)]
 pub struct GetModelsTestClassHashes;
@@ -62,22 +62,24 @@ impl InlineMacroExprPlugin for GetModelsTestClassHashes {
             vec![]
         };
 
-        let (_namespaces, models) =
-            match load_manifest_models_and_namespaces(metadata.cfg_set, &whitelisted_namespaces) {
-                Ok((namespaces, models)) => (namespaces, models),
-                Err(_e) => {
-                    return InlinePluginResult {
-                        code: None,
-                        diagnostics: vec![PluginDiagnostic {
-                            stable_ptr: syntax.stable_ptr().untyped(),
-                            message: "Failed to load models and namespaces, ensure you have run \
+        let (_namespaces, models) = match load_resources_and_namespaces_from_annotations(
+            metadata.cfg_set,
+            &whitelisted_namespaces,
+        ) {
+            Ok((namespaces, models, _)) => (namespaces, models),
+            Err(_e) => {
+                return InlinePluginResult {
+                    code: None,
+                    diagnostics: vec![PluginDiagnostic {
+                        stable_ptr: syntax.stable_ptr().untyped(),
+                        message: "Failed to load models and namespaces, ensure you have run \
                                              `sozo build` first."
-                                .to_string(),
-                            severity: Severity::Error,
-                        }],
-                    };
-                }
-            };
+                            .to_string(),
+                        severity: Severity::Error,
+                    }],
+                };
+            }
+        };
 
         let mut builder = PatchBuilder::new(db, syntax);
 

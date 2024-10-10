@@ -1,7 +1,7 @@
 use starknet::SyscallResult;
 
 use dojo::meta::Layout;
-use dojo::meta::introspect::Ty;
+use dojo::meta::introspect::{Ty, Struct};
 use dojo::world::IWorldDispatcher;
 use dojo::utils::{Descriptor, DescriptorTrait};
 
@@ -71,6 +71,9 @@ pub trait Model<T> {
     fn values(self: @T) -> Span<felt252>;
     fn layout() -> Layout;
     fn instance_layout(self: @T) -> Layout;
+
+    fn schema() -> Struct;
+
     fn packed_size() -> Option<usize>;
 }
 
@@ -87,7 +90,7 @@ pub trait IModel<T> {
     fn unpacked_size(self: @T) -> Option<usize>;
     fn packed_size(self: @T) -> Option<usize>;
     fn layout(self: @T) -> Layout;
-    fn schema(self: @T) -> Ty;
+    fn schema(self: @T) -> Struct;
 }
 
 #[cfg(target: "test")]

@@ -9,7 +9,7 @@ use cairo_lang_syntax::node::{ast, TypedStablePtr, TypedSyntaxNode};
 use tracing::trace;
 
 use super::unsupported_arg_diagnostic;
-use super::utils::{extract_namespaces, load_manifest_models_and_namespaces};
+use super::utils::{extract_namespaces, load_resources_and_namespaces_from_annotations};
 
 #[derive(Debug, Default)]
 pub struct SpawnTestWorld;
@@ -62,29 +62,36 @@ impl InlineMacroExprPlugin for SpawnTestWorld {
             vec![]
         };
 
-        let (namespaces, models) =
-            match load_manifest_models_and_namespaces(metadata.cfg_set, &whitelisted_namespaces) {
-                Ok((namespaces, models)) => (namespaces, models),
-                Err(_e) => {
-                    return InlinePluginResult {
-                        code: None,
-                        diagnostics: vec![PluginDiagnostic {
-                            stable_ptr: syntax.stable_ptr().untyped(),
-                            message: "failed to load models and namespaces, ensure you have run \
+        let (namespaces, models, events) = match load_resources_and_namespaces_from_annotations(
+            metadata.cfg_set,
+            &whitelisted_namespaces,
+        ) {
+            Ok((namespaces, models, events)) => (namespaces, models, events),
+            Err(_e) => {
+                return InlinePluginResult {
+                    code: None,
+                    diagnostics: vec![PluginDiagnostic {
+                        stable_ptr: syntax.stable_ptr().untyped(),
+                        message: "failed to load resources and namespaces, ensure you have run \
                                   `sozo build` first."
-                                .to_string(),
-                            severity: Severity::Error,
-                        }],
-                    };
-                }
-            };
+                            .to_string(),
+                        severity: Severity::Error,
+                    }],
+                };
+            }
+        };
 
-        trace!(?namespaces, ?models, "Spawning test world from macro.");
+        trace!(
+            ?namespaces,
+            ?models,
+            ?events,
+            "Spawning test world from macro."
+        );
 
         let mut builder = PatchBuilder::new(db, syntax);
 
         builder.add_str(&format!(
-            "dojo::utils::test::spawn_test_world([{}].span(), [{}].span())",
+            "dojo::utils::test::spawn_test_world([{}].span(), [{}].span(), [{}].span())",
             namespaces
                 .iter()
                 .map(|n| format!("\"{}\"", n))
@@ -93,6 +100,11 @@ impl InlineMacroExprPlugin for SpawnTestWorld {
             models
                 .iter()
                 .map(|m| format!("{}::TEST_CLASS_HASH", m))
+                .collect::<Vec<String>>()
+                .join(", "),
+            events
+                .iter()
+                .map(|e| format!("{}::TEST_CLASS_HASH", e))
                 .collect::<Vec<String>>()
                 .join(", ")
         ));
