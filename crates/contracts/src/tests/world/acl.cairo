@@ -255,7 +255,7 @@ fn test_not_writer_with_known_contract() {
     starknet::testing::set_contract_address(account);
 
     let contract_address = world
-        .register_contract('salt1', foo_setter::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+        .register_contract('salt1', foo_setter::TEST_CLASS_HASH.try_into().unwrap());
     let d = IFooSetterDispatcher { contract_address };
     d.set_foo(1, 2);
 }
@@ -325,8 +325,5 @@ fn test_attacker_control_hashes_contract_deployment() {
     world.register_namespace("atk");
 
     // Attacker can't take ownership of the Foo model.
-    world
-        .register_contract(
-            'salt1', attacker_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span()
-        );
+    world.register_contract('salt1', attacker_contract::TEST_CLASS_HASH.try_into().unwrap());
 }
