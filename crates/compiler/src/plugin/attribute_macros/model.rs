@@ -148,7 +148,13 @@ impl DojoModel {
                 severity: Severity::Error,
             });
         }
-
+        if !diagnostics.is_empty() {
+            return PluginResult {
+                code: None,
+                diagnostics,
+                remove_original_item: false,
+            };
+        }
         let (keys_to_tuple, key_type) = if keys.len() > 1 {
             (
                 format!("({})", key_attrs.join(", ")),
