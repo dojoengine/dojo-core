@@ -29,7 +29,7 @@ pub mod models {
 
 pub mod events {
     use starknet::ContractAddress;
-    
+
     #[derive(Drop, Serde)]
     #[dojo::event]
     pub struct PositionUpdated {
@@ -57,9 +57,9 @@ pub mod actions {
         pub a: u8,
     }
 
-    #[constructor]
-    fn constructor(ref self: ContractState, a: u32) {
-        let _b = a + 1;
+    fn dojo_init(world: @IWorldDispatcher, id: u32, a: u8) {
+        let m = ModelInContract { id, a };
+        m.set(world);
     }
 
     #[abi(embed_v0)]
@@ -83,8 +83,25 @@ pub mod sn_actions {
 
 #[cfg(test)]
 mod tests {
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
     #[test]
     fn test_spawn_world_full() {
         let _world = spawn_test_world!();
     }
+
+    #[test]
+    fn test_dojo_init_flow() {
+        let world = spawn_test_world!();
+
+        let actions_addr = world
+            .register_contract('salt1', super::actions::TEST_CLASS_HASH.try_into().unwrap());
+
+        world.grant_writer(dojo::utils::bytearray_hash(@"ds"), actions_addr);
+
+        world.init_contract(selector_from_tag!("ds-actions"), [10, 20].span());
+
+        let model = super::actions::ModelInContractStore::get(world, 10);
+        assert_eq!(model.a, 20);
+    }
 }
+

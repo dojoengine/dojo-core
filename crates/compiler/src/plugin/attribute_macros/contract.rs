@@ -7,7 +7,9 @@ use cairo_lang_defs::plugin::{
 };
 use cairo_lang_diagnostics::Severity;
 use cairo_lang_plugins::plugins::HasItemsInCfgEx;
-use cairo_lang_syntax::node::ast::{ArgClause, Expr, MaybeModuleBody, OptionArgListParenthesized};
+use cairo_lang_syntax::node::ast::{
+    ArgClause, Expr, MaybeModuleBody, OptionArgListParenthesized, OptionReturnTypeClause,
+};
 use cairo_lang_syntax::node::db::SyntaxGroup;
 use cairo_lang_syntax::node::helpers::QueryAttrs;
 use cairo_lang_syntax::node::{ast, ids, Terminal, TypedStablePtr, TypedSyntaxNode};
@@ -19,10 +21,11 @@ use crate::namespace_config::NamespaceConfig;
 use crate::plugin::syntax::world_param::{self, WorldParamInjectionKind};
 use crate::plugin::syntax::{self_param, utils as syntax_utils};
 
-use super::patches::CONTRACT_PATCH;
+use super::patches::{CONTRACT_PATCH, DEFAULT_INIT_PATCH};
 use super::DOJO_CONTRACT_ATTR;
 
 const CONSTRUCTOR_FN: &str = "constructor";
+const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";
 
 #[derive(Debug, Clone, Default)]
@@ -53,10 +56,6 @@ impl DojoContract {
             diagnostics,
             systems: vec![],
         };
-
-        let mut has_event = false;
-        let mut has_storage = false;
-        let mut has_constructor = false;
 
         let unmapped_namespace = parameters
             .namespace
@@ -96,6 +95,11 @@ impl DojoContract {
         let contract_selector =
             naming::compute_selector_from_hashes(contract_namespace_hash, contract_name_hash);
 
+        let mut has_event = false;
+        let mut has_storage = false;
+        let mut has_init = false;
+        let mut has_constructor = false;
+
         if let MaybeModuleBody::Some(body) = module_ast.body(db) {
             let mut body_nodes: Vec<_> = body
                 .iter_items_in_cfg(db, metadata.cfg_set)
@@ -125,6 +129,11 @@ impl DojoContract {
                             has_constructor = true;
                             return contract.handle_constructor_fn(db, fn_ast);
                         }
+
+                        if fn_name == DOJO_INIT_FN {
+                            has_init = true;
+                            return contract.handle_init_fn(db, fn_ast);
+                        }
                     }
 
                     vec![RewriteNode::Copied(el.as_syntax_node())]
@@ -135,13 +144,24 @@ impl DojoContract {
                 let node = RewriteNode::Text(
                     "
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     "
                     .to_string(),
                 );
 
+                body_nodes.append(&mut vec![node]);
+            }
+
+            if !has_init {
+                let node = RewriteNode::interpolate_patched(
+                    DEFAULT_INIT_PATCH,
+                    &UnorderedHashMap::from([(
+                        "init_name".to_string(),
+                        RewriteNode::Text(DOJO_INIT_FN.to_string()),
+                    )]),
+                );
                 body_nodes.append(&mut vec![node]);
             }
 
@@ -208,6 +228,8 @@ impl DojoContract {
         PluginResult::default()
     }
 
+    /// If a constructor is provided, we should keep the user statements.
+    /// We only inject the world provider initializer.
     fn handle_constructor_fn(
         &mut self,
         db: &dyn SyntaxGroup,
@@ -249,6 +271,89 @@ impl DojoContract {
 
         // Close the constructor with users statements included.
         nodes.push(RewriteNode::Text("}\n".to_string()));
+
+        nodes
+    }
+
+    fn handle_init_fn(
+        &mut self,
+        db: &dyn SyntaxGroup,
+        fn_ast: &ast::FunctionWithBody,
+    ) -> Vec<RewriteNode> {
+        let fn_decl = fn_ast.declaration(db);
+
+        if let OptionReturnTypeClause::ReturnTypeClause(_) = fn_decl.signature(db).ret_ty(db) {
+            self.diagnostics.push(PluginDiagnostic {
+                stable_ptr: fn_ast.stable_ptr().untyped(),
+                message: format!("The {} function cannot have a return type.", DOJO_INIT_FN)
+                    .to_string(),
+                severity: Severity::Error,
+            });
+        }
+
+        let (params_str, was_world_injected) = self.rewrite_parameters(
+            db,
+            fn_decl.signature(db).parameters(db),
+            fn_ast.stable_ptr().untyped(),
+        );
+
+        // Since the dojo init is meant to be called by the world, we don't need an
+        // interface to be generated (which adds a considerable amount of code).
+        let impl_node = RewriteNode::Text(
+            "
+            #[abi(per_item)]
+            #[generate_trait]
+            pub impl IDojoInitImpl of IDojoInit {
+                #[external(v0)]
+            "
+            .to_string(),
+        );
+
+        let declaration_node = RewriteNode::Mapped {
+            node: Box::new(RewriteNode::Text(format!(
+                "fn {}({}) {{",
+                DOJO_INIT_FN, params_str
+            ))),
+            origin: fn_ast
+                .declaration(db)
+                .as_syntax_node()
+                .span_without_trivia(db),
+        };
+
+        let world_line_node = if was_world_injected {
+            RewriteNode::Text("let world = self.world_provider.world();".to_string())
+        } else {
+            RewriteNode::empty()
+        };
+
+        // Asserts the caller is the world, and close the init function.
+        let assert_world_caller_node = RewriteNode::Text(
+            "if starknet::get_caller_address() != self.world_provider.world().contract_address { \
+             core::panics::panic_with_byte_array(@format!(\"Only the world can init contract \
+             `{}`, but caller is `{:?}`\", self.tag(), starknet::get_caller_address())); }"
+                .to_string(),
+        );
+
+        let func_nodes = fn_ast
+            .body(db)
+            .statements(db)
+            .elements(db)
+            .iter()
+            .map(|e| RewriteNode::Mapped {
+                node: Box::new(RewriteNode::from(e.as_syntax_node())),
+                origin: e.as_syntax_node().span_without_trivia(db),
+            })
+            .collect::<Vec<_>>();
+
+        let mut nodes = vec![
+            impl_node,
+            declaration_node,
+            world_line_node,
+            assert_world_caller_node,
+        ];
+        nodes.extend(func_nodes);
+        // Close the init function + close the impl block.
+        nodes.push(RewriteNode::Text("}\n}".to_string()));
 
         nodes
     }

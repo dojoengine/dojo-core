@@ -122,6 +122,7 @@ mod tests {
         mod entities;
         mod resources;
         mod world;
+        mod init;
     }
     mod utils {
         mod hash;

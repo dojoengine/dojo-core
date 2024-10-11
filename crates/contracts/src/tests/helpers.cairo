@@ -159,9 +159,10 @@ pub mod foo_setter {
 pub mod test_contract {}
 
 #[dojo::contract]
-pub mod test_contract_with_constructor_args {
-    #[constructor]
-    fn constructor(ref self: ContractState, _a: felt252, _b: u128) {}
+pub mod test_contract_with_dojo_init_args {
+    fn dojo_init(world: @IWorldDispatcher, _arg1: felt252) {
+        let _a = world.uuid();
+    }
 }
 
 #[dojo::contract(namespace: "buzz_namespace")]

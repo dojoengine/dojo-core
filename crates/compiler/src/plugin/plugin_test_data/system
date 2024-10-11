@@ -699,16 +699,35 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
     }
 
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: upgradeable_cpt::Event,
                 WorldProviderEvent: world_provider_cpt::Event,
             }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -978,6 +997,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -986,6 +1023,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -1106,16 +1144,35 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
     }
 
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: upgradeable_cpt::Event,
                 WorldProviderEvent: world_provider_cpt::Event,
             }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -1385,6 +1442,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -1393,6 +1468,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -1516,16 +1592,35 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
     }
 
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: upgradeable_cpt::Event,
                 WorldProviderEvent: world_provider_cpt::Event,
             }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -1795,6 +1890,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -1803,6 +1916,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -1933,9 +2047,24 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
     }
 
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
+                    
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -2017,6 +2146,10 @@ impl TestEventIsEvent of starknet::Event<TestEvent> {
                 )?;
         Option::Some(TestEvent {address, })
     }
+}
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
 }
 
 
@@ -2238,6 +2371,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -2246,6 +2397,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -2372,9 +2524,24 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
             }
             
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
+                    
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
 
 
 #[phantom]
@@ -2615,6 +2782,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -2623,6 +2808,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -2810,11 +2996,15 @@ impl Eventtestcomponent2_eventIntoEvent of Into<testcomponent2::Event, Event> {
         Event::testcomponent2_event(self)
     }
 }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl StorageStorageBaseDrop of core::traits::Drop::<StorageStorageBase>;
 impl StorageStorageBaseCopy of core::traits::Copy::<StorageStorageBase>;
 impl StorageStorageBaseMutDrop of core::traits::Drop::<StorageStorageBaseMut>;
 impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
-                    
+
                 }
 
                 #[starknet::interface]
@@ -2897,10 +3087,25 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
  impl InternalImplBad  of InternalUtils<ContractState>  {fn bad_func_using_generate(self: @ContractState) -> felt252  {let world = self.world_provider.world();            'land'
 }}
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
@@ -2908,6 +3113,10 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
                 WorldProviderEvent: world_provider_cpt::Event,
             }
     trait InternalUtils{fn bad_func_using_generate(self: @ContractState) -> felt252;
+}
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
 }
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
@@ -3332,6 +3541,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -3347,6 +3574,7 @@ pub mod __external {
     pub use super::__wrapper__TestFaultyImpl__do_with_several_world_dispatchers as do_with_several_world_dispatchers;
     pub use super::__wrapper__TestFaultyImpl__do_with_world_not_named_world as do_with_world_not_named_world;
     pub use super::__wrapper__TestFaultyImpl__do_with_world_not_first as do_with_world_not_first;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -3486,10 +3714,25 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
     }
 
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
@@ -3500,6 +3743,10 @@ impl ActionDrop of core::traits::Drop::<Action>;
     trait InternalNoContractState {
         fn func1(world: IWorldDispatcher) -> felt252;
     }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -3934,6 +4181,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -3950,6 +4215,7 @@ pub mod __external {
     pub use super::__wrapper__TestNominalImpl__do_params_and_world_ref as do_params_and_world_ref;
     pub use super::__wrapper__TestNominalImpl__do_with_self as do_with_self;
     pub use super::__wrapper__TestNominalImpl__do_with_ref_self as do_with_ref_self;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -4071,12 +4337,31 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
                     self.world_provider.initializer();
                 }
 
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: upgradeable_cpt::Event,
                 WorldProviderEvent: world_provider_cpt::Event,
             }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -4349,6 +4634,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -4357,6 +4660,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }
@@ -4474,16 +4778,35 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                     
                     #[constructor]
-                     fn constructor(ref self: ContractState) {
-                         self.world_provider.initializer();
-                     }
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
                     
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState) {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
+            core::panics::panic_with_byte_array(
+                @format!("Only the world can init contract `{}`, but caller is `{:?}`",
+                self.tag(),
+                starknet::get_caller_address(),
+            ));
+        }
+    }
+}
+
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
                 UpgradeableEvent: upgradeable_cpt::Event,
                 WorldProviderEvent: world_provider_cpt::Event,
             }
+pub trait IDojoInit {
+    #[external(v0)]
+    fn dojo_init(self: @ContractState);
+}
 impl EventDrop of core::traits::Drop::<Event>;
 impl EventIsEvent of starknet::Event<Event> {
     fn append_keys_and_data(
@@ -4753,6 +5076,24 @@ fn __wrapper__constructor(mut data: Span::<felt252>) -> Span::<felt252> {
     core::array::ArrayTrait::span(@arr)
 }
 
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__IDojoInitImpl__dojo_init(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    IDojoInitImpl::dojo_init(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::array::ArrayTrait::span(@arr)
+}
+
 
 pub mod __external {
     pub use super::__wrapper__ContractImpl__name as name;
@@ -4761,6 +5102,7 @@ pub mod __external {
     pub use super::__wrapper__ContractImpl__name_hash as name_hash;
     pub use super::__wrapper__ContractImpl__namespace_hash as namespace_hash;
     pub use super::__wrapper__ContractImpl__selector as selector;
+    pub use super::__wrapper__IDojoInitImpl__dojo_init as dojo_init;
 }
 pub mod __l1_handler {
 }

@@ -10,7 +10,7 @@ use dojo::world::{
 };
 use dojo::tests::helpers::{
     IbarDispatcher, IbarDispatcherTrait, drop_all_events, deploy_world_and_bar, Foo, foo, bar,
-    Character, character, test_contract, test_contract_with_constructor_args, SimpleEvent,
+    Character, character, test_contract, test_contract_with_dojo_init_args, SimpleEvent,
     simple_event, SimpleEventEmitter
 };
 use dojo::utils::test::{spawn_test_world, deploy_with_world_address, GasCounterTrait};
@@ -93,7 +93,7 @@ fn test_contract_getter() {
     let world = deploy_world();
 
     let address = world
-        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
 
     if let Resource::Contract((contract_address, namespace_hash)) = world
         .resource(selector_from_tag!("dojo-test_contract")) {
@@ -299,17 +299,97 @@ fn test_upgradeable_world_from_non_owner() {
 fn test_constructor_default() {
     let world = deploy_world();
     let _address = world
-        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap(), [].span());
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
+}
+
+#[test]
+fn test_can_call_init_only_world() {
+    let world = deploy_world();
+    let address = world
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
+
+    let expected_panic: ByteArray =
+        "Only the world can init contract `dojo-test_contract`, but caller is `0`";
+
+    match starknet::syscalls::call_contract_syscall(
+        address, dojo::world::world::DOJO_INIT_SELECTOR, [].span()
+    ) {
+        Result::Ok(_) => panic!("should panic"),
+        Result::Err(e) => {
+            let mut s = e.span();
+            // Remove the out of range error.
+            s.pop_front().unwrap();
+            // Remove the ENTRYPOINT_FAILED suffix.
+            s.pop_back().unwrap();
+
+            let e_str: ByteArray = Serde::deserialize(ref s).expect('failed deser');
+
+            assert_eq!(e_str, expected_panic);
+        }
+    }
 }
 
 #[test]
 #[available_gas(6000000)]
-fn test_constructor_with_args() {
+#[should_panic(expected: ('CONTRACT_NOT_DEPLOYED', 'ENTRYPOINT_FAILED'))]
+fn test_can_call_init_only_owner() {
+    let world = deploy_world();
+    let _address = world
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
+
+    let bob = starknet::contract_address_const::<0x1337>();
+    starknet::testing::set_contract_address(bob);
+
+    world.init_contract(selector_from_tag!("dojo-test_contract"), [].span());
+}
+
+#[test]
+#[available_gas(6000000)]
+fn test_can_call_init_default() {
+    let world = deploy_world();
+    let _address = world
+        .register_contract('salt1', test_contract::TEST_CLASS_HASH.try_into().unwrap());
+
+    world.init_contract(selector_from_tag!("dojo-test_contract"), [].span());
+}
+
+#[test]
+#[available_gas(6000000)]
+fn test_can_call_init_args() {
     let world = deploy_world();
     let _address = world
         .register_contract(
-            'salt1',
-            test_contract_with_constructor_args::TEST_CLASS_HASH.try_into().unwrap(),
-            [1, 2].span()
+            'salt1', test_contract_with_dojo_init_args::TEST_CLASS_HASH.try_into().unwrap()
         );
+
+    world.init_contract(selector_from_tag!("dojo-test_contract_with_dojo_init_args"), [1].span());
+}
+
+#[test]
+fn test_can_call_init_only_world_args() {
+    let world = deploy_world();
+    let address = world
+        .register_contract(
+            'salt1', test_contract_with_dojo_init_args::TEST_CLASS_HASH.try_into().unwrap()
+        );
+
+    let expected_panic: ByteArray =
+        "Only the world can init contract `dojo-test_contract_with_dojo_init_args`, but caller is `0`";
+
+    match starknet::syscalls::call_contract_syscall(
+        address, dojo::world::world::DOJO_INIT_SELECTOR, [123].span()
+    ) {
+        Result::Ok(_) => panic!("should panic"),
+        Result::Err(e) => {
+            let mut s = e.span();
+            // Remove the out of range error.
+            s.pop_front().unwrap();
+            // Remove the ENTRYPOINT_FAILED suffix.
+            s.pop_back().unwrap();
+
+            let e_str: ByteArray = Serde::deserialize(ref s).expect('failed deser');
+
+            assert_eq!(e_str, expected_panic);
+        }
+    }
 }

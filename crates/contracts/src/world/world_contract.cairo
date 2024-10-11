@@ -65,6 +65,7 @@ pub mod world {
     use super::Permission;
 
     pub const WORLD: felt252 = 0;
+    pub const DOJO_INIT_SELECTOR: felt252 = selector!("dojo_init");
 
     #[event]
     #[derive(Drop, starknet::Event)]
@@ -78,6 +79,7 @@ pub mod world {
         ModelUpgraded: ModelUpgraded,
         EventUpgraded: EventUpgraded,
         ContractUpgraded: ContractUpgraded,
+        ContractInitialized: ContractInitialized,
         EventEmitted: EventEmitted,
         MetadataUpdate: MetadataUpdate,
         StoreSetRecord: StoreSetRecord,
@@ -106,7 +108,6 @@ pub mod world {
         pub address: ContractAddress,
         pub class_hash: ClassHash,
         pub salt: felt252,
-        pub constructor_calldata: Span<felt252>,
     }
 
     #[derive(Drop, starknet::Event)]
@@ -225,6 +226,13 @@ pub mod world {
     }
 
     #[derive(Drop, starknet::Event)]
+    pub struct ContractInitialized {
+        #[key]
+        pub selector: felt252,
+        pub init_calldata: Span<felt252>,
+    }
+
+    #[derive(Drop, starknet::Event)]
     pub struct EventEmitted {
         #[key]
         pub event_selector: felt252,
@@ -244,6 +252,7 @@ pub mod world {
         resources: Map::<felt252, Resource>,
         owners: Map::<(felt252, ContractAddress), bool>,
         writers: Map::<(felt252, ContractAddress), bool>,
+        initialized_contracts: Map::<felt252, bool>,
     }
 
     /// Constructor for the world contract.
@@ -641,16 +650,11 @@ pub mod world {
         }
 
         fn register_contract(
-            ref self: ContractState,
-            salt: felt252,
-            class_hash: ClassHash,
-            constructor_calldata: Span<felt252>
+            ref self: ContractState, salt: felt252, class_hash: ClassHash,
         ) -> ContractAddress {
             let caller = get_caller_address();
 
-            let (contract_address, _) = deploy_syscall(
-                class_hash, salt, constructor_calldata, false
-            )
+            let (contract_address, _) = deploy_syscall(class_hash, salt, [].span(), false)
                 .unwrap_syscall();
 
             let descriptor = DescriptorTrait::from_contract_assert(contract_address);
@@ -686,7 +690,6 @@ pub mod world {
                         class_hash,
                         address: contract_address,
                         selector: descriptor.selector(),
-                        constructor_calldata
                     }
                 );
 
@@ -727,6 +730,35 @@ pub mod world {
                 panic_with_byte_array(
                     @errors::resource_conflict(new_descriptor.name(), @"contract")
                 )
+            }
+        }
+
+        fn init_contract(ref self: ContractState, selector: felt252, init_calldata: Span<felt252>) {
+            if let Resource::Contract((contract_address, _)) = self.resources.read(selector) {
+                if self.initialized_contracts.read(selector) {
+                    let dispatcher = IContractDispatcher { contract_address };
+                    panic_with_byte_array(@errors::contract_already_initialized(@dispatcher.tag()));
+                } else {
+                    self.assert_caller_permissions(selector, Permission::Owner);
+
+                    // For the init, to ensure only the world can call the init function,
+                    // the verification is done in the init function of the contract that is
+                    // injected by the plugin.
+                    // <crates/compiler/src/plugin/attribute_macros/contract.rs#L275>
+
+                    starknet::syscalls::call_contract_syscall(
+                        contract_address, DOJO_INIT_SELECTOR, init_calldata
+                    )
+                        .unwrap_syscall();
+
+                    self.initialized_contracts.write(selector, true);
+
+                    self.emit(ContractInitialized { selector, init_calldata });
+                }
+            } else {
+                panic_with_byte_array(
+                    @errors::resource_conflict(@format!("{selector}"), @"contract")
+                );
             }
         }
 
@@ -905,14 +937,14 @@ pub mod world {
             self.panic_with_details(caller, resource_selector, permission)
         }
 
-        ///
+        /// Asserts the name is valid according to the naming convention.
         fn assert_name(self: @ContractState, name: @ByteArray) {
             if !dojo::utils::is_name_valid(name) {
                 panic_with_byte_array(@errors::invalid_naming("Name", name))
             }
         }
 
-        ///
+        /// Asserts the namespace is valid according to the naming convention.
         fn assert_namespace(self: @ContractState, namespace: @ByteArray) {
             if !dojo::utils::is_name_valid(namespace) {
                 panic_with_byte_array(@errors::invalid_naming("Namespace", namespace))
