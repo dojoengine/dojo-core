@@ -1,7 +1,6 @@
 //! Storage operations for models and entities.
 
 use dojo::meta::Layout;
-use dojo::utils::entity_id_from_keys;
 
 /// Write a new entity.
 ///

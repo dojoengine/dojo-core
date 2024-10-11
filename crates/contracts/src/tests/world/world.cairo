@@ -1,11 +1,9 @@
-use starknet::{contract_address_const, ContractAddress, get_caller_address};
-
 use dojo::world::Resource;
-use dojo::world::world::{Event, EventEmitted};
-use dojo::model::{Model, ResourceMetadata};
+use dojo::world::world::Event;
+use dojo::model::Model;
 use dojo::utils::bytearray_hash;
 use dojo::world::{
-    IWorldDispatcher, IWorldDispatcherTrait, world, IUpgradeableWorld, IUpgradeableWorldDispatcher,
+    IWorldDispatcher, IWorldDispatcherTrait, IUpgradeableWorldDispatcher,
     IUpgradeableWorldDispatcherTrait
 };
 use dojo::tests::helpers::{
@@ -60,7 +58,7 @@ fn test_model() {
 
 #[test]
 fn test_system() {
-    let (world, bar_contract) = deploy_world_and_bar();
+    let (_world, bar_contract) = deploy_world_and_bar();
 
     bar_contract.set_foo(1337, 1337);
 
@@ -71,7 +69,7 @@ fn test_system() {
 
 #[test]
 fn test_delete() {
-    let (world, bar_contract) = deploy_world_and_bar();
+    let (_world, bar_contract) = deploy_world_and_bar();
 
     // set model
     bar_contract.set_foo(1337, 1337);
@@ -177,7 +175,7 @@ fn test_execute_multiple_worlds() {
 #[test]
 #[available_gas(60000000)]
 fn bench_execute() {
-    let (world, bar_contract) = deploy_world_and_bar();
+    let (_world, bar_contract) = deploy_world_and_bar();
 
     let alice = starknet::contract_address_const::<0x1337>();
     starknet::testing::set_contract_address(alice);
@@ -225,8 +223,7 @@ trait IWorldUpgrade<TContractState> {
 
 #[starknet::contract]
 mod worldupgrade {
-    use super::{IWorldUpgrade, IWorldDispatcher, ContractAddress};
-    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+    use super::IWorldDispatcher;
 
     #[storage]
     struct Storage {

@@ -19,20 +19,16 @@ impl PermissionDisplay of Display<Permission> {
 
 #[starknet::contract]
 pub mod world {
-    use core::array::{ArrayTrait, SpanTrait};
+    use core::array::ArrayTrait;
     use core::box::BoxTrait;
-    use core::hash::HashStateTrait;
     use core::num::traits::Zero;
-    use core::pedersen::PedersenTrait;
-    use core::serde::Serde;
     use core::traits::Into;
     use core::panic_with_felt252;
     use core::panics::panic_with_byte_array;
 
     use starknet::{
-        get_caller_address, get_contract_address, get_tx_info, ClassHash, ContractAddress,
-        syscalls::{deploy_syscall, emit_event_syscall, replace_class_syscall}, SyscallResultTrait,
-        storage::Map,
+        get_caller_address, get_tx_info, ClassHash, ContractAddress,
+        syscalls::{deploy_syscall, replace_class_syscall}, SyscallResultTrait, storage::Map,
     };
     pub use starknet::storage::{
         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
@@ -45,20 +41,13 @@ pub mod world {
     };
     use dojo::contract::{IContractDispatcher, IContractDispatcherTrait};
     use dojo::meta::Layout;
-    use dojo::event::{IEventDispatcher, IEventDispatcherTrait};
-    use dojo::model::{
-        Model, IModelDispatcher, IModelDispatcherTrait, ResourceMetadata, ResourceMetadataTrait,
-        metadata, ModelIndex
-    };
+    use dojo::model::{Model, ResourceMetadata, ResourceMetadataTrait, metadata, ModelIndex};
     use dojo::storage;
     use dojo::utils::{
         entity_id_from_keys, bytearray_hash, DescriptorTrait, IDescriptorDispatcher,
         IDescriptorDispatcherTrait
     };
-    use dojo::world::{
-        IWorldDispatcher, IWorldDispatcherTrait, IWorld, IUpgradeableWorld, Resource,
-        ResourceIsNoneTrait
-    };
+    use dojo::world::{IWorld, IUpgradeableWorld, Resource, ResourceIsNoneTrait};
     use super::Permission;
 
     pub const WORLD: felt252 = 0;

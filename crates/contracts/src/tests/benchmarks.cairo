@@ -3,9 +3,7 @@ use core::poseidon::poseidon_hash_span;
 use core::result::ResultTrait;
 use core::serde::Serde;
 
-use starknet::{
-    contract_address_const, ContractAddress, ClassHash, get_caller_address, SyscallResultTrait
-};
+use starknet::{ContractAddress, SyscallResultTrait};
 use starknet::storage_access::{
     storage_base_address_from_felt252, storage_address_from_base,
     storage_address_from_base_and_offset
@@ -13,7 +11,6 @@ use starknet::storage_access::{
 use starknet::syscalls::{storage_read_syscall, storage_write_syscall};
 
 use dojo::meta::Layout;
-use dojo::meta::introspect::Introspect;
 use dojo::model::{Model, ModelIndex};
 use dojo::storage::{database, storage};
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
