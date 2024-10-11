@@ -10,7 +10,8 @@ use dojo::world::world::{
 use dojo::contract::{IContractDispatcher, IContractDispatcherTrait};
 
 use dojo::tests::helpers::{
-    deploy_world, drop_all_events, Foo, foo, Buzz, buzz, test_contract, buzz_contract
+    deploy_world, drop_all_events, Foo, foo, foo_invalid_name, foo_invalid_namespace, Buzz, buzz,
+    test_contract, buzz_contract
 };
 use dojo::utils::test::spawn_test_world;
 
@@ -170,6 +171,27 @@ fn test_register_model_for_namespace_writer() {
     starknet::testing::set_account_contract_address(bob);
     starknet::testing::set_contract_address(bob);
     world.register_model(foo::TEST_CLASS_HASH.try_into().unwrap());
+}
+
+#[test]
+#[should_panic(
+    expected: ("Name `foo-bis` is invalid according to Dojo naming rules", 'ENTRYPOINT_FAILED',)
+)]
+fn test_register_model_with_invalid_name() {
+    let world = deploy_world();
+    world.register_model(foo_invalid_name::TEST_CLASS_HASH.try_into().unwrap());
+}
+
+#[test]
+#[should_panic(
+    expected: (
+        "Namespace `inv@lid n@mesp@ce` is invalid according to Dojo naming rules",
+        'ENTRYPOINT_FAILED',
+    )
+)]
+fn test_register_model_with_invalid_namespace() {
+    let world = deploy_world();
+    world.register_model(foo_invalid_namespace::TEST_CLASS_HASH.try_into().unwrap());
 }
 
 #[test]
