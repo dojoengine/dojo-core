@@ -297,28 +297,14 @@ impl DojoContract {
             fn_ast.stable_ptr().untyped(),
         );
 
-        let trait_node = RewriteNode::interpolate_patched(
-            "#[starknet::interface]
-            pub trait IDojoInit<ContractState> {
-                fn $init_name$($params_str$);
-            }
-            ",
-            &UnorderedHashMap::from([
-                (
-                    "init_name".to_string(),
-                    RewriteNode::Text(DOJO_INIT_FN.to_string()),
-                ),
-                (
-                    "params_str".to_string(),
-                    RewriteNode::Text(params_str.clone()),
-                ),
-            ]),
-        );
-
+        // Since the dojo init is meant to be called by the world, we don't need an
+        // interface to be generated (which adds a considerable amount of code).
         let impl_node = RewriteNode::Text(
             "
-            #[abi(embed_v0)]
-            pub impl IDojoInitImpl of IDojoInit<ContractState> {
+            #[abi(per_item)]
+            #[generate_trait]
+            pub impl IDojoInitImpl of IDojoInit {
+                #[external(v0)]
             "
             .to_string(),
         );
@@ -360,7 +346,6 @@ impl DojoContract {
             .collect::<Vec<_>>();
 
         let mut nodes = vec![
-            trait_node,
             impl_node,
             declaration_node,
             world_line_node,

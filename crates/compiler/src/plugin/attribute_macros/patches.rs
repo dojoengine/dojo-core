@@ -1,11 +1,8 @@
 pub const DEFAULT_INIT_PATCH: &str = "
-#[starknet::interface]
-pub trait IDojoInit<ContractState> {
-    fn $init_name$(self: @ContractState);
-}
-
-#[abi(embed_v0)]
-pub impl IDojoInitImpl of IDojoInit<ContractState> {
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
     fn $init_name$(self: @ContractState) {
         if starknet::get_caller_address() != self.world_provider.world().contract_address {
             core::panics::panic_with_byte_array(
