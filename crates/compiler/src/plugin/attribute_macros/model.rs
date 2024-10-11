@@ -105,9 +105,7 @@ impl DojoModel {
 
         let mut values: Vec<Member> = vec![];
         let mut keys: Vec<Member> = vec![];
-
         let mut members_values: Vec<RewriteNode> = vec![];
-
         let mut key_types: Vec<String> = vec![];
         let mut key_attrs: Vec<String> = vec![];
 
