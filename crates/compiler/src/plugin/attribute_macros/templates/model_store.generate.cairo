@@ -6,14 +6,15 @@ pub struct $model_type$Entity {
 
 type $model_type$KeyType = $key_type$;
 
-pub impl $model_type$ModelKeyImpl of dojo::model::members::key::KeyParserTrait<$model_type$, $model_type$KeyType>{
+pub impl $model_type$KeyParser of dojo::model::model::KeyParser<$model_type$, $model_type$KeyType>{
     #[inline(always)]
-    fn serde_key(self: @$model_type$) -> $model_type$KeyType {
+    fn parse_key(self: @$model_type$) -> $model_type$KeyType {
         $keys_to_tuple$
     }
-} 
+}
 
-pub impl $model_type$KeyImpl = dojo::model::members::key::KeyImpl<$model_type$KeyType>;
+impl $model_type$EntityKey of dojo::model::entity::EntityKey<$model_type$Entity, $model_type$KeyType> {
+}
 
 // Impl to get the static attributes of a model
 pub mod $model_name_snake$_attributes {
@@ -66,35 +67,27 @@ pub mod $model_name_snake$_attributes {
 pub impl $model_type$Attributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$>;
 pub impl $model_type$EntityAttributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$Entity>;
 
-pub impl $model_type$ModelSerdeImpl of dojo::model::model::ModelSerde<$model_type$>{
-    fn serde_keys(self: @$model_type$) -> Span<felt252> {
-        dojo::model::members::MemberTrait::<$model_type$KeyType>::serialize(
-            @$model_type$ModelKeyImpl::serde_key(self)
-        )
+pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$>{
+    fn serialise_keys(self: @$model_type$) -> Span<felt252> {
+        let mut serialized = core::array::ArrayTrait::new();
+        $serialized_keys$
+        core::array::ArrayTrait::span(@serialized)
     }
-    fn serde_values(self: @$model_type$) -> Span<felt252> {
+    fn serialise_values(self: @$model_type$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
     }
-    fn serde_keys_values(self: @$model_type$) -> (Span<felt252>, Span<felt252>) {
-        let mut serialized = core::array::ArrayTrait::new();
-        $serialized_values$
-        (Self::serde_keys(self), core::array::ArrayTrait::span(@serialized))
-    }
-}
+} 
 
-pub impl $model_type$EntitySerdeImpl of dojo::model::entity::EntitySerde<$model_type$Entity>{
-    fn serde_id(self: @$model_type$Entity) -> felt252 {
+pub impl $model_type$EntityParser of dojo::model::entity::EntityParser<$model_type$Entity>{
+    fn parse_id(self: @$model_type$Entity) -> felt252 {
         *self.__id
     }
-    fn serde_values(self: @$model_type$Entity) -> Span<felt252> {
+    fn serialise_values(self: @$model_type$Entity) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
-    }
-    fn serde_id_values(self: @$model_type$Entity) -> (felt252, Span<felt252>) {
-        (*self.__id, Self::serde_values(self))
     }
 }
 

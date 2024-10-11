@@ -58,7 +58,6 @@ pub impl MemberImpl<T, +Serde<T>, +Drop<T>> of MemberTrait<T> {
         Serde::<T>::serialize(value, ref serialized);
         serialized.span()
     }
-
     fn deserialize(values: Span<felt252>) -> T {
         let mut values = values.into();
         let value = Serde::<T>::deserialize(ref values);
@@ -69,40 +68,11 @@ pub impl MemberImpl<T, +Serde<T>, +Drop<T>> of MemberTrait<T> {
     }
 }
 
-pub mod key {
-    use super::MemberTrait;
-    use dojo::utils::entity_id_from_keys;
-
-    pub trait KeyParserTrait<M, K> {
-        fn serde_key(self: @M) -> K;
-    }
-
-    pub trait KeyTrait<K> {
-        fn serialize(self: @K) -> Span<felt252>;
-        fn deserialize(keys: Span<felt252>) -> K;
-        fn to_entity_id(self: @K) -> felt252;
-    }
-
-    pub impl KeyImpl<K, +MemberTrait<K>, +Copy<K>> of KeyTrait<K> {
-        fn serialize(self: @K) -> Span<felt252> {
-            MemberTrait::<K>::serialize(self)
-        }
-
-        fn deserialize(keys: Span<felt252>) -> K {
-            MemberTrait::<K>::deserialize(keys)
-        }
-
-        fn to_entity_id(self: @K) -> felt252 {
-            entity_id_from_keys(Self::serialize(self))
-        }
-    }
-}
-
 
 pub impl MemberStoreImpl<
     M, T, +ModelAttributes<M>, +MemberTrait<T>, +Drop<T>, +Drop<M>
 > of MemberStore<M, T> {
-    fn get_member(self: @IWorldDispatcher, member_id: felt252, entity_id: felt252,) -> T {
+    fn get_member(self: @IWorldDispatcher, member_id: felt252, entity_id: felt252) -> T {
         MemberTrait::<
             T
         >::deserialize(

@@ -3,21 +3,23 @@ use starknet::SyscallResult;
 use dojo::{
     world::{IWorldDispatcher, IWorldDispatcherTrait}, utils::{Descriptor, DescriptorTrait},
     meta::{Layout, introspect::Ty},
-    model::{
-        ModelAttributes, attributes::ModelIndex,
-        members::{MemberStore, key::{KeyTrait, KeyParserTrait}}
-    }
+    model::{ModelAttributes, attributes::ModelIndex, members::MemberStore},
+    utils::{entity_id_from_key, serialize_inline, deserialize_unwrap, entity_id_from_keys}
 };
 
-pub trait ModelSerde<M> {
-    fn serde_keys(self: @M) -> Span<felt252>;
-    fn serde_values(self: @M) -> Span<felt252>;
-    fn serde_keys_values(self: @M) -> (Span<felt252>, Span<felt252>);
+
+pub trait KeyParser<M, K> {
+    fn parse_key(self: @M) -> K;
+}
+
+pub trait ModelParser<M> {
+    fn serialise_keys(self: @M) -> Span<felt252>;
+    fn serialise_values(self: @M) -> Span<felt252>;
 }
 
 pub trait Model<M> {
-    fn key<K, +KeyParserTrait<M, K>>(self: @M) -> K;
-    fn entity_id<K, +KeyTrait<K>, +KeyParserTrait<M, K>, +Drop<K>>(self: @M) -> felt252;
+    fn key<K, +KeyParser<M, K>>(self: @M) -> K;
+    fn entity_id(self: @M) -> felt252;
     fn keys(self: @M) -> Span<felt252>;
     fn values(self: @M) -> Span<felt252>;
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>;
@@ -36,35 +38,35 @@ pub trait Model<M> {
 
 pub trait ModelStore<M> {
     // Get a model from the world
-    fn get<K, +KeyTrait<K>, +Drop<K>>(self: @IWorldDispatcher, key: K) -> M;
+    fn get<K, +Drop<K>, +Serde<K>>(self: @IWorldDispatcher, key: K) -> M;
     // Set a model in the world
     fn set(self: IWorldDispatcher, model: @M);
     // Get a member of a model from the world
     fn delete(self: IWorldDispatcher, model: @M);
     // Delete a model from the world from its key
-    fn delete_from_key<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K);
+    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K);
     // Get a member of a model from the world
-    fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +KeyTrait<K>, +Drop<K>>(
+    fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: @IWorldDispatcher, member_id: felt252, key: K
     ) -> T;
     // Update a member of a model in the world
-    fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +KeyTrait<K>, +Drop<K>>(
+    fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: IWorldDispatcher, member_id: felt252, key: K, value: T
     );
 }
 
-pub impl ModelImpl<M, +ModelSerde<M>, +Serde<M>, +ModelAttributes<M>> of Model<M> {
-    fn key<K, +KeyParserTrait<M, K>>(self: @M) -> K {
-        KeyParserTrait::<M, K>::serde_key(self)
+pub impl ModelImpl<M, +ModelParser<M>, +ModelAttributes<M>, +Serde<M>> of Model<M> {
+    fn key<K, +KeyParser<M, K>>(self: @M) -> K {
+        KeyParser::<M, K>::parse_key(self)
     }
-    fn entity_id<K, +KeyTrait<K>, +KeyParserTrait<M, K>, +Drop<K>>(self: @M) -> felt252 {
-        KeyTrait::<K>::to_entity_id(@Self::key::<K>(self))
+    fn entity_id(self: @M) -> felt252 {
+        entity_id_from_keys(Self::keys(self))
     }
     fn keys(self: @M) -> Span<felt252> {
-        ModelSerde::<M>::serde_keys(self)
+        ModelParser::<M>::serialise_keys(self)
     }
     fn values(self: @M) -> Span<felt252> {
-        ModelSerde::<M>::serde_values(self)
+        ModelParser::<M>::serialise_values(self)
     }
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M> {
         let mut serialized: Array<felt252> = keys.into();
@@ -106,16 +108,11 @@ pub impl ModelImpl<M, +ModelSerde<M>, +Serde<M>, +ModelAttributes<M>> of Model<M
     }
 }
 
-pub impl ModelStoreImpl<
-    M, +ModelSerde<M>, +Model<M>, +ModelAttributes<M>, +Drop<M>,
-> of ModelStore<M> {
-    fn get<K, +KeyTrait<K>, +Drop<K>>(self: @IWorldDispatcher, mut key: K) -> M {
-        let mut keys = KeyTrait::<K>::serialize(@key);
+pub impl ModelStoreImpl<M, +Model<M>, +Drop<M>> of ModelStore<M> {
+    fn get<K, +Drop<K>, +Serde<K>>(self: @IWorldDispatcher, key: K) -> M {
+        let mut keys = serialize_inline::<K>(@key);
         let mut values = IWorldDispatcherTrait::entity(
-            *self,
-            ModelAttributes::<M>::selector(),
-            ModelIndex::Keys(keys),
-            ModelAttributes::<M>::layout()
+            *self, Model::<M>::selector(), ModelIndex::Keys(keys), Model::<M>::layout()
         );
         match Model::<M>::from_values(ref keys, ref values) {
             Option::Some(model) => model,
@@ -128,10 +125,12 @@ pub impl ModelStoreImpl<
     }
 
     fn set(self: IWorldDispatcher, model: @M) {
-        let (keys, values) = ModelSerde::<M>::serde_keys_values(model);
-
         IWorldDispatcherTrait::set_entity(
-            self, Model::<M>::selector(), ModelIndex::Keys(keys), values, Model::<M>::layout()
+            self,
+            Model::<M>::selector(),
+            ModelIndex::Keys(Model::<M>::keys(model)),
+            Model::<M>::values(model),
+            Model::<M>::layout()
         );
     }
 
@@ -139,32 +138,30 @@ pub impl ModelStoreImpl<
         IWorldDispatcherTrait::delete_entity(
             self,
             Model::<M>::selector(),
-            ModelIndex::Keys(ModelSerde::<M>::serde_keys(model)),
+            ModelIndex::Keys(Model::<M>::keys(model)),
             Model::<M>::layout()
         );
     }
 
-    fn delete_from_key<K, +KeyTrait<K>, +Drop<K>>(self: IWorldDispatcher, key: K) {
+    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K) {
         IWorldDispatcherTrait::delete_entity(
             self,
             Model::<M>::selector(),
-            ModelIndex::Keys(KeyTrait::<K>::serialize(@key)),
+            ModelIndex::Keys(serialize_inline::<K>(@key)),
             Model::<M>::layout()
         );
     }
 
-    fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +KeyTrait<K>, +Drop<K>>(
+    fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: @IWorldDispatcher, member_id: felt252, key: K
     ) -> T {
-        MemberStore::<M, T>::get_member(self, member_id, KeyTrait::<K>::to_entity_id(@key))
+        MemberStore::<M, T>::get_member(self, member_id, entity_id_from_key::<K>(@key))
     }
 
-    fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +KeyTrait<K>, +Drop<K>>(
+    fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: IWorldDispatcher, member_id: felt252, key: K, value: T
     ) {
-        MemberStore::<
-            M, T
-        >::update_member(self, member_id, KeyTrait::<K>::to_entity_id(@key), value);
+        MemberStore::<M, T>::update_member(self, member_id, entity_id_from_key::<K>(@key), value);
     }
 }
 
@@ -185,7 +182,7 @@ pub impl ModelTestImpl<M, +Model<M>> of ModelTest<M> {
         dojo::world::IWorldTestDispatcherTrait::set_entity_test(
             world_test,
             Model::<M>::selector(),
-            ModelIndex::Keys(Model::<M>::keys(self)),
+            ModelIndex::Keys(Model::keys(self)),
             Model::<M>::values(self),
             Model::<M>::layout()
         );
@@ -199,7 +196,7 @@ pub impl ModelTestImpl<M, +Model<M>> of ModelTest<M> {
         dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
             world_test,
             Model::<M>::selector(),
-            ModelIndex::Keys(dojo::model::Model::keys(self)),
+            ModelIndex::Keys(Model::keys(self)),
             Model::<M>::layout()
         );
     }

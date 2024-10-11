@@ -1,17 +1,14 @@
 use dojo::{
-    meta::{Layout},
-    model::{
-        ModelAttributes, attributes::ModelIndex, members::{key::{KeyTrait, KeyParserTrait}},
-        members::{MemberStore},
-    },
-    world::{IWorldDispatcher, IWorldDispatcherTrait},
+    meta::{Layout}, model::{ModelAttributes, attributes::ModelIndex, members::{MemberStore},},
+    world::{IWorldDispatcher, IWorldDispatcherTrait}, utils::entity_id_from_key,
 };
 
+pub trait EntityKey<E, K> {}
+
 // Needs to be generated
-pub trait EntitySerde<E> {
-    fn serde_id(self: @E) -> felt252;
-    fn serde_values(self: @E) -> Span<felt252>;
-    fn serde_id_values(self: @E) -> (felt252, Span<felt252>);
+pub trait EntityParser<E> {
+    fn parse_id(self: @E) -> felt252;
+    fn serialise_values(self: @E) -> Span<felt252>;
 }
 
 
@@ -34,7 +31,7 @@ pub trait Entity<E> {
 
 pub trait EntityStore<E> {
     // Get an entity from the world
-    fn get_entity<K, +KeyTrait<K>, +Drop<K>>(self: @IWorldDispatcher, key: K) -> E;
+    fn get_entity<K, +Drop<K>, +Serde<K>, +EntityKey<E, K>>(self: @IWorldDispatcher, key: K) -> E;
     // Get an entity from the world using its entity id
     fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E;
     // Update an entity in the world
@@ -53,18 +50,17 @@ pub trait EntityStore<E> {
     );
 }
 
-pub impl EntityImpl<E, +EntitySerde<E>, +Serde<E>, +ModelAttributes<E>> of Entity<E> {
+pub impl EntityImpl<E, +Serde<E>, +ModelAttributes<E>, +EntityParser<E>> of Entity<E> {
     fn id(self: @E) -> felt252 {
-        EntitySerde::<E>::serde_id(self)
+        EntityParser::<E>::parse_id(self)
     }
     fn values(self: @E) -> Span<felt252> {
-        EntitySerde::<E>::serde_values(self)
+        EntityParser::<E>::serialise_values(self)
     }
     fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E> {
         let mut serialized: Array<felt252> = array![entity_id];
         serialized.append_span(values);
         let mut span = serialized.span();
-
         Serde::<E>::deserialize(ref span)
     }
     fn name() -> ByteArray {
@@ -99,19 +95,14 @@ pub impl EntityImpl<E, +EntitySerde<E>, +Serde<E>, +ModelAttributes<E>> of Entit
     }
 }
 
-pub impl EntityStoreImpl<
-    E, +Entity<E>, +EntitySerde<E>, +ModelAttributes<E>, +Drop<E>
-> of EntityStore<E> {
-    fn get_entity<K, +KeyTrait<K>, +Drop<K>>(self: @IWorldDispatcher, key: K) -> E {
-        Self::get_entity_from_id(self, KeyTrait::<K>::to_entity_id(@key))
+pub impl EntityStoreImpl<E, +Entity<E>, +Drop<E>> of EntityStore<E> {
+    fn get_entity<K, +Drop<K>, +Serde<K>, +EntityKey<E, K>>(self: @IWorldDispatcher, key: K) -> E {
+        Self::get_entity_from_id(self, entity_id_from_key(@key))
     }
 
     fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E {
         let mut values = IWorldDispatcherTrait::entity(
-            *self,
-            ModelAttributes::<E>::selector(),
-            ModelIndex::Id(entity_id),
-            ModelAttributes::<E>::layout()
+            *self, Entity::<E>::selector(), ModelIndex::Id(entity_id), Entity::<E>::layout()
         );
         match Entity::<E>::from_values(entity_id, ref values) {
             Option::Some(model) => model,
@@ -124,13 +115,12 @@ pub impl EntityStoreImpl<
     }
 
     fn update(self: IWorldDispatcher, entity: @E) {
-        let (entity_id, values) = EntitySerde::<E>::serde_id_values(entity);
         IWorldDispatcherTrait::set_entity(
             self,
-            ModelAttributes::<E>::selector(),
-            ModelIndex::Id(entity_id),
-            values,
-            ModelAttributes::<E>::layout()
+            Entity::<E>::selector(),
+            ModelIndex::Id(Entity::<E>::id(entity)),
+            Entity::<E>::values(entity),
+            Entity::<E>::layout()
         );
     }
     fn delete_entity(self: IWorldDispatcher, entity: @E) {
@@ -138,10 +128,7 @@ pub impl EntityStoreImpl<
     }
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252) {
         IWorldDispatcherTrait::delete_entity(
-            self,
-            ModelAttributes::<E>::selector(),
-            ModelIndex::Id(entity_id),
-            ModelAttributes::<E>::layout()
+            self, Entity::<E>::selector(), ModelIndex::Id(entity_id), Entity::<E>::layout()
         );
     }
 

@@ -57,7 +57,7 @@ fn test_get_and_update_entity() {
     world.set(@foo);
 
     let entity_id = foo.entity_id();
-    let mut entity: FooEntity = world.get_entity(entity_id);
+    let mut entity: FooEntity = world.get_entity(foo.key());
     assert_eq!(entity.__id, entity_id);
     assert_eq!(entity.v1, entity.v1);
     assert_eq!(entity.v2, entity.v2);
@@ -67,7 +67,7 @@ fn test_get_and_update_entity() {
 
     world.update(@entity);
 
-    let read_values: FooEntity = world.get_entity(entity_id);
+    let read_values: FooEntity = world.get_entity_from_id(entity_id);
     assert!(read_values.v1 == entity.v1 && read_values.v2 == entity.v2);
 }
 
@@ -80,10 +80,10 @@ fn test_delete_entity() {
     world.set(@foo);
 
     let entity_id = foo.entity_id();
-    let mut entity: FooEntity = world.get_entity(entity_id);
+    let mut entity: FooEntity = world.get_entity_from_id(entity_id);
     EntityStore::delete_entity(world, @entity);
 
-    let read_values: FooEntity = world.get_entity(entity_id);
+    let read_values: FooEntity = world.get_entity_from_id(entity_id);
     assert!(read_values.v1 == 0 && read_values.v2 == 0);
 }
 
@@ -97,15 +97,15 @@ fn test_get_and_set_member_from_entity() {
 
     let v1: u128 = EntityStore::<
         FooEntity
-    >::get_member_from_id(@world, foo.entity_id(), selector!("v1"));
+    >::get_member_from_id(@world, selector!("v1"), foo.entity_id());
 
-    assert!(v1 == 3);
+    assert_eq!(v1, 3);
 
-    let entity: FooEntity = world.get_entity(foo.entity_id());
-    EntityStore::<FooEntity>::update_member_from_id(world, entity.id(), selector!("v1"), 42);
+    let entity: FooEntity = world.get_entity_from_id(foo.entity_id());
+    EntityStore::<FooEntity>::update_member_from_id(world, selector!("v1"), entity.id(), 42);
 
-    let entity: FooEntity = world.get_entity(foo.entity_id());
-    assert!(entity.v1 == 42);
+    let entity: FooEntity = world.get_entity_from_id(foo.entity_id());
+    assert_eq!(entity.v1, 42);
 }
 
 #[test]
@@ -119,7 +119,7 @@ fn test_get_and_set_field_name() {
     let v1 = FooMembersStore::get_v1_from_id(@world, foo.entity_id());
     assert!(foo.v1 == v1);
 
-    let _entity: FooEntity = world.get_entity(foo.entity_id());
+    let _entity: FooEntity = world.get_entity_from_id(foo.entity_id());
 
     FooMembersStore::update_v1_from_id(world, foo.entity_id(), 42);
 

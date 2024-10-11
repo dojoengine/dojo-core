@@ -111,6 +111,7 @@ impl DojoModel {
         let mut key_types: Vec<String> = vec![];
         let mut key_attrs: Vec<String> = vec![];
 
+        let mut serialized_keys: Vec<RewriteNode> = vec![];
         let mut serialized_values: Vec<RewriteNode> = vec![];
         let mut field_accessors: Vec<RewriteNode> = vec![];
 
@@ -120,7 +121,8 @@ impl DojoModel {
             if member.key {
                 keys.push(member.clone());
                 key_types.push(member.ty.clone());
-                key_attrs.push(format!("*self.{}", member.name.clone()))
+                key_attrs.push(format!("*self.{}", member.name.clone()));
+                serialized_keys.push(serialize_member_ty(member, true));
             } else {
                 values.push(member.clone());
                 serialized_values.push(serialize_member_ty(member, true));
@@ -131,19 +133,6 @@ impl DojoModel {
                 field_accessors.push(generate_field_accessors(model_type.clone(), member));
             }
         });
-
-        let (keys_to_tuple, key_type) = if keys.len() > 1 {
-            (
-                format!("({})", key_attrs.join(", ")),
-                format!("({})", key_types.join(", ")),
-            )
-        } else {
-            (
-                key_attrs.first().unwrap().to_string(),
-                key_types.first().unwrap().to_string(),
-            )
-        };
-
         if keys.is_empty() {
             diagnostics.push(PluginDiagnostic {
                 message: "Model must define at least one #[key] attribute".into(),
@@ -159,6 +148,18 @@ impl DojoModel {
                 severity: Severity::Error,
             });
         }
+
+        let (keys_to_tuple, key_type) = if keys.len() > 1 {
+            (
+                format!("({})", key_attrs.join(", ")),
+                format!("({})", key_types.join(", ")),
+            )
+        } else {
+            (
+                key_attrs.first().unwrap().to_string(),
+                key_types.first().unwrap().to_string(),
+            )
+        };
 
         let mut derive_attr_names = extract_derive_attr_names(
             db,
@@ -218,6 +219,10 @@ impl DojoModel {
                 ),
                 ("model_version".to_string(), model_version),
                 ("model_selector".to_string(), model_selector),
+                (
+                    "serialized_keys".to_string(),
+                    RewriteNode::new_modified(serialized_keys),
+                ),
                 (
                     "serialized_values".to_string(),
                     RewriteNode::new_modified(serialized_values),

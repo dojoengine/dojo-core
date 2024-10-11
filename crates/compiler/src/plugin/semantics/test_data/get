@@ -134,7 +134,7 @@ Block(
                     ),
                     expr: FunctionCall(
                         ExprFunctionCall {
-                            function: ?4::get::<core::felt252, dojo::model::members::key::KeyImpl::<core::felt252, dojo::model::members::MemberImpl::<core::felt252, core::Felt252Serde, core::felt252Drop>, core::felt252Copy>, core::felt252Drop>,
+                            function: ?4::get::<core::felt252, core::felt252Drop, core::Felt252Serde>,
                             args: [
                                 Value(
                                     Snapshot(
