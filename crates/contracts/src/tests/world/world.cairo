@@ -25,7 +25,7 @@ trait IMetadataOnly<T> {
 
 #[starknet::contract]
 mod resource_metadata_malicious {
-    use dojo::model::{ModelAttributes, ResourceMetadata};
+    use dojo::model::{ModelDefinition, ResourceMetadata};
     use dojo::utils::bytearray_hash;
 
     #[storage]
@@ -34,7 +34,7 @@ mod resource_metadata_malicious {
     #[abi(embed_v0)]
     impl InvalidModelName of super::IMetadataOnly<ContractState> {
         fn selector(self: @ContractState) -> felt252 {
-            ModelAttributes::<ResourceMetadata>::selector()
+            ModelDefinition::<ResourceMetadata>::selector()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {

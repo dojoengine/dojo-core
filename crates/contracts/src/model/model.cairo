@@ -3,7 +3,7 @@ use starknet::SyscallResult;
 use dojo::{
     world::{IWorldDispatcher, IWorldDispatcherTrait}, utils::{Descriptor, DescriptorTrait},
     meta::{Layout, introspect::Ty},
-    model::{ModelAttributes, attributes::ModelIndex, members::MemberStore},
+    model::{ModelDefinition, attributes::ModelIndex, members::MemberStore},
     utils::{entity_id_from_key, serialize_inline, deserialize_unwrap, entity_id_from_keys}
 };
 
@@ -13,8 +13,8 @@ pub trait KeyParser<M, K> {
 }
 
 pub trait ModelParser<M> {
-    fn serialise_keys(self: @M) -> Span<felt252>;
-    fn serialise_values(self: @M) -> Span<felt252>;
+    fn serialize_keys(self: @M) -> Span<felt252>;
+    fn serialize_values(self: @M) -> Span<felt252>;
 }
 
 pub trait Model<M> {
@@ -55,7 +55,7 @@ pub trait ModelStore<M> {
     );
 }
 
-pub impl ModelImpl<M, +ModelParser<M>, +ModelAttributes<M>, +Serde<M>> of Model<M> {
+pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<M> {
     fn key<K, +KeyParser<M, K>>(self: @M) -> K {
         KeyParser::<M, K>::parse_key(self)
     }
@@ -63,10 +63,10 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelAttributes<M>, +Serde<M>> of Model<
         entity_id_from_keys(Self::keys(self))
     }
     fn keys(self: @M) -> Span<felt252> {
-        ModelParser::<M>::serialise_keys(self)
+        ModelParser::<M>::serialize_keys(self)
     }
     fn values(self: @M) -> Span<felt252> {
-        ModelParser::<M>::serialise_values(self)
+        ModelParser::<M>::serialize_values(self)
     }
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M> {
         let mut serialized: Array<felt252> = keys.into();
@@ -77,34 +77,34 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelAttributes<M>, +Serde<M>> of Model<
     }
 
     fn name() -> ByteArray {
-        ModelAttributes::<M>::name()
+        ModelDefinition::<M>::name()
     }
     fn namespace() -> ByteArray {
-        ModelAttributes::<M>::namespace()
+        ModelDefinition::<M>::namespace()
     }
     fn tag() -> ByteArray {
-        ModelAttributes::<M>::tag()
+        ModelDefinition::<M>::tag()
     }
     fn version() -> u8 {
-        ModelAttributes::<M>::version()
+        ModelDefinition::<M>::version()
     }
     fn selector() -> felt252 {
-        ModelAttributes::<M>::selector()
+        ModelDefinition::<M>::selector()
     }
     fn layout() -> Layout {
-        ModelAttributes::<M>::layout()
+        ModelDefinition::<M>::layout()
     }
     fn name_hash() -> felt252 {
-        ModelAttributes::<M>::name_hash()
+        ModelDefinition::<M>::name_hash()
     }
     fn namespace_hash() -> felt252 {
-        ModelAttributes::<M>::namespace_hash()
+        ModelDefinition::<M>::namespace_hash()
     }
     fn instance_selector(self: @M) -> felt252 {
-        ModelAttributes::<M>::selector()
+        ModelDefinition::<M>::selector()
     }
     fn instance_layout(self: @M) -> Layout {
-        ModelAttributes::<M>::layout()
+        ModelDefinition::<M>::layout()
     }
 }
 

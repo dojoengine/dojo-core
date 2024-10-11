@@ -27,7 +27,7 @@ use super::element::{
 };
 use super::DOJO_MODEL_ATTR;
 
-const MODEL_CODE_STRING: &str = include_str!("./templates/model_store.generate.cairo");
+const MODEL_CODE_PATCH: &str = include_str!("./templates/model_store.generate.cairo");
 const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");
 type ModelParameters = CommonStructParameters;
 const ENTITY_DERIVE_IGNORE: [&str; 2] = [DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE];
@@ -195,7 +195,7 @@ impl DojoModel {
         diagnostics.extend(derive_diagnostics);
 
         let node = RewriteNode::interpolate_patched(
-            MODEL_CODE_STRING,
+            MODEL_CODE_PATCH,
             &UnorderedHashMap::from([
                 (
                     "model_type".to_string(),

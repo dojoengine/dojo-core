@@ -19,7 +19,7 @@ impl $model_type$EntityKey of dojo::model::entity::EntityKey<$model_type$Entity,
 // Impl to get the static attributes of a model
 pub mod $model_name_snake$_attributes {
     use super::$model_type$;
-    pub impl $model_type$AttributesImpl<T> of dojo::model::ModelAttributes<T>{
+    pub impl $model_type$DefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
         fn version() -> u8 {
             $model_version$
@@ -64,7 +64,7 @@ pub mod $model_name_snake$_attributes {
 }
 
 
-pub impl $model_type$Attributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$>;
+pub impl $model_type$Definition = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$>;
 pub impl $model_type$EntityAttributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$Entity>;
 
 pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$>{
@@ -73,7 +73,7 @@ pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$
         $serialized_keys$
         core::array::ArrayTrait::span(@serialized)
     }
-    fn serialise_values(self: @$model_type$) -> Span<felt252> {
+    fn serialize_values(self: @$model_type$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
@@ -84,7 +84,7 @@ pub impl $model_type$EntityParser of dojo::model::entity::EntityParser<$model_ty
     fn parse_id(self: @$model_type$Entity) -> felt252 {
         *self.__id
     }
-    fn serialise_values(self: @$model_type$Entity) -> Span<felt252> {
+    fn serialize_values(self: @$model_type$Entity) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
@@ -114,7 +114,7 @@ pub trait I$model_type$<T> {
 pub mod $model_name_snake$ {
     use super::$model_type$;
     use super::I$model_type$;
-    use super::$model_type$Attributes;
+    use super::$model_type$Definition;
     use super::$model_type$ModelImpl;
     #[storage]
     struct Storage {}
@@ -122,31 +122,31 @@ pub mod $model_name_snake$ {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            $model_type$Attributes::name()
+            $model_type$Definition::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            $model_type$Attributes::namespace()
+            $model_type$Definition::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            $model_type$Attributes::tag()
+            $model_type$Definition::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            $model_type$Attributes::version()
+            $model_type$Definition::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            $model_type$Attributes::selector()
+            $model_type$Definition::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            $model_type$Attributes::name_hash()
+            $model_type$Definition::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            $model_type$Attributes::namespace_hash()
+            $model_type$Definition::namespace_hash()
         }
 
         fn unpacked_size(self: @ContractState) -> Option<usize> {
@@ -154,11 +154,11 @@ pub mod $model_name_snake$ {
         }
 
         fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size($model_type$Attributes::layout())
+            dojo::meta::layout::compute_packed_size($model_type$Definition::layout())
         }
 
         fn layout(self: @ContractState) -> dojo::meta::Layout {
-            $model_type$Attributes::layout()
+            $model_type$Definition::layout()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {

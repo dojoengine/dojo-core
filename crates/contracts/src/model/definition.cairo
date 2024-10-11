@@ -8,7 +8,7 @@ pub enum ModelIndex {
     MemberId: (felt252, felt252)
 }
 
-pub trait ModelAttributes<T> {
+pub trait ModelDefinition<T> {
     fn name() -> ByteArray;
     fn namespace() -> ByteArray;
     fn tag() -> ByteArray;

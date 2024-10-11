@@ -1,5 +1,5 @@
 use dojo::{
-    meta::{Layout}, model::{ModelAttributes, attributes::ModelIndex, members::{MemberStore},},
+    meta::{Layout}, model::{ModelDefinition, attributes::ModelIndex, members::{MemberStore},},
     world::{IWorldDispatcher, IWorldDispatcherTrait}, utils::entity_id_from_key,
 };
 
@@ -8,7 +8,7 @@ pub trait EntityKey<E, K> {}
 // Needs to be generated
 pub trait EntityParser<E> {
     fn parse_id(self: @E) -> felt252;
-    fn serialise_values(self: @E) -> Span<felt252>;
+    fn serialize_values(self: @E) -> Span<felt252>;
 }
 
 
@@ -50,12 +50,12 @@ pub trait EntityStore<E> {
     );
 }
 
-pub impl EntityImpl<E, +Serde<E>, +ModelAttributes<E>, +EntityParser<E>> of Entity<E> {
+pub impl EntityImpl<E, +Serde<E>, +ModelDefinition<E>, +EntityParser<E>> of Entity<E> {
     fn id(self: @E) -> felt252 {
         EntityParser::<E>::parse_id(self)
     }
     fn values(self: @E) -> Span<felt252> {
-        EntityParser::<E>::serialise_values(self)
+        EntityParser::<E>::serialize_values(self)
     }
     fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E> {
         let mut serialized: Array<felt252> = array![entity_id];
@@ -64,34 +64,34 @@ pub impl EntityImpl<E, +Serde<E>, +ModelAttributes<E>, +EntityParser<E>> of Enti
         Serde::<E>::deserialize(ref span)
     }
     fn name() -> ByteArray {
-        ModelAttributes::<E>::name()
+        ModelDefinition::<E>::name()
     }
     fn namespace() -> ByteArray {
-        ModelAttributes::<E>::namespace()
+        ModelDefinition::<E>::namespace()
     }
     fn tag() -> ByteArray {
-        ModelAttributes::<E>::tag()
+        ModelDefinition::<E>::tag()
     }
     fn version() -> u8 {
-        ModelAttributes::<E>::version()
+        ModelDefinition::<E>::version()
     }
     fn selector() -> felt252 {
-        ModelAttributes::<E>::selector()
+        ModelDefinition::<E>::selector()
     }
     fn layout() -> Layout {
-        ModelAttributes::<E>::layout()
+        ModelDefinition::<E>::layout()
     }
     fn name_hash() -> felt252 {
-        ModelAttributes::<E>::name_hash()
+        ModelDefinition::<E>::name_hash()
     }
     fn namespace_hash() -> felt252 {
-        ModelAttributes::<E>::namespace_hash()
+        ModelDefinition::<E>::namespace_hash()
     }
     fn instance_selector(self: @E) -> felt252 {
-        ModelAttributes::<E>::selector()
+        ModelDefinition::<E>::selector()
     }
     fn instance_layout(self: @E) -> Layout {
-        ModelAttributes::<E>::layout()
+        ModelDefinition::<E>::layout()
     }
 }
 

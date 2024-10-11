@@ -32,7 +32,7 @@ pub struct ResourceMetadata {
     pub metadata_uri: ByteArray,
 }
 
-pub impl ResourceMetadataAttributesImpl of dojo::model::ModelAttributes<ResourceMetadata> {
+pub impl ResourceMetadataAttributesImpl of dojo::model::ModelDefinition<ResourceMetadata> {
     #[inline(always)]
     fn name() -> ByteArray {
         "ResourceMetadata"
@@ -83,10 +83,10 @@ pub impl ResourceMetadataModelKeyImpl of KeyParser<ResourceMetadata, felt252> {
 }
 
 pub impl ResourceMetadataModelParser of ModelParser<ResourceMetadata> {
-    fn serialise_keys(self: @ResourceMetadata) -> Span<felt252> {
+    fn serialize_keys(self: @ResourceMetadata) -> Span<felt252> {
         [*self.resource_id].span()
     }
-    fn serialise_values(self: @ResourceMetadata) -> Span<felt252> {
+    fn serialize_values(self: @ResourceMetadata) -> Span<felt252> {
         serialize_inline(self.metadata_uri)
     }
 }

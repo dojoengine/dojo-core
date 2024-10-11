@@ -1,5 +1,5 @@
 use dojo::{
-    utils::find_model_field_layout, meta::Layout, model::{attributes::ModelIndex, ModelAttributes},
+    utils::find_model_field_layout, meta::Layout, model::{attributes::ModelIndex, ModelDefinition},
     world::{IWorldDispatcher, IWorldDispatcherTrait}
 };
 use core::panic_with_felt252;
@@ -70,7 +70,7 @@ pub impl MemberImpl<T, +Serde<T>, +Drop<T>> of MemberTrait<T> {
 
 
 pub impl MemberStoreImpl<
-    M, T, +ModelAttributes<M>, +MemberTrait<T>, +Drop<T>, +Drop<M>
+    M, T, +ModelDefinition<M>, +MemberTrait<T>, +Drop<T>, +Drop<M>
 > of MemberStore<M, T> {
     fn get_member(self: @IWorldDispatcher, member_id: felt252, entity_id: felt252) -> T {
         MemberTrait::<
@@ -78,9 +78,9 @@ pub impl MemberStoreImpl<
         >::deserialize(
             get_serialized_member(
                 *self,
-                ModelAttributes::<M>::selector(),
+                ModelDefinition::<M>::selector(),
                 member_id,
-                ModelAttributes::<M>::layout(),
+                ModelDefinition::<M>::layout(),
                 entity_id
             )
         )
@@ -88,9 +88,9 @@ pub impl MemberStoreImpl<
     fn update_member(self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T,) {
         update_serialized_member(
             self,
-            ModelAttributes::<M>::selector(),
+            ModelDefinition::<M>::selector(),
             member_id,
-            ModelAttributes::<M>::layout(),
+            ModelDefinition::<M>::layout(),
             entity_id,
             MemberTrait::<T>::serialize(@value)
         )
