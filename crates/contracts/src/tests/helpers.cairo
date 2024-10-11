@@ -38,18 +38,23 @@ pub mod foo_invalid_name {
         fn namespace(self: @ContractState) -> ByteArray {
             "dojo"
         }
+
         fn tag(self: @ContractState) -> ByteArray {
             "dojo-foo-bis"
         }
+
         fn version(self: @ContractState) -> u8 {
             1
         }
+
         fn selector(self: @ContractState) -> felt252 {
             dojo::utils::selector_from_names(@"dojo", @"foo-bis")
         }
+
         fn name_hash(self: @ContractState) -> felt252 {
             dojo::utils::bytearray_hash(@"foo-bis")
         }
+
         fn namespace_hash(self: @ContractState) -> felt252 {
             dojo::utils::bytearray_hash(@"dojo")
         }
@@ -57,6 +62,7 @@ pub mod foo_invalid_name {
         fn unpacked_size(self: @ContractState) -> Option<usize> {
             Option::None
         }
+
         fn packed_size(self: @ContractState) -> Option<usize> {
             Option::None
         }
@@ -64,12 +70,26 @@ pub mod foo_invalid_name {
         fn layout(self: @ContractState) -> dojo::meta::Layout {
             dojo::meta::Layout::Fixed([].span())
         }
+
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Ty::Struct(
                 dojo::meta::introspect::Struct {
                     name: 'foo', attrs: [].span(), children: [].span()
                 }
             )
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::ModelDefinition {
+                name: self.name(),
+                namespace: self.namespace(),
+                namespace_selector: self.namespace_hash(),
+                version: self.version(),
+                layout: self.layout(),
+                schema: self.schema(),
+                packed_size: self.packed_size(),
+                unpacked_size: self.unpacked_size(),
+            }
         }
     }
 }
@@ -91,18 +111,23 @@ pub mod foo_invalid_namespace {
         fn namespace(self: @ContractState) -> ByteArray {
             "inv@lid n@mesp@ce"
         }
+
         fn tag(self: @ContractState) -> ByteArray {
             "inv@lid n@mesp@ce-foo"
         }
+
         fn version(self: @ContractState) -> u8 {
             1
         }
+
         fn selector(self: @ContractState) -> felt252 {
             dojo::utils::selector_from_names(@"inv@lid n@mesp@ce", @"foo")
         }
+
         fn name_hash(self: @ContractState) -> felt252 {
             dojo::utils::bytearray_hash(@"foo")
         }
+
         fn namespace_hash(self: @ContractState) -> felt252 {
             dojo::utils::bytearray_hash(@"inv@lid n@mesp@ce")
         }
@@ -110,6 +135,7 @@ pub mod foo_invalid_namespace {
         fn unpacked_size(self: @ContractState) -> Option<usize> {
             Option::None
         }
+
         fn packed_size(self: @ContractState) -> Option<usize> {
             Option::None
         }
@@ -117,12 +143,26 @@ pub mod foo_invalid_namespace {
         fn layout(self: @ContractState) -> dojo::meta::Layout {
             dojo::meta::Layout::Fixed([].span())
         }
+
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Ty::Struct(
                 dojo::meta::introspect::Struct {
                     name: 'foo', attrs: [].span(), children: [].span()
                 }
             )
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::ModelDefinition {
+                name: self.name(),
+                namespace: self.namespace(),
+                namespace_selector: self.namespace_hash(),
+                version: self.version(),
+                layout: self.layout(),
+                schema: self.schema(),
+                packed_size: self.packed_size(),
+                unpacked_size: self.unpacked_size(),
+            }
         }
     }
 }

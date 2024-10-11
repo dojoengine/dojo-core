@@ -740,6 +740,25 @@ pub impl BadModelMultipleVersionsModelImpl of dojo::model::Model<BadModelMultipl
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<BadModelMultipleVersions>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<BadModelMultipleVersions>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -796,6 +815,10 @@ pub mod bad_model_multiple_versions {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<BadModelMultipleVersions>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<BadModelMultipleVersions>::definition()
         }
     }
 
@@ -1073,6 +1096,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__bad_model_multiple_versionsImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -1106,6 +1148,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__bad_model_multiple_versionsImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -1576,6 +1619,25 @@ pub impl BadModelBadVersionTypeModelImpl of dojo::model::Model<BadModelBadVersio
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<BadModelBadVersionType>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<BadModelBadVersionType>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -1632,6 +1694,10 @@ pub mod bad_model_bad_version_type {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<BadModelBadVersionType>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<BadModelBadVersionType>::definition()
         }
     }
 
@@ -1909,6 +1975,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__bad_model_bad_version_typeImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -1942,6 +2027,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__bad_model_bad_version_typeImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -2412,6 +2498,25 @@ pub impl BadModelNoVersionValueModelImpl of dojo::model::Model<BadModelNoVersion
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<BadModelNoVersionValue>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<BadModelNoVersionValue>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -2468,6 +2573,10 @@ pub mod bad_model_no_version_value {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<BadModelNoVersionValue>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<BadModelNoVersionValue>::definition()
         }
     }
 
@@ -2745,6 +2854,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__bad_model_no_version_valueImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -2778,6 +2906,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__bad_model_no_version_valueImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -3248,6 +3377,25 @@ pub impl BadModelUnexpectedArgWithValueModelImpl of dojo::model::Model<BadModelU
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<BadModelUnexpectedArgWithValue>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<BadModelUnexpectedArgWithValue>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -3304,6 +3452,10 @@ pub mod bad_model_unexpected_arg_with_value {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<BadModelUnexpectedArgWithValue>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<BadModelUnexpectedArgWithValue>::definition()
         }
     }
 
@@ -3581,6 +3733,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__bad_model_unexpected_arg_with_valueImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -3614,6 +3785,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__bad_model_unexpected_arg_with_valueImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -4084,6 +4256,25 @@ pub impl BadModelUnexpectedArgModelImpl of dojo::model::Model<BadModelUnexpected
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<BadModelUnexpectedArg>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<BadModelUnexpectedArg>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -4140,6 +4331,10 @@ pub mod bad_model_unexpected_arg {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<BadModelUnexpectedArg>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<BadModelUnexpectedArg>::definition()
         }
     }
 
@@ -4417,6 +4612,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__bad_model_unexpected_argImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -4450,6 +4664,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__bad_model_unexpected_argImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -4920,6 +5135,25 @@ pub impl BadModelNotSupportedVersionModelImpl of dojo::model::Model<BadModelNotS
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<BadModelNotSupportedVersion>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<BadModelNotSupportedVersion>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -4976,6 +5210,10 @@ pub mod bad_model_not_supported_version {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<BadModelNotSupportedVersion>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<BadModelNotSupportedVersion>::definition()
         }
     }
 
@@ -5253,6 +5491,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__bad_model_not_supported_versionImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -5286,6 +5543,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__bad_model_not_supported_versionImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -5756,6 +6014,25 @@ pub impl Modelv0ModelImpl of dojo::model::Model<Modelv0> {
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<Modelv0>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<Modelv0>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -5812,6 +6089,10 @@ pub mod modelv_0 {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<Modelv0>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<Modelv0>::definition()
         }
     }
 
@@ -6089,6 +6370,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__modelv_0Impl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -6122,6 +6422,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__modelv_0Impl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -6592,6 +6893,25 @@ pub impl ModelWithBadNamespaceFormatModelImpl of dojo::model::Model<ModelWithBad
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithBadNamespaceFormat>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithBadNamespaceFormat>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -6648,6 +6968,10 @@ pub mod model_with_bad_namespace_format {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithBadNamespaceFormat>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::definition()
         }
     }
 
@@ -6925,6 +7249,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_bad_namespace_formatImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -6958,6 +7301,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_bad_namespace_formatImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -7428,6 +7772,25 @@ pub impl ModelWithShortStringNamespaceModelImpl of dojo::model::Model<ModelWithS
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithShortStringNamespace>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithShortStringNamespace>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -7484,6 +7847,10 @@ pub mod model_with_short_string_namespace {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithShortStringNamespace>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithShortStringNamespace>::definition()
         }
     }
 
@@ -7761,6 +8128,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_short_string_namespaceImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -7794,6 +8180,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_short_string_namespaceImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -8264,6 +8651,25 @@ pub impl ModelWithStringNamespaceModelImpl of dojo::model::Model<ModelWithString
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithStringNamespace>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithStringNamespace>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -8320,6 +8726,10 @@ pub mod model_with_string_namespace {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithStringNamespace>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithStringNamespace>::definition()
         }
     }
 
@@ -8597,6 +9007,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_string_namespaceImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -8630,6 +9059,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_string_namespaceImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -9100,6 +9530,25 @@ pub impl PositionModelImpl of dojo::model::Model<Position> {
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<Position>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<Position>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -9156,6 +9605,10 @@ pub mod position {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<Position>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<Position>::definition()
         }
     }
 
@@ -9433,6 +9886,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__positionImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -9466,6 +9938,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__positionImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -9930,6 +10403,25 @@ pub impl RolesModelImpl of dojo::model::Model<Roles> {
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<Roles>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<Roles>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -9986,6 +10478,10 @@ pub mod roles {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<Roles>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<Roles>::definition()
         }
     }
 
@@ -10263,6 +10759,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__rolesImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -10296,6 +10811,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__rolesImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -10690,6 +11206,25 @@ pub impl OnlyKeyModelModelImpl of dojo::model::Model<OnlyKeyModel> {
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<OnlyKeyModel>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<OnlyKeyModel>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -10746,6 +11281,10 @@ pub mod only_key_model {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<OnlyKeyModel>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<OnlyKeyModel>::definition()
         }
     }
 
@@ -11023,6 +11562,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__only_key_modelImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -11056,6 +11614,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__only_key_modelImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -11445,6 +12004,25 @@ pub impl U256KeyModelModelImpl of dojo::model::Model<U256KeyModel> {
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<U256KeyModel>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<U256KeyModel>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -11501,6 +12079,10 @@ pub mod u_256_key_model {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<U256KeyModel>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<U256KeyModel>::definition()
         }
     }
 
@@ -11778,6 +12360,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__u_256_key_modelImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -11811,6 +12412,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__u_256_key_modelImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -12292,6 +12894,25 @@ core::serde::Serde::serialize(self.player, ref serialized);
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<Player>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<Player>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -12348,6 +12969,10 @@ pub mod player {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<Player>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<Player>::definition()
         }
     }
 
@@ -12625,6 +13250,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__playerImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -12658,6 +13302,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__playerImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -13210,6 +13855,25 @@ core::serde::Serde::serialize(self.y, ref serialized);
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithSimpleArray>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithSimpleArray>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -13266,6 +13930,10 @@ pub mod model_with_simple_array {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithSimpleArray>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithSimpleArray>::definition()
         }
     }
 
@@ -13543,6 +14211,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_simple_arrayImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -13576,6 +14263,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_simple_arrayImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -14124,6 +14812,25 @@ core::serde::Serde::serialize(self.y, ref serialized);
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithByteArray>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithByteArray>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -14180,6 +14887,10 @@ pub mod model_with_byte_array {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithByteArray>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithByteArray>::definition()
         }
     }
 
@@ -14457,6 +15168,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_byte_arrayImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -14490,6 +15220,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_byte_arrayImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -15042,6 +15773,25 @@ core::serde::Serde::serialize(self.y, ref serialized);
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithComplexArray>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithComplexArray>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -15098,6 +15848,10 @@ pub mod model_with_complex_array {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithComplexArray>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithComplexArray>::definition()
         }
     }
 
@@ -15375,6 +16129,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_complex_arrayImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -15408,6 +16181,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_complex_arrayImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -15967,6 +16741,25 @@ core::serde::Serde::serialize(self.y, ref serialized);
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithTuple>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithTuple>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -16023,6 +16816,10 @@ pub mod model_with_tuple {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithTuple>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithTuple>::definition()
         }
     }
 
@@ -16300,6 +17097,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_tupleImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -16333,6 +17149,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_tupleImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -16901,6 +17718,25 @@ core::serde::Serde::serialize(self.y, ref serialized);
     fn packed_size() -> Option<usize> {
         dojo::meta::layout::compute_packed_size(Self::layout())
     }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<ModelWithTupleNoPrimitives>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<ModelWithTupleNoPrimitives>::size(),
+        }
+    }
 }
 
 #[starknet::interface]
@@ -16957,6 +17793,10 @@ pub mod model_with_tuple_no_primitives {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Introspect::<ModelWithTupleNoPrimitives>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::definition()
         }
     }
 
@@ -17234,6 +18074,25 @@ fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::model::ModelDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__model_with_tuple_no_primitivesImpl__ensure_abi(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -17267,6 +18126,7 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
     pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__model_with_tuple_no_primitivesImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
