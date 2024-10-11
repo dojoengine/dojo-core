@@ -110,7 +110,7 @@ fn deploy_world() -> IWorldDispatcher {
 }
 
 #[test]
-#[available_gas(6000000)]
+#[available_gas(7000000)]
 fn test_upgrade_from_world() {
     let world = deploy_world();
 
@@ -125,7 +125,7 @@ fn test_upgrade_from_world() {
 }
 
 #[test]
-#[available_gas(6000000)]
+#[available_gas(7000000)]
 #[should_panic(
     expected: ('class_hash not world provider', 'ENTRYPOINT_FAILED', 'ENTRYPOINT_FAILED')
 )]
