@@ -55,6 +55,7 @@ pub mod attacker_contract {
 
 #[starknet::contract]
 pub mod attacker_model {
+    use super::super::super::super::model::IModel;
     #[storage]
     struct Storage {}
 
@@ -103,6 +104,19 @@ pub mod attacker_model {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Ty::Primitive('felt252')
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::ModelDefinition {
+                name: self.name(),
+                namespace: self.namespace(),
+                namespace_selector: self.namespace_hash(),
+                version: self.version(),
+                layout: self.layout(),
+                schema: self.schema(),
+                packed_size: self.packed_size(),
+                unpacked_size: self.unpacked_size(),
+            }
         }
     }
 }
