@@ -7,15 +7,59 @@ use dojo::{
 };
 
 
+/// Trait `KeyParser` defines a trait for parsing keys from a given model.
+///
+/// # Type Parameters
+/// - `M`: The type of the model from which the key will be parsed.
+/// - `K`: The type of the key that will be parsed from the model.
+///
+/// # Methods
+/// - `fn parse_key(self: @M) -> K;`
+///   - Parses and returns the key from the given model instance.
 pub trait KeyParser<M, K> {
     fn parse_key(self: @M) -> K;
 }
 
+/// Defines a trait for parsing models, providing methods to serialize keys and values.
+///
+/// # Type Parameters:
+/// - `M`: The type of the model to be parsed.
+///
+/// # Methods:
+/// - `serialize_keys(self: @M) -> Span<felt252>`: Serializes the keys of the model into a `Span` of
+/// `felt252`.
+/// - `serialize_values(self: @M) -> Span<felt252>`: Serializes the values of the model into a
+/// `Span` of `felt252`.
 pub trait ModelParser<M> {
     fn serialize_keys(self: @M) -> Span<felt252>;
     fn serialize_values(self: @M) -> Span<felt252>;
 }
 
+/// The `Model` trait defines a set of methods that must be implemented by any type `M` that
+/// conforms to this trait.
+/// It provides a standardized way to interact with models, including retrieving keys, entity IDs,
+/// and values, as well as constructing models from values and obtaining metadata about the model
+/// such as name, namespace, version, and layout.
+///
+/// Methods:
+/// - `key<K, +KeyParser<M, K>>(self: @M) -> K`: Retrieves the key of the model.
+/// - `entity_id(self: @M) -> felt252`: Retrieves the entity ID of the model.
+/// - `keys(self: @M) -> Span<felt252>`: Retrieves the keys of the model as a span of `felt252`
+///         values.
+/// - `values(self: @M) -> Span<felt252>`: Retrieves the values of the model as a span of `felt252`
+///         values.
+/// - `from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>`: Constructs a
+///         model from the given keys and values.
+/// - `name() -> ByteArray`: Retrieves the name of the model as a `ByteArray`.
+/// - `namespace() -> ByteArray`: Retrieves the namespace of the model as a `ByteArray`.
+/// - `tag() -> ByteArray`: Retrieves the tag of the model as a `ByteArray`.
+/// - `version() -> u8`: Retrieves the version of the model.
+/// - `selector() -> felt252`: Retrieves the selector of the model.
+/// - `layout() -> Layout`: Retrieves the layout of the model.
+/// - `name_hash() -> felt252`: Retrieves the hash of the model's name.
+/// - `namespace_hash() -> felt252`: Retrieves the hash of the model's namespace.
+/// - `instance_selector(self: @M) -> felt252`: Retrieves the selector for an instance of the model.
+/// - `instance_layout(self: @M) -> Layout`: Retrieves the layout for an instance of the model.
 pub trait Model<M> {
     fn key<K, +KeyParser<M, K>>(self: @M) -> K;
     fn entity_id(self: @M) -> felt252;
@@ -35,20 +79,37 @@ pub trait Model<M> {
     fn instance_layout(self: @M) -> Layout;
 }
 
+
+/// The `ModelStore` trait defines a set of methods for managing models within a world dispatcher.
+///
+/// # Type Parameters
+/// - `M`: The type of the model.
+/// - `K`: The type of the key used to identify models.
+/// - `T`: The type of the member within the model.
+///
+/// # Methods
+/// - `fn get<K, +Drop<K>, +Serde<K>>(self: @IWorldDispatcher, key: K) -> M`: Retrieves a model of
+///         type `M` using the provided key of type `K`.
+/// - `fn set(self: IWorldDispatcher, model: @M)`: Stores the provided model of type `M`.
+/// - `fn delete(self: IWorldDispatcher, model: @M)`: Deletes the provided model of type `M`.
+/// - `fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K)`: Deletes a model
+///         of type `M` using the provided key of type `K`.
+/// - `fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
+///         self: @IWorldDispatcher, member_id: felt252, key: K
+///    ) -> T`: Retrieves a member of type `T` from a model of type `M` using the provided member ID
+///   and key of type `K`.
+/// - `fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
+///         self: IWorldDispatcher, member_id: felt252, key: K, value: T
+///    )`: Updates a member of type `T` within a model of type `M` using the provided member ID, key
+///         of type `K`, and new value of type `T`.
 pub trait ModelStore<M> {
-    // Get a model from the world
     fn get<K, +Drop<K>, +Serde<K>>(self: @IWorldDispatcher, key: K) -> M;
-    // Set a model in the world
     fn set(self: IWorldDispatcher, model: @M);
-    // Get a member of a model from the world
     fn delete(self: IWorldDispatcher, model: @M);
-    // Delete a model from the world from its key
     fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K);
-    // Get a member of a model from the world
     fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: @IWorldDispatcher, member_id: felt252, key: K
     ) -> T;
-    // Update a member of a model in the world
     fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: IWorldDispatcher, member_id: felt252, key: K, value: T
     );
