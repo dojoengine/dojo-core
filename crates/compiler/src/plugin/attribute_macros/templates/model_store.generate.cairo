@@ -68,7 +68,7 @@ pub impl $model_type$Attributes = $model_name_snake$_attributes::$model_type$Att
 pub impl $model_type$EntityAttributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$Entity>;
 
 pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$>{
-    fn serialise_keys(self: @$model_type$) -> Span<felt252> {
+    fn serialize_keys(self: @$model_type$) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_keys$
         core::array::ArrayTrait::span(@serialized)
