@@ -1,11 +1,10 @@
 use dojo::{
-    meta::{Layout}, model::{ModelDefinition, attributes::ModelIndex, members::{MemberStore},},
+    meta::{Layout}, model::{ModelDefinition, ModelIndex, members::{MemberStore},},
     world::{IWorldDispatcher, IWorldDispatcherTrait}, utils::entity_id_from_key,
 };
 
 pub trait EntityKey<E, K> {}
 
-// Needs to be generated
 pub trait EntityParser<E> {
     fn parse_id(self: @E) -> felt252;
     fn serialize_values(self: @E) -> Span<felt252>;
@@ -32,19 +31,19 @@ pub trait Entity<E> {
 pub trait EntityStore<E> {
     // Get an entity from the world
     fn get_entity<K, +Drop<K>, +Serde<K>, +EntityKey<E, K>>(self: @IWorldDispatcher, key: K) -> E;
-    // Get an entity from the world using its entity id
+    // Get an entity from the world using its entity id.
     fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E;
-    // Update an entity in the world
+    // Update an entity in the world.
     fn update(self: IWorldDispatcher, entity: @E);
-    // Delete an entity from the
+    // Delete an entity from the world.
     fn delete_entity(self: IWorldDispatcher, entity: @E);
-    // Delete an entity from the world from its entity id
+    // Delete an entity from the world from its entity id.
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252);
-    // Get a member of a model from the world using its entity id
+    // Get a member of a model from the world using its entity id.
     fn get_member_from_id<T, +MemberStore<E, T>>(
         self: @IWorldDispatcher, member_id: felt252, entity_id: felt252
     ) -> T;
-    // Update a member of a model in the world using its entity id
+    // Update a member of a model in the world using its entity id.
     fn update_member_from_id<T, +MemberStore<E, T>>(
         self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T
     );

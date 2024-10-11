@@ -64,7 +64,7 @@ impl DojoModel {
             .get_text(db)
             .trim()
             .to_string();
-        let model_name_snake = model_type.to_case(Case::Snake);
+        let model_type_snake = model_type.to_case(Case::Snake);
 
         let model_namespace = compute_namespace(&model_type, &parameters, namespace_config);
 
@@ -202,8 +202,8 @@ impl DojoModel {
                     RewriteNode::Text(model_type.clone()),
                 ),
                 (
-                    "model_name_snake".to_string(),
-                    RewriteNode::Text(model_name_snake.clone()),
+                    "model_type_snake".to_string(),
+                    RewriteNode::Text(model_type_snake.clone()),
                 ),
                 (
                     "model_namespace".to_string(),

@@ -2,8 +2,7 @@ use starknet::SyscallResult;
 
 use dojo::{
     world::{IWorldDispatcher, IWorldDispatcherTrait}, utils::{Descriptor, DescriptorTrait},
-    meta::{Layout, introspect::Ty},
-    model::{ModelDefinition, attributes::ModelIndex, members::MemberStore},
+    meta::{Layout, introspect::Ty}, model::{ModelDefinition, ModelIndex, members::MemberStore},
     utils::{entity_id_from_key, serialize_inline, deserialize_unwrap, entity_id_from_keys}
 };
 

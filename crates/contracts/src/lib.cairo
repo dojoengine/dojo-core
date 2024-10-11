@@ -25,8 +25,8 @@ pub mod meta {
 }
 
 pub mod model {
-    pub mod attributes;
-    pub use attributes::{ModelIndex, ModelDefinition};
+    pub mod definition;
+    pub use definition::{ModelIndex, ModelDefinition};
 
     pub mod members;
     pub use members::{MemberStore};

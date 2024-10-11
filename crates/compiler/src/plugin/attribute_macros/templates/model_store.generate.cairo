@@ -16,8 +16,8 @@ pub impl $model_type$KeyParser of dojo::model::model::KeyParser<$model_type$, $m
 impl $model_type$EntityKey of dojo::model::entity::EntityKey<$model_type$Entity, $model_type$KeyType> {
 }
 
-// Impl to get the static attributes of a model
-pub mod $model_name_snake$_attributes {
+// Impl to get the static definition of a model
+pub mod $model_type_snake$_definition {
     use super::$model_type$;
     pub impl $model_type$DefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
@@ -64,8 +64,8 @@ pub mod $model_name_snake$_attributes {
 }
 
 
-pub impl $model_type$Definition = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$>;
-pub impl $model_type$EntityAttributes = $model_name_snake$_attributes::$model_type$AttributesImpl<$model_type$Entity>;
+pub impl $model_type$Definition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$>;
+pub impl $model_type$EntityDefinition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$Entity>;
 
 pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$>{
     fn serialize_keys(self: @$model_type$) -> Span<felt252> {
@@ -111,7 +111,7 @@ pub trait I$model_type$<T> {
 }
 
 #[starknet::contract]
-pub mod $model_name_snake$ {
+pub mod $model_type_snake$ {
     use super::$model_type$;
     use super::I$model_type$;
     use super::$model_type$Definition;

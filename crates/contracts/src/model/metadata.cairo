@@ -32,7 +32,7 @@ pub struct ResourceMetadata {
     pub metadata_uri: ByteArray,
 }
 
-pub impl ResourceMetadataAttributesImpl of dojo::model::ModelDefinition<ResourceMetadata> {
+pub impl ResourceMetadataDefinitionImpl of dojo::model::ModelDefinition<ResourceMetadata> {
     #[inline(always)]
     fn name() -> ByteArray {
         "ResourceMetadata"
@@ -124,7 +124,7 @@ pub impl ResourceMetadataIntrospect<> of Introspect<ResourceMetadata<>> {
 
 #[starknet::contract]
 pub mod resource_metadata {
-    use super::{ResourceMetadata, ResourceMetadataAttributesImpl};
+    use super::{ResourceMetadata, ResourceMetadataDefinitionImpl};
 
     use dojo::meta::introspect::{Introspect, Ty};
     use dojo::meta::Layout;
@@ -134,19 +134,19 @@ pub mod resource_metadata {
 
     #[external(v0)]
     fn selector(self: @ContractState) -> felt252 {
-        ResourceMetadataAttributesImpl::selector()
+        ResourceMetadataDefinitionImpl::selector()
     }
 
     fn name(self: @ContractState) -> ByteArray {
-        ResourceMetadataAttributesImpl::name()
+        ResourceMetadataDefinitionImpl::name()
     }
 
     fn version(self: @ContractState) -> u8 {
-        ResourceMetadataAttributesImpl::version()
+        ResourceMetadataDefinitionImpl::version()
     }
 
     fn namespace(self: @ContractState) -> ByteArray {
-        ResourceMetadataAttributesImpl::namespace()
+        ResourceMetadataDefinitionImpl::namespace()
     }
 
     #[external(v0)]
