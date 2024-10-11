@@ -175,7 +175,10 @@ fn test_register_model_for_namespace_writer() {
 
 #[test]
 #[should_panic(
-    expected: ("Name `foo-bis` is invalid according to Dojo naming rules", 'ENTRYPOINT_FAILED',)
+    expected: (
+        "Name `foo-bis` is invalid according to Dojo naming rules: ^[a-zA-Z0-9_]+$",
+        'ENTRYPOINT_FAILED',
+    )
 )]
 fn test_register_model_with_invalid_name() {
     let world = deploy_world();
@@ -185,7 +188,7 @@ fn test_register_model_with_invalid_name() {
 #[test]
 #[should_panic(
     expected: (
-        "Namespace `inv@lid n@mesp@ce` is invalid according to Dojo naming rules",
+        "Namespace `inv@lid n@mesp@ce` is invalid according to Dojo naming rules: ^[a-zA-Z0-9_]+$",
         'ENTRYPOINT_FAILED',
     )
 )]

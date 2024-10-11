@@ -75,5 +75,5 @@ pub fn no_world_owner(caller: ContractAddress, target: @ByteArray) -> ByteArray 
 }
 
 pub fn invalid_naming(kind: ByteArray, what: @ByteArray) -> ByteArray {
-    format!("{kind} `{what}` is invalid according to Dojo naming rules")
+    format!("{kind} `{what}` is invalid according to Dojo naming rules: ^[a-zA-Z0-9_]+$")
 }

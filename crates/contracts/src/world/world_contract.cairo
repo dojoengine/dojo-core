@@ -937,14 +937,14 @@ pub mod world {
             self.panic_with_details(caller, resource_selector, permission)
         }
 
-        ///
+        /// Asserts the name is valid according to the naming convention.
         fn assert_name(self: @ContractState, name: @ByteArray) {
             if !dojo::utils::is_name_valid(name) {
                 panic_with_byte_array(@errors::invalid_naming("Name", name))
             }
         }
 
-        ///
+        /// Asserts the namespace is valid according to the naming convention.
         fn assert_namespace(self: @ContractState, namespace: @ByteArray) {
             if !dojo::utils::is_name_valid(namespace) {
                 panic_with_byte_array(@errors::invalid_naming("Namespace", namespace))
