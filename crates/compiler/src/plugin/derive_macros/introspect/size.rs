@@ -189,7 +189,7 @@ pub fn compute_item_size_from_type(item_type: &String) -> Vec<String> {
             vec![p.0.to_string()]
         } else {
             vec![format!(
-                "dojo::model::introspect::Introspect::<{}>::size()",
+                "dojo::meta::introspect::Introspect::<{}>::size()",
                 item_type
             )]
         }

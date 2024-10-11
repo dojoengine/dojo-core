@@ -19,6 +19,7 @@ pub struct CompilerConfig {
 ///
 /// For example, the compiler only relies on the `namespace` configuration. However, sozo
 /// requires additional configurations, like `world`, `env`, etc.
+#[derive(Debug)]
 pub struct DojoConfigLoader<T>
 where
     T: serde::de::DeserializeOwned + Default,

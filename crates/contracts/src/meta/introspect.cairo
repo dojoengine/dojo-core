@@ -1,7 +1,7 @@
-use dojo::model::Layout;
+use dojo::meta::{Layout, FieldLayout};
 use dojo::storage::packing;
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub enum Ty {
     Primitive: felt252,
     Struct: Struct,
@@ -14,21 +14,21 @@ pub enum Ty {
     ByteArray,
 }
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub struct Struct {
     pub name: felt252,
     pub attrs: Span<felt252>,
     pub children: Span<Member>
 }
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub struct Enum {
     pub name: felt252,
     pub attrs: Span<felt252>,
     pub children: Span<(felt252, Ty)>
 }
 
-#[derive(Copy, Drop, Serde)]
+#[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub struct Member {
     pub name: felt252,
     pub attrs: Span<felt252>,
@@ -241,9 +241,9 @@ pub impl Introspect_option<T, +Introspect<T>> of Introspect<Option<T>> {
     fn layout() -> Layout {
         Layout::Enum(
             [
-                dojo::model::FieldLayout { // Some
+                dojo::meta::FieldLayout { // Some
                  selector: 0, layout: Introspect::<T>::layout() },
-                dojo::model::FieldLayout { // None
+                dojo::meta::FieldLayout { // None
                  selector: 1, layout: Layout::Fixed([].span()) },
             ].span()
         )

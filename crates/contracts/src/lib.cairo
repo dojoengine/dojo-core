@@ -1,19 +1,32 @@
 pub mod contract {
-    mod base_contract;
-    pub use base_contract::base;
     pub mod contract;
     pub use contract::{IContract, IContractDispatcher, IContractDispatcherTrait};
-    pub mod upgradeable;
+
+    pub mod components {
+        pub mod upgradeable;
+        pub mod world_provider;
+    }
 }
 
-pub mod model {
+pub mod event {
+    pub mod event;
+    pub use event::{Event, EventDefinition, IEvent, IEventDispatcher, IEventDispatcherTrait};
+
+    #[cfg(target: "test")]
+    pub use event::{EventTest};
+}
+
+pub mod meta {
     pub mod introspect;
     pub mod layout;
     pub use layout::{Layout, FieldLayout};
+}
 
+pub mod model {
     pub mod model;
     pub use model::{
-        Model, ModelIndex, ModelEntity, IModel, IModelDispatcher, IModelDispatcherTrait,
+        Model, ModelDefinition, ModelIndex, ModelEntity, IModel, IModelDispatcher,
+        IModelDispatcherTrait,
     };
 
     #[cfg(target: "test")]
@@ -28,6 +41,7 @@ pub(crate) mod storage {
     pub(crate) mod packing;
     pub(crate) mod layout;
     pub(crate) mod storage;
+    pub(crate) mod entity_model;
 }
 
 pub mod utils {
@@ -43,40 +57,57 @@ pub mod utils {
     #[cfg(target: "test")]
     pub mod test;
 
-    pub mod utils;
-    pub use utils::{
-        bytearray_hash, entity_id_from_keys, find_field_layout, find_model_field_layout, any_none,
-        sum, combine_key, selector_from_names,
-    };
-
     pub mod descriptor;
     pub use descriptor::{
         Descriptor, DescriptorTrait, IDescriptorDispatcher, IDescriptorDispatcherTrait
     };
+
+    pub mod hash;
+    pub use hash::{bytearray_hash, selector_from_names};
+
+    pub mod key;
+    pub use key::{entity_id_from_keys, combine_key};
+
+    pub mod layout;
+    pub use layout::{find_field_layout, find_model_field_layout};
+
+    pub mod misc;
+    pub use misc::{any_none, sum};
+
+    pub mod naming;
+    pub use naming::is_name_valid;
 }
 
 pub mod world {
-    pub(crate) mod update;
-    pub(crate) mod config;
     pub(crate) mod errors;
 
-    mod world_contract;
-    pub use world_contract::{
-        world, IWorld, IWorldDispatcher, IWorldDispatcherTrait, IWorldProvider,
-        IWorldProviderDispatcher, IWorldProviderDispatcherTrait, Resource,
+    mod resource;
+    pub use resource::{Resource, ResourceIsNoneTrait};
+
+    mod iworld;
+    pub use iworld::{
+        IWorld, IWorldDispatcher, IWorldDispatcherTrait, IUpgradeableWorld,
+        IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait
     };
 
     #[cfg(target: "test")]
-    pub use world_contract::{
-        IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait, IUpgradeableWorld,
-        IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait
-    };
+    pub use iworld::{IWorldTest, IWorldTestDispatcher, IWorldTestDispatcherTrait};
+
+    mod world_contract;
+    pub use world_contract::world;
 }
 
 #[cfg(test)]
 mod tests {
-    mod model {
+    mod meta {
         mod introspect;
+    }
+
+    mod event {
+        mod event;
+    }
+
+    mod model {
         mod model;
     }
     mod storage {
@@ -84,7 +115,7 @@ mod tests {
         mod packing;
         mod storage;
     }
-    mod base;
+    mod contract;
     mod benchmarks;
     mod expanded {
         pub(crate) mod selector_attack;
@@ -95,6 +126,13 @@ mod tests {
         mod entities;
         mod resources;
         mod world;
+        mod init;
     }
-    mod utils;
+    mod utils {
+        mod hash;
+        mod key;
+        mod layout;
+        mod misc;
+        mod naming;
+    }
 }

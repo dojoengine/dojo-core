@@ -9,7 +9,7 @@ use cairo_lang_starknet::starknet_plugin_suite;
 use cairo_lang_test_plugin::{test_plugin_suite, TestsCompilationConfig};
 use cairo_lang_test_runner::{CompiledTestRunner, RunProfilerConfig, TestCompiler, TestRunConfig};
 use clap::Args;
-use dojo_compiler::compiler::compiler::{
+use dojo_compiler::compiler::cairo_compiler::{
     collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
 };
 use dojo_compiler::compiler::config::{CompilerConfig, DojoConfigLoader};

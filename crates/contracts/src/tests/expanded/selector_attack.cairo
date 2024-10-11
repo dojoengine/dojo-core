@@ -4,9 +4,8 @@
 #[starknet::contract]
 pub mod attacker_contract {
     use dojo::world;
-    use dojo::world::IWorldDispatcher;
-    use dojo::world::IWorldDispatcherTrait;
-    use dojo::world::IWorldProvider;
+    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::contract::components::world_provider::IWorldProvider;
     use dojo::contract::IContract;
     use starknet::storage::{
         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
@@ -56,6 +55,7 @@ pub mod attacker_contract {
 
 #[starknet::contract]
 pub mod attacker_model {
+    use super::super::super::super::model::IModel;
     #[storage]
     struct Storage {}
 
@@ -98,12 +98,25 @@ pub mod attacker_model {
             Option::None
         }
 
-        fn layout(self: @ContractState) -> dojo::model::Layout {
-            dojo::model::Layout::Fixed([].span())
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::meta::Layout::Fixed([].span())
         }
 
-        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
-            dojo::model::introspect::Ty::Primitive('felt252')
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
+            dojo::meta::introspect::Ty::Primitive('felt252')
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::ModelDefinition {
+                name: self.name(),
+                namespace: self.namespace(),
+                namespace_selector: self.namespace_hash(),
+                version: self.version(),
+                layout: self.layout(),
+                schema: self.schema(),
+                packed_size: self.packed_size(),
+                unpacked_size: self.unpacked_size(),
+            }
         }
     }
 }

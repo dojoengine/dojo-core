@@ -24,9 +24,9 @@ use crate::plugin::syntax::{self_param, utils as syntax_utils};
 use super::patches::{CONTRACT_PATCH, DEFAULT_INIT_PATCH};
 use super::DOJO_CONTRACT_ATTR;
 
+const CONSTRUCTOR_FN: &str = "constructor";
 const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";
-const CONTRACT_NOMAPPING: &str = "nomapping";
 
 #[derive(Debug, Clone, Default)]
 pub struct ContractParameters {
@@ -56,10 +56,6 @@ impl DojoContract {
             diagnostics,
             systems: vec![],
         };
-
-        let mut has_event = false;
-        let mut has_storage = false;
-        let mut has_init = false;
 
         let unmapped_namespace = parameters
             .namespace
@@ -99,6 +95,11 @@ impl DojoContract {
         let contract_selector =
             naming::compute_selector_from_hashes(contract_namespace_hash, contract_name_hash);
 
+        let mut has_event = false;
+        let mut has_storage = false;
+        let mut has_init = false;
+        let mut has_constructor = false;
+
         if let MaybeModuleBody::Some(body) = module_ast.body(db) {
             let mut body_nodes: Vec<_> = body
                 .iter_items_in_cfg(db, metadata.cfg_set)
@@ -124,6 +125,11 @@ impl DojoContract {
                         let fn_decl = fn_ast.declaration(db);
                         let fn_name = fn_decl.name(db).text(db);
 
+                        if fn_name == CONSTRUCTOR_FN {
+                            has_constructor = true;
+                            return contract.handle_constructor_fn(db, fn_ast);
+                        }
+
                         if fn_name == DOJO_INIT_FN {
                             has_init = true;
                             return contract.handle_init_fn(db, fn_ast);
@@ -133,6 +139,20 @@ impl DojoContract {
                     vec![RewriteNode::Copied(el.as_syntax_node())]
                 })
                 .collect();
+
+            if !has_constructor {
+                let node = RewriteNode::Text(
+                    "
+                    #[constructor]
+                        fn constructor(ref self: ContractState) {
+                            self.world_provider.initializer();
+                        }
+                    "
+                    .to_string(),
+                );
+
+                body_nodes.append(&mut vec![node]);
+            }
 
             if !has_init {
                 let node = RewriteNode::interpolate_patched(
@@ -184,13 +204,18 @@ impl DojoContract {
 
             let (code, code_mappings) = builder.build();
 
+            crate::debug_expand(
+                &format!("CONTRACT PATCH: {contract_namespace}-{name}"),
+                &code,
+            );
+
             return PluginResult {
                 code: Some(PluginGeneratedFile {
                     name: name.clone(),
                     content: code,
                     aux_data: Some(DynGeneratedFileAuxData::new(ContractAuxData {
-                        name,
-                        namespace: contract_namespace.clone(),
+                        name: name.to_string(),
+                        namespace: contract_namespace.to_string(),
                         systems: contract.systems.clone(),
                     })),
                     code_mappings,
@@ -203,6 +228,53 @@ impl DojoContract {
         PluginResult::default()
     }
 
+    /// If a constructor is provided, we should keep the user statements.
+    /// We only inject the world provider initializer.
+    fn handle_constructor_fn(
+        &mut self,
+        db: &dyn SyntaxGroup,
+        fn_ast: &ast::FunctionWithBody,
+    ) -> Vec<RewriteNode> {
+        let fn_decl = fn_ast.declaration(db);
+
+        let params_str = self.params_to_str(db, fn_decl.signature(db).parameters(db));
+
+        let declaration_node = RewriteNode::Mapped {
+            node: Box::new(RewriteNode::Text(format!(
+                "
+                #[constructor]
+                fn constructor({}) {{
+                    self.world_provider.initializer();
+                ",
+                params_str
+            ))),
+            origin: fn_ast
+                .declaration(db)
+                .as_syntax_node()
+                .span_without_trivia(db),
+        };
+
+        let func_nodes = fn_ast
+            .body(db)
+            .statements(db)
+            .elements(db)
+            .iter()
+            .map(|e| RewriteNode::Mapped {
+                node: Box::new(RewriteNode::from(e.as_syntax_node())),
+                origin: e.as_syntax_node().span_without_trivia(db),
+            })
+            .collect::<Vec<_>>();
+
+        let mut nodes = vec![declaration_node];
+
+        nodes.extend(func_nodes);
+
+        // Close the constructor with users statements included.
+        nodes.push(RewriteNode::Text("}\n".to_string()));
+
+        nodes
+    }
+
     fn handle_init_fn(
         &mut self,
         db: &dyn SyntaxGroup,
@@ -213,7 +285,8 @@ impl DojoContract {
         if let OptionReturnTypeClause::ReturnTypeClause(_) = fn_decl.signature(db).ret_ty(db) {
             self.diagnostics.push(PluginDiagnostic {
                 stable_ptr: fn_ast.stable_ptr().untyped(),
-                message: "The dojo_init function cannot have a return type.".to_string(),
+                message: format!("The {} function cannot have a return type.", DOJO_INIT_FN)
+                    .to_string(),
                 severity: Severity::Error,
             });
         }
@@ -224,28 +297,14 @@ impl DojoContract {
             fn_ast.stable_ptr().untyped(),
         );
 
-        let trait_node = RewriteNode::interpolate_patched(
-            "#[starknet::interface]
-            pub trait IDojoInit<ContractState> {
-                fn $init_name$($params_str$);
-            }
-            ",
-            &UnorderedHashMap::from([
-                (
-                    "init_name".to_string(),
-                    RewriteNode::Text(DOJO_INIT_FN.to_string()),
-                ),
-                (
-                    "params_str".to_string(),
-                    RewriteNode::Text(params_str.clone()),
-                ),
-            ]),
-        );
-
+        // Since the dojo init is meant to be called by the world, we don't need an
+        // interface to be generated (which adds a considerable amount of code).
         let impl_node = RewriteNode::Text(
             "
-            #[abi(embed_v0)]
-            pub impl IDojoInitImpl of IDojoInit<ContractState> {
+            #[abi(per_item)]
+            #[generate_trait]
+            pub impl IDojoInitImpl of IDojoInit {
+                #[external(v0)]
             "
             .to_string(),
         );
@@ -262,13 +321,14 @@ impl DojoContract {
         };
 
         let world_line_node = if was_world_injected {
-            RewriteNode::Text("let world = self.world_dispatcher.read();".to_string())
+            RewriteNode::Text("let world = self.world_provider.world();".to_string())
         } else {
             RewriteNode::empty()
         };
 
+        // Asserts the caller is the world, and close the init function.
         let assert_world_caller_node = RewriteNode::Text(
-            "if starknet::get_caller_address() != self.world().contract_address { \
+            "if starknet::get_caller_address() != self.world_provider.world().contract_address { \
              core::panics::panic_with_byte_array(@format!(\"Only the world can init contract \
              `{}`, but caller is `{:?}`\", self.tag(), starknet::get_caller_address())); }"
                 .to_string(),
@@ -286,7 +346,6 @@ impl DojoContract {
             .collect::<Vec<_>>();
 
         let mut nodes = vec![
-            trait_node,
             impl_node,
             declaration_node,
             world_line_node,
@@ -319,7 +378,8 @@ impl DojoContract {
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
-                UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
+                UpgradeableEvent: upgradeable_cpt::Event,
+                WorldProviderEvent: world_provider_cpt::Event,
                 $variants$
             }
             ",
@@ -334,7 +394,8 @@ impl DojoContract {
             #[event]
             #[derive(Drop, starknet::Event)]
             enum Event {
-                UpgradeableEvent: dojo::contract::upgradeable::upgradeable::Event,
+                UpgradeableEvent: upgradeable_cpt::Event,
+                WorldProviderEvent: world_provider_cpt::Event,
             }
             "
             .to_string(),
@@ -360,9 +421,10 @@ impl DojoContract {
             "
             #[storage]
             struct Storage {
-                world_dispatcher: IWorldDispatcher,
                 #[substorage(v0)]
-                upgradeable: dojo::contract::upgradeable::upgradeable::Storage,
+                upgradeable: upgradeable_cpt::Storage,
+                #[substorage(v0)]
+                world_provider: world_provider_cpt::Storage,
                 $members$
             }
             ",
@@ -376,13 +438,25 @@ impl DojoContract {
             "
             #[storage]
             struct Storage {
-                world_dispatcher: IWorldDispatcher,
                 #[substorage(v0)]
-                upgradeable: dojo::contract::upgradeable::upgradeable::Storage,
+                upgradeable: upgradeable_cpt::Storage,
+                #[substorage(v0)]
+                world_provider: world_provider_cpt::Storage,
             }
             "
             .to_string(),
         )]
+    }
+
+    /// Converts parameter list to it's string representation.
+    pub fn params_to_str(&mut self, db: &dyn SyntaxGroup, param_list: ast::ParamList) -> String {
+        let params = param_list
+            .elements(db)
+            .iter()
+            .map(|param| param.as_syntax_node().get_text(db))
+            .collect::<Vec<_>>();
+
+        params.join(", ")
     }
 
     /// Rewrites parameter list by:
@@ -461,10 +535,10 @@ impl DojoContract {
     /// Rewrites function declaration by:
     ///  * adding `self` parameter if missing,
     ///  * removing `world` if present as first parameter (self excluded),
-    ///  * adding `let world = self.world_dispatcher.read();` statement at the beginning of the
+    ///  * adding `let world = self.world_provider.world();` statement at the beginning of the
     ///    function to restore the removed `world` parameter.
     ///  * if `has_generate_trait` is true, the implementation containing the function has the
-    ///    #[generate_trait] attribute.
+    ///    `#[generate_trait]` attribute.
     pub fn rewrite_function(
         &mut self,
         db: &dyn SyntaxGroup,
@@ -502,7 +576,7 @@ impl DojoContract {
         };
 
         let world_line_node = if was_world_injected {
-            RewriteNode::Text("let world = self.world_dispatcher.read();".to_string())
+            RewriteNode::Text("let world = self.world_provider.world();".to_string())
         } else {
             RewriteNode::empty()
         };
@@ -658,8 +732,6 @@ fn get_parameters(
                             CONTRACT_NAMESPACE => {
                                 parameters.namespace =
                                     get_contract_namespace(db, arg_value, diagnostics);
-                            }
-                            CONTRACT_NOMAPPING => {
                                 parameters.nomapping = true;
                             }
                             _ => {

@@ -1,13 +1,10 @@
 pub const DEFAULT_INIT_PATCH: &str = "
-#[starknet::interface]
-pub trait IDojoInit<ContractState> {
-    fn $init_name$(self: @ContractState);
-}
-
-#[abi(embed_v0)]
-pub impl IDojoInitImpl of IDojoInit<ContractState> {
+#[abi(per_item)]
+#[generate_trait]
+pub impl IDojoInitImpl of IDojoInit {
+    #[external(v0)]
     fn $init_name$(self: @ContractState) {
-        if starknet::get_caller_address() != self.world().contract_address {
+        if starknet::get_caller_address() != self.world_provider.world().contract_address {
             core::panics::panic_with_byte_array(
                 @format!(\"Only the world can init contract `{}`, but caller \
  is `{:?}`\",
@@ -25,15 +22,22 @@ pub const CONTRACT_PATCH: &str = "
                     use dojo::world;
                     use dojo::world::IWorldDispatcher;
                     use dojo::world::IWorldDispatcherTrait;
-                    use dojo::world::IWorldProvider;
+                    use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
+                    use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
                     use starknet::storage::{
                         StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, \
                         StoragePointerWriteAccess
                     };
 
-                    component!(path: dojo::contract::upgradeable::upgradeable, storage: \
-                     upgradeable, event: UpgradeableEvent);
+                    component!(path: world_provider_cpt, storage: world_provider, event: WorldProviderEvent);
+                    component!(path: upgradeable_cpt, storage: upgradeable, event: UpgradeableEvent);
+
+                    #[abi(embed_v0)]
+                    impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
+                    
+                    #[abi(embed_v0)]
+                    impl UpgradeableImpl = upgradeable_cpt::UpgradeableImpl<ContractState>;
 
                     #[abi(embed_v0)]
                     pub impl ContractImpl of IContract<ContractState> {
@@ -61,17 +65,6 @@ pub const CONTRACT_PATCH: &str = "
                             $contract_selector$
                         }
                     }
-
-                    #[abi(embed_v0)]
-                    impl WorldProviderImpl of IWorldProvider<ContractState> {
-                        fn world(self: @ContractState) -> IWorldDispatcher {
-                            self.world_dispatcher.read()
-                        }
-                    }
-
-                    #[abi(embed_v0)]
-                    impl UpgradableImpl = \
-                     dojo::contract::upgradeable::upgradeable::UpgradableImpl<ContractState>;
 
                     $body$
                 }
@@ -109,22 +102,16 @@ pub impl $type_name$StoreImpl of $type_name$Store {
         core::poseidon::poseidon_hash_span(serialized.span())
     }
 
-    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> $type_name$ {
-        let mut serialized = core::array::ArrayTrait::new();
-        serialized.append_span(keys);
-        serialized.append_span(values);
-        let mut serialized = core::array::ArrayTrait::span(@serialized);
+    fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<$type_name$> {
+        $deserialized_keys$
+        $deserialized_values$
 
-        let entity = core::serde::Serde::<$type_name$>::deserialize(ref serialized);
-
-        if core::option::OptionTrait::<$type_name$>::is_none(@entity) {
-            panic!(
-                \"Model `$type_name$`: deserialization failed. Ensure the length of the keys tuple \
-             is matching the number of #[key] fields in the model struct.\"
-            );
-        }
-
-        core::option::OptionTrait::<$type_name$>::unwrap(entity)
+        Option::Some(
+            $type_name$ {
+                $member_key_names$
+                $member_value_names$
+            }
+        )
     }
 
     fn get(world: dojo::world::IWorldDispatcher, $param_keys$) -> $type_name$ {
@@ -156,18 +143,15 @@ pub impl $type_name$ModelEntityImpl of dojo::model::ModelEntity<$type_name$Entit
         core::array::ArrayTrait::span(@serialized)
     }
 
-    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> $type_name$Entity {
-        let mut serialized = array![entity_id];
-        serialized.append_span(values);
-        let mut serialized = core::array::ArrayTrait::span(@serialized);
+    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<$type_name$Entity> {
+        $deserialized_values$
 
-        let entity_values = core::serde::Serde::<$type_name$Entity>::deserialize(ref serialized);
-        if core::option::OptionTrait::<$type_name$Entity>::is_none(@entity_values) {
-            panic!(
-                \"ModelEntity `$type_name$Entity`: deserialization failed.\"
-            );
-        }
-        core::option::OptionTrait::<$type_name$Entity>::unwrap(entity_values)
+        Option::Some(
+            $type_name$Entity {
+                __id: entity_id,
+                $member_value_names$
+            }
+        )
     }
 
     fn get(world: dojo::world::IWorldDispatcher, entity_id: felt252) -> $type_name$Entity {
@@ -177,7 +161,12 @@ pub impl $type_name$ModelEntityImpl of dojo::model::ModelEntity<$type_name$Entit
             dojo::model::ModelIndex::Id(entity_id),
             dojo::model::Model::<$type_name$>::layout()
         );
-        Self::from_values(entity_id, ref values)
+        match Self::from_values(entity_id, ref values) {
+            Option::Some(x) => x,
+            Option::None => {
+                panic!(\"ModelEntity `$type_name$Entity`: deserialization failed.\")
+            }
+        }
     }
 
     fn update_entity(self: @$type_name$Entity, world: dojo::world::IWorldDispatcher) {
@@ -278,7 +267,12 @@ pub impl $type_name$ModelImpl of dojo::model::Model<$type_name$> {
         );
         let mut _keys = keys;
 
-        $type_name$Store::from_values(ref _keys, ref values)
+        match $type_name$Store::from_values(ref _keys, ref values) {
+            Option::Some(x) => x,
+            Option::None => {
+                panic!(\"Model `$type_name$`: deserialization failed.\")
+            }
+        }
     }
 
    fn set_model(
@@ -405,18 +399,37 @@ pub impl $type_name$ModelImpl of dojo::model::Model<$type_name$> {
     }
 
     #[inline(always)]
-    fn layout() -> dojo::model::Layout {
-        dojo::model::introspect::Introspect::<$type_name$>::layout()
+    fn layout() -> dojo::meta::Layout {
+        dojo::meta::introspect::Introspect::<$type_name$>::layout()
     }
 
     #[inline(always)]
-    fn instance_layout(self: @$type_name$) -> dojo::model::Layout {
+    fn instance_layout(self: @$type_name$) -> dojo::meta::Layout {
         Self::layout()
     }
 
     #[inline(always)]
     fn packed_size() -> Option<usize> {
-        dojo::model::layout::compute_packed_size(Self::layout())
+        dojo::meta::layout::compute_packed_size(Self::layout())
+    }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<$type_name$>::ty()
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::model::ModelDefinition {
+        dojo::model::ModelDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema(),
+            packed_size: Self::packed_size(),
+            unpacked_size: dojo::meta::introspect::Introspect::<$type_name$>::size(),
+        }
     }
 }
 
@@ -498,25 +511,199 @@ pub mod $contract_name$ {
         }
 
         fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::model::introspect::Introspect::<$type_name$>::size()
+            dojo::meta::introspect::Introspect::<$type_name$>::size()
         }
 
         fn packed_size(self: @ContractState) -> Option<usize> {
             dojo::model::Model::<$type_name$>::packed_size()
         }
 
-        fn layout(self: @ContractState) -> dojo::model::Layout {
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
             dojo::model::Model::<$type_name$>::layout()
         }
 
-        fn schema(self: @ContractState) -> dojo::model::introspect::Ty {
-            dojo::model::introspect::Introspect::<$type_name$>::ty()
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
+            dojo::meta::introspect::Introspect::<$type_name$>::ty()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
+            dojo::model::Model::<$type_name$>::definition()
         }
     }
 
     #[abi(embed_v0)]
     impl $contract_name$Impl of I$contract_name$<ContractState>{
         fn ensure_abi(self: @ContractState, model: $type_name$) {
+        }
+    }
+}
+";
+
+pub const EVENT_PATCH: &str = "
+#[generate_trait]
+pub impl $type_name$EmitterImpl of $type_name$Emitter {
+    fn emit(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
+        dojo::event::Event::<$type_name$>::emit(self, world);
+    }
+}
+
+pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
+
+    fn emit(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
+        dojo::world::IWorldDispatcherTrait::emit_event(
+            world,
+            Self::selector(),
+            Self::keys(self),
+            Self::values(self),
+            Self::historical()
+        );
+    }
+
+    #[inline(always)]
+    fn name() -> ByteArray {
+        \"$type_name$\"
+    }
+
+    #[inline(always)]
+    fn namespace() -> ByteArray {
+        \"$event_namespace$\"
+    }
+
+    #[inline(always)]
+    fn tag() -> ByteArray {
+        \"$event_tag$\"
+    }
+
+    #[inline(always)]
+    fn version() -> u8 {
+        $event_version$
+    }
+
+    #[inline(always)]
+    fn selector() -> felt252 {
+        $event_selector$
+    }
+
+    #[inline(always)]
+    fn instance_selector(self: @$type_name$) -> felt252 {
+        Self::selector()
+    }
+
+    #[inline(always)]
+    fn name_hash() -> felt252 {
+        $event_name_hash$
+    }
+
+    #[inline(always)]
+    fn namespace_hash() -> felt252 {
+        $event_namespace_hash$
+    }
+
+    #[inline(always)]
+    fn definition() -> dojo::event::EventDefinition {
+        dojo::event::EventDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema()
+        }
+    }
+
+    #[inline(always)]
+    fn layout() -> dojo::meta::Layout {
+        dojo::meta::introspect::Introspect::<$type_name$>::layout()
+    }
+
+    #[inline(always)]
+    fn schema() -> dojo::meta::introspect::Ty {
+        dojo::meta::introspect::Introspect::<$type_name$>::ty()
+    }
+
+    #[inline(always)]
+    fn historical() -> bool {
+        $event_historical$
+    }
+
+    #[inline(always)]
+    fn keys(self: @$type_name$) -> Span<felt252> {
+        let mut serialized = core::array::ArrayTrait::new();
+        $serialized_keys$
+        core::array::ArrayTrait::span(@serialized)
+    }
+
+    #[inline(always)]
+    fn values(self: @$type_name$) -> Span<felt252> {
+        let mut serialized = core::array::ArrayTrait::new();
+        $serialized_values$
+        core::array::ArrayTrait::span(@serialized)
+    }
+}
+
+#[cfg(target: \"test\")]
+pub impl $type_name$EventImplTest of dojo::event::EventTest<$type_name$> {
+    fn emit_test(self: @$type_name$, world: dojo::world::IWorldDispatcher) {
+        let world_test = dojo::world::IWorldTestDispatcher { contract_address: \
+             world.contract_address };
+
+        dojo::world::IWorldTestDispatcherTrait::emit_event_test(
+            world_test,
+            dojo::event::Event::<$type_name$>::selector(),
+            dojo::event::Event::<$type_name$>::keys(self),
+            dojo::event::Event::<$type_name$>::values(self),
+            dojo::event::Event::<$type_name$>::historical()
+        );
+    }
+}
+
+#[starknet::contract]
+pub mod $contract_name$ {
+    use super::$type_name$;
+
+    #[storage]
+    struct Storage {}
+
+    #[abi(embed_v0)]
+    impl DojoEventImpl of dojo::event::IEvent<ContractState>{
+        fn name(self: @ContractState) -> ByteArray {
+           \"$type_name$\"
+        }
+
+        fn namespace(self: @ContractState) -> ByteArray {
+           \"$event_namespace$\"
+        }
+
+        fn tag(self: @ContractState) -> ByteArray {
+            \"$event_tag$\"
+        }
+
+        fn version(self: @ContractState) -> u8 {
+           $event_version$
+        }
+
+        fn selector(self: @ContractState) -> felt252 {
+           $event_selector$
+        }
+
+        fn name_hash(self: @ContractState) -> felt252 {
+            $event_name_hash$
+        }
+
+        fn namespace_hash(self: @ContractState) -> felt252 {
+            $event_namespace_hash$
+        }
+
+        fn definition(self: @ContractState) -> dojo::event::EventDefinition {
+            dojo::event::Event::<$type_name$>::definition()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::event::Event::<$type_name$>::layout()
+        }
+
+        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
+            dojo::meta::introspect::Introspect::<$type_name$>::ty()
         }
     }
 }

@@ -22,6 +22,14 @@ pub fn no_namespace_write_access(caller: ContractAddress, namespace: @ByteArray)
     format!("Caller `{:?}` has no write access on namespace `{}`", caller, namespace)
 }
 
+pub fn event_already_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
+    format!("Resource `{}-{}` is already registered", namespace, name)
+}
+
+pub fn event_not_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
+    format!("Resource `{}-{}` is not registered", namespace, name)
+}
+
 pub fn model_already_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
     format!("Resource `{}-{}` is already registered", namespace, name)
 }
@@ -64,4 +72,8 @@ pub fn no_model_write_access(tag: @ByteArray, caller: ContractAddress) -> ByteAr
 
 pub fn no_world_owner(caller: ContractAddress, target: @ByteArray) -> ByteArray {
     format!("Caller `{:?}` can't {} (not world owner)", caller, target)
+}
+
+pub fn invalid_naming(kind: ByteArray, what: @ByteArray) -> ByteArray {
+    format!("{kind} `{what}` is invalid according to Dojo naming rules: ^[a-zA-Z0-9_]+$")
 }

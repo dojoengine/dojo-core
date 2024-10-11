@@ -12,8 +12,8 @@ use dojo_types::naming;
 use scarb::compiler::Profile;
 use scarb::core::Config;
 
-use crate::compiler::manifest::AbstractBaseManifest;
-use crate::namespace_config::{DOJO_MANIFESTS_DIR_CFG_KEY, WORKSPACE_CURRENT_PROFILE_CFG_KEY};
+use crate::compiler::annotation::DojoAnnotation;
+use crate::namespace_config::{DOJO_ANNOTATIONS_DIR_CFG_KEY, WORKSPACE_CURRENT_PROFILE_CFG_KEY};
 
 #[derive(Debug)]
 pub enum SystemRWOpRecord {
@@ -55,14 +55,12 @@ pub fn load_manifest_models_and_namespaces(
 
     let ws = scarb::ops::read_workspace(config.manifest_path(), &config)?;
 
-    let mut base_abstract_manifest = AbstractBaseManifest::new(&ws);
+    let annotations = DojoAnnotation::read(&ws)?;
 
-    base_abstract_manifest.read()?;
+    let mut models = HashSet::<String>::new();
+    let mut namespaces = HashSet::<String>::new();
 
-    let mut models = HashSet::new();
-    let mut namespaces = HashSet::new();
-
-    for model in base_abstract_manifest.models {
+    for model in annotations.models {
         let qualified_path = model.qualified_path;
         let namespace = naming::split_tag(&model.tag)?.0;
 
@@ -83,7 +81,7 @@ pub fn load_manifest_models_and_namespaces(
 /// Gets the dojo_manifests_dir for the current profile from the cfg_set.
 pub fn get_dojo_manifests_dir(cfg_set: CfgSet) -> anyhow::Result<Utf8PathBuf> {
     for cfg in cfg_set.into_iter() {
-        if cfg.key == DOJO_MANIFESTS_DIR_CFG_KEY {
+        if cfg.key == DOJO_ANNOTATIONS_DIR_CFG_KEY {
             return Ok(Utf8PathBuf::from(cfg.value.unwrap().as_str().to_string()));
         }
     }

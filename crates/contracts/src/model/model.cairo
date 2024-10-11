@@ -1,6 +1,20 @@
-use dojo::model::Layout;
-use dojo::model::introspect::Ty;
+use starknet::SyscallResult;
+
+use dojo::meta::Layout;
+use dojo::meta::introspect::Ty;
 use dojo::world::IWorldDispatcher;
+
+#[derive(Drop, Serde, Debug, PartialEq)]
+pub struct ModelDefinition {
+    pub name: ByteArray,
+    pub namespace: ByteArray,
+    pub namespace_selector: felt252,
+    pub version: u8,
+    pub layout: Layout,
+    pub schema: Ty,
+    pub packed_size: Option<u32>,
+    pub unpacked_size: Option<u32>
+}
 
 #[derive(Copy, Drop, Serde, Debug, PartialEq)]
 pub enum ModelIndex {
@@ -14,7 +28,7 @@ pub enum ModelIndex {
 pub trait ModelEntity<T> {
     fn id(self: @T) -> felt252;
     fn values(self: @T) -> Span<felt252>;
-    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> T;
+    fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<T>;
     // Get is always used with the trait path, which results in no ambiguity for the compiler.
     fn get(world: IWorldDispatcher, entity_id: felt252) -> T;
     // Update and delete can be used directly on the entity, which results in ambiguity.
@@ -69,6 +83,9 @@ pub trait Model<T> {
     fn layout() -> Layout;
     fn instance_layout(self: @T) -> Layout;
     fn packed_size() -> Option<usize>;
+
+    fn schema() -> Ty;
+    fn definition() -> ModelDefinition;
 }
 
 #[starknet::interface]
@@ -85,6 +102,7 @@ pub trait IModel<T> {
     fn packed_size(self: @T) -> Option<usize>;
     fn layout(self: @T) -> Layout;
     fn schema(self: @T) -> Ty;
+    fn definition(self: @T) -> ModelDefinition;
 }
 
 #[cfg(target: "test")]
