@@ -10,7 +10,7 @@ use cairo_lang_test_plugin::{test_plugin_suite, TestsCompilationConfig};
 use cairo_lang_test_runner::{CompiledTestRunner, RunProfilerConfig, TestCompiler, TestRunConfig};
 use clap::Args;
 use dojo_compiler::compiler::cairo_compiler::{
-    collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
+    collect_all_crate_ids, collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
 };
 use dojo_compiler::compiler::config::{CompilerConfig, DojoConfigLoader};
 use dojo_compiler::compiler::scarb_internal::{
@@ -165,7 +165,7 @@ impl TestArgs {
 
             let test_crate_ids = collect_main_crate_ids(&unit, &db, false);
 
-            let mut main_crate_ids = test_crate_ids.clone();
+            let mut main_crate_ids = collect_all_crate_ids(&unit, &db);
 
             if let Some(external_contracts) = props.build_external_contracts {
                 main_crate_ids.extend(collect_crates_ids_from_selectors(&db, &external_contracts));

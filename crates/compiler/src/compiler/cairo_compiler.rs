@@ -377,3 +377,10 @@ pub fn collect_crates_ids_from_selectors(
         .map(|package_name: SmolStr| db.intern_crate(CrateLongId::Real(package_name)))
         .collect::<Vec<_>>()
 }
+
+pub fn collect_all_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) -> Vec<CrateId> {
+    unit.components
+        .iter()
+        .map(|component| db.intern_crate(CrateLongId::Real(component.cairo_package_name())))
+        .collect()
+}
