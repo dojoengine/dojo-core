@@ -161,7 +161,7 @@ impl Compiler for DojoCompiler {
         props.verify()?;
 
         let main_crate_ids = collect_main_crate_ids(&unit, db, true);
-        let compiler_config = build_compiler_config(&db, &unit, &main_crate_ids, ws);
+        let compiler_config = build_compiler_config(db, &unit, &main_crate_ids, ws);
 
         trace!(unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
 

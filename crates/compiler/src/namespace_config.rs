@@ -293,7 +293,7 @@ mod tests {
         let empty_cfg_set = CfgSet::new();
         let empty_namespace_config = NamespaceConfig::from(&empty_cfg_set);
 
-        assert_eq!(empty_namespace_config.default, "");
+        assert_eq!(empty_namespace_config.default, "DEFAULT_NAMESPACE_CFG");
         assert_eq!(empty_namespace_config.mappings, None);
     }
 }

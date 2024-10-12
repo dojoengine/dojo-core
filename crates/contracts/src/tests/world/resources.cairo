@@ -1,16 +1,13 @@
-use starknet::{contract_address_const, ContractAddress, ClassHash};
+use starknet::ContractAddress;
 
 use dojo::model::{Model, ResourceMetadata};
-use dojo::utils::{bytearray_hash, entity_id_from_keys};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, world};
-use dojo::world::world::{
-    Event, NamespaceRegistered, ModelRegistered, ModelUpgraded, MetadataUpdate, ContractRegistered,
-    ContractUpgraded
-};
+use dojo::utils::bytearray_hash;
+use dojo::world::IWorldDispatcherTrait;
+use dojo::world::world::{Event};
 use dojo::contract::{IContractDispatcher, IContractDispatcherTrait};
 
 use dojo::tests::helpers::{
-    deploy_world, drop_all_events, Foo, foo, foo_invalid_name, foo_invalid_namespace, Buzz, buzz,
+    deploy_world, drop_all_events, Foo, foo, foo_invalid_name, foo_invalid_namespace, buzz,
     test_contract, buzz_contract
 };
 use dojo::utils::test::spawn_test_world;

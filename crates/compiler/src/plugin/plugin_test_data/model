@@ -884,6 +884,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -1763,6 +1764,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -2642,6 +2644,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -3521,6 +3524,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -4400,6 +4404,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -5279,6 +5284,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -6158,6 +6164,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -7037,6 +7044,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -7916,6 +7924,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -8795,6 +8804,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -9674,6 +9684,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -10547,6 +10558,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -11350,6 +11362,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -12148,6 +12161,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -13038,6 +13052,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -13999,6 +14014,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -14956,6 +14972,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -15917,6 +15934,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -16885,6 +16903,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -17862,6 +17881,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -20974,12 +20994,12 @@ impl Ibad_model_multiple_versionsDispatcherSubPointersImpl of starknet::storage:
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_multiple_versionsDispatcher>) -> Ibad_model_multiple_versionsDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -20992,12 +21012,12 @@ impl Ibad_model_multiple_versionsDispatcherSubPointersMutImpl of starknet::stora
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_multiple_versionsDispatcher>>) -> Ibad_model_multiple_versionsDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21054,12 +21074,12 @@ impl Ibad_model_multiple_versionsLibraryDispatcherSubPointersImpl of starknet::s
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_multiple_versionsLibraryDispatcher>) -> Ibad_model_multiple_versionsLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21072,12 +21092,12 @@ impl Ibad_model_multiple_versionsLibraryDispatcherSubPointersMutImpl of starknet
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_multiple_versionsLibraryDispatcher>>) -> Ibad_model_multiple_versionsLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21134,12 +21154,12 @@ impl Ibad_model_multiple_versionsSafeLibraryDispatcherSubPointersImpl of starkne
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_multiple_versionsSafeLibraryDispatcher>) -> Ibad_model_multiple_versionsSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21152,12 +21172,12 @@ impl Ibad_model_multiple_versionsSafeLibraryDispatcherSubPointersMutImpl of star
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_multiple_versionsSafeLibraryDispatcher>>) -> Ibad_model_multiple_versionsSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21214,12 +21234,12 @@ impl Ibad_model_multiple_versionsSafeDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_multiple_versionsSafeDispatcher>) -> Ibad_model_multiple_versionsSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21232,12 +21252,12 @@ impl Ibad_model_multiple_versionsSafeDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_multiple_versionsSafeDispatcher>>) -> Ibad_model_multiple_versionsSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_multiple_versionsSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21294,12 +21314,12 @@ impl Ibad_model_bad_version_typeDispatcherSubPointersImpl of starknet::storage::
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_bad_version_typeDispatcher>) -> Ibad_model_bad_version_typeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21312,12 +21332,12 @@ impl Ibad_model_bad_version_typeDispatcherSubPointersMutImpl of starknet::storag
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_bad_version_typeDispatcher>>) -> Ibad_model_bad_version_typeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21374,12 +21394,12 @@ impl Ibad_model_bad_version_typeLibraryDispatcherSubPointersImpl of starknet::st
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_bad_version_typeLibraryDispatcher>) -> Ibad_model_bad_version_typeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21392,12 +21412,12 @@ impl Ibad_model_bad_version_typeLibraryDispatcherSubPointersMutImpl of starknet:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_bad_version_typeLibraryDispatcher>>) -> Ibad_model_bad_version_typeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21454,12 +21474,12 @@ impl Ibad_model_bad_version_typeSafeLibraryDispatcherSubPointersImpl of starknet
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_bad_version_typeSafeLibraryDispatcher>) -> Ibad_model_bad_version_typeSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21472,12 +21492,12 @@ impl Ibad_model_bad_version_typeSafeLibraryDispatcherSubPointersMutImpl of stark
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_bad_version_typeSafeLibraryDispatcher>>) -> Ibad_model_bad_version_typeSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21534,12 +21554,12 @@ impl Ibad_model_bad_version_typeSafeDispatcherSubPointersImpl of starknet::stora
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_bad_version_typeSafeDispatcher>) -> Ibad_model_bad_version_typeSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21552,12 +21572,12 @@ impl Ibad_model_bad_version_typeSafeDispatcherSubPointersMutImpl of starknet::st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_bad_version_typeSafeDispatcher>>) -> Ibad_model_bad_version_typeSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_bad_version_typeSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21614,12 +21634,12 @@ impl Ibad_model_no_version_valueDispatcherSubPointersImpl of starknet::storage::
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_no_version_valueDispatcher>) -> Ibad_model_no_version_valueDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21632,12 +21652,12 @@ impl Ibad_model_no_version_valueDispatcherSubPointersMutImpl of starknet::storag
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_no_version_valueDispatcher>>) -> Ibad_model_no_version_valueDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21694,12 +21714,12 @@ impl Ibad_model_no_version_valueLibraryDispatcherSubPointersImpl of starknet::st
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_no_version_valueLibraryDispatcher>) -> Ibad_model_no_version_valueLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21712,12 +21732,12 @@ impl Ibad_model_no_version_valueLibraryDispatcherSubPointersMutImpl of starknet:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_no_version_valueLibraryDispatcher>>) -> Ibad_model_no_version_valueLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21774,12 +21794,12 @@ impl Ibad_model_no_version_valueSafeLibraryDispatcherSubPointersImpl of starknet
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_no_version_valueSafeLibraryDispatcher>) -> Ibad_model_no_version_valueSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21792,12 +21812,12 @@ impl Ibad_model_no_version_valueSafeLibraryDispatcherSubPointersMutImpl of stark
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_no_version_valueSafeLibraryDispatcher>>) -> Ibad_model_no_version_valueSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -21854,12 +21874,12 @@ impl Ibad_model_no_version_valueSafeDispatcherSubPointersImpl of starknet::stora
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_no_version_valueSafeDispatcher>) -> Ibad_model_no_version_valueSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21872,12 +21892,12 @@ impl Ibad_model_no_version_valueSafeDispatcherSubPointersMutImpl of starknet::st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_no_version_valueSafeDispatcher>>) -> Ibad_model_no_version_valueSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_no_version_valueSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21934,12 +21954,12 @@ impl Ibad_model_unexpected_arg_with_valueDispatcherSubPointersImpl of starknet::
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_arg_with_valueDispatcher>) -> Ibad_model_unexpected_arg_with_valueDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -21952,12 +21972,12 @@ impl Ibad_model_unexpected_arg_with_valueDispatcherSubPointersMutImpl of starkne
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_arg_with_valueDispatcher>>) -> Ibad_model_unexpected_arg_with_valueDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22014,12 +22034,12 @@ impl Ibad_model_unexpected_arg_with_valueLibraryDispatcherSubPointersImpl of sta
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_arg_with_valueLibraryDispatcher>) -> Ibad_model_unexpected_arg_with_valueLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22032,12 +22052,12 @@ impl Ibad_model_unexpected_arg_with_valueLibraryDispatcherSubPointersMutImpl of 
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_arg_with_valueLibraryDispatcher>>) -> Ibad_model_unexpected_arg_with_valueLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22094,12 +22114,12 @@ impl Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcherSubPointersImpl of
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcher>) -> Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22112,12 +22132,12 @@ impl Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcherSubPointersMutImpl
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcher>>) -> Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22174,12 +22194,12 @@ impl Ibad_model_unexpected_arg_with_valueSafeDispatcherSubPointersImpl of starkn
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_arg_with_valueSafeDispatcher>) -> Ibad_model_unexpected_arg_with_valueSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22192,12 +22212,12 @@ impl Ibad_model_unexpected_arg_with_valueSafeDispatcherSubPointersMutImpl of sta
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_arg_with_valueSafeDispatcher>>) -> Ibad_model_unexpected_arg_with_valueSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_arg_with_valueSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22254,12 +22274,12 @@ impl Ibad_model_unexpected_argDispatcherSubPointersImpl of starknet::storage::Su
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_argDispatcher>) -> Ibad_model_unexpected_argDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22272,12 +22292,12 @@ impl Ibad_model_unexpected_argDispatcherSubPointersMutImpl of starknet::storage:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_argDispatcher>>) -> Ibad_model_unexpected_argDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22334,12 +22354,12 @@ impl Ibad_model_unexpected_argLibraryDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_argLibraryDispatcher>) -> Ibad_model_unexpected_argLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22352,12 +22372,12 @@ impl Ibad_model_unexpected_argLibraryDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_argLibraryDispatcher>>) -> Ibad_model_unexpected_argLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22414,12 +22434,12 @@ impl Ibad_model_unexpected_argSafeLibraryDispatcherSubPointersImpl of starknet::
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_argSafeLibraryDispatcher>) -> Ibad_model_unexpected_argSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22432,12 +22452,12 @@ impl Ibad_model_unexpected_argSafeLibraryDispatcherSubPointersMutImpl of starkne
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_argSafeLibraryDispatcher>>) -> Ibad_model_unexpected_argSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22494,12 +22514,12 @@ impl Ibad_model_unexpected_argSafeDispatcherSubPointersImpl of starknet::storage
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_unexpected_argSafeDispatcher>) -> Ibad_model_unexpected_argSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22512,12 +22532,12 @@ impl Ibad_model_unexpected_argSafeDispatcherSubPointersMutImpl of starknet::stor
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_unexpected_argSafeDispatcher>>) -> Ibad_model_unexpected_argSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_unexpected_argSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22574,12 +22594,12 @@ impl Ibad_model_not_supported_versionDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_not_supported_versionDispatcher>) -> Ibad_model_not_supported_versionDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22592,12 +22612,12 @@ impl Ibad_model_not_supported_versionDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_not_supported_versionDispatcher>>) -> Ibad_model_not_supported_versionDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22654,12 +22674,12 @@ impl Ibad_model_not_supported_versionLibraryDispatcherSubPointersImpl of starkne
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_not_supported_versionLibraryDispatcher>) -> Ibad_model_not_supported_versionLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22672,12 +22692,12 @@ impl Ibad_model_not_supported_versionLibraryDispatcherSubPointersMutImpl of star
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_not_supported_versionLibraryDispatcher>>) -> Ibad_model_not_supported_versionLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22734,12 +22754,12 @@ impl Ibad_model_not_supported_versionSafeLibraryDispatcherSubPointersImpl of sta
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_not_supported_versionSafeLibraryDispatcher>) -> Ibad_model_not_supported_versionSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22752,12 +22772,12 @@ impl Ibad_model_not_supported_versionSafeLibraryDispatcherSubPointersMutImpl of 
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_not_supported_versionSafeLibraryDispatcher>>) -> Ibad_model_not_supported_versionSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22814,12 +22834,12 @@ impl Ibad_model_not_supported_versionSafeDispatcherSubPointersImpl of starknet::
     fn sub_pointers(self: starknet::storage::StoragePointer<Ibad_model_not_supported_versionSafeDispatcher>) -> Ibad_model_not_supported_versionSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22832,12 +22852,12 @@ impl Ibad_model_not_supported_versionSafeDispatcherSubPointersMutImpl of starkne
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ibad_model_not_supported_versionSafeDispatcher>>) -> Ibad_model_not_supported_versionSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ibad_model_not_supported_versionSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22894,12 +22914,12 @@ impl Imodelv_0DispatcherSubPointersImpl of starknet::storage::SubPointers<Imodel
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodelv_0Dispatcher>) -> Imodelv_0DispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0DispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22912,12 +22932,12 @@ impl Imodelv_0DispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodelv_0Dispatcher>>) -> Imodelv_0DispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0DispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -22974,12 +22994,12 @@ impl Imodelv_0LibraryDispatcherSubPointersImpl of starknet::storage::SubPointers
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodelv_0LibraryDispatcher>) -> Imodelv_0LibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0LibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -22992,12 +23012,12 @@ impl Imodelv_0LibraryDispatcherSubPointersMutImpl of starknet::storage::SubPoint
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodelv_0LibraryDispatcher>>) -> Imodelv_0LibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0LibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23054,12 +23074,12 @@ impl Imodelv_0SafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPoin
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodelv_0SafeLibraryDispatcher>) -> Imodelv_0SafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0SafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23072,12 +23092,12 @@ impl Imodelv_0SafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubP
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodelv_0SafeLibraryDispatcher>>) -> Imodelv_0SafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0SafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23134,12 +23154,12 @@ impl Imodelv_0SafeDispatcherSubPointersImpl of starknet::storage::SubPointers<Im
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodelv_0SafeDispatcher>) -> Imodelv_0SafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0SafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23152,12 +23172,12 @@ impl Imodelv_0SafeDispatcherSubPointersMutImpl of starknet::storage::SubPointers
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodelv_0SafeDispatcher>>) -> Imodelv_0SafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodelv_0SafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23214,12 +23234,12 @@ impl Imodel_with_bad_namespace_formatDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_bad_namespace_formatDispatcher>) -> Imodel_with_bad_namespace_formatDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23232,12 +23252,12 @@ impl Imodel_with_bad_namespace_formatDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_bad_namespace_formatDispatcher>>) -> Imodel_with_bad_namespace_formatDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23294,12 +23314,12 @@ impl Imodel_with_bad_namespace_formatLibraryDispatcherSubPointersImpl of starkne
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_bad_namespace_formatLibraryDispatcher>) -> Imodel_with_bad_namespace_formatLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23312,12 +23332,12 @@ impl Imodel_with_bad_namespace_formatLibraryDispatcherSubPointersMutImpl of star
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_bad_namespace_formatLibraryDispatcher>>) -> Imodel_with_bad_namespace_formatLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23374,12 +23394,12 @@ impl Imodel_with_bad_namespace_formatSafeLibraryDispatcherSubPointersImpl of sta
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_bad_namespace_formatSafeLibraryDispatcher>) -> Imodel_with_bad_namespace_formatSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23392,12 +23412,12 @@ impl Imodel_with_bad_namespace_formatSafeLibraryDispatcherSubPointersMutImpl of 
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_bad_namespace_formatSafeLibraryDispatcher>>) -> Imodel_with_bad_namespace_formatSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23454,12 +23474,12 @@ impl Imodel_with_bad_namespace_formatSafeDispatcherSubPointersImpl of starknet::
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_bad_namespace_formatSafeDispatcher>) -> Imodel_with_bad_namespace_formatSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23472,12 +23492,12 @@ impl Imodel_with_bad_namespace_formatSafeDispatcherSubPointersMutImpl of starkne
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_bad_namespace_formatSafeDispatcher>>) -> Imodel_with_bad_namespace_formatSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_bad_namespace_formatSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23534,12 +23554,12 @@ impl Imodel_with_short_string_namespaceDispatcherSubPointersImpl of starknet::st
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_short_string_namespaceDispatcher>) -> Imodel_with_short_string_namespaceDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23552,12 +23572,12 @@ impl Imodel_with_short_string_namespaceDispatcherSubPointersMutImpl of starknet:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_short_string_namespaceDispatcher>>) -> Imodel_with_short_string_namespaceDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23614,12 +23634,12 @@ impl Imodel_with_short_string_namespaceLibraryDispatcherSubPointersImpl of stark
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_short_string_namespaceLibraryDispatcher>) -> Imodel_with_short_string_namespaceLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23632,12 +23652,12 @@ impl Imodel_with_short_string_namespaceLibraryDispatcherSubPointersMutImpl of st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_short_string_namespaceLibraryDispatcher>>) -> Imodel_with_short_string_namespaceLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23694,12 +23714,12 @@ impl Imodel_with_short_string_namespaceSafeLibraryDispatcherSubPointersImpl of s
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_short_string_namespaceSafeLibraryDispatcher>) -> Imodel_with_short_string_namespaceSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23712,12 +23732,12 @@ impl Imodel_with_short_string_namespaceSafeLibraryDispatcherSubPointersMutImpl o
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_short_string_namespaceSafeLibraryDispatcher>>) -> Imodel_with_short_string_namespaceSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23774,12 +23794,12 @@ impl Imodel_with_short_string_namespaceSafeDispatcherSubPointersImpl of starknet
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_short_string_namespaceSafeDispatcher>) -> Imodel_with_short_string_namespaceSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23792,12 +23812,12 @@ impl Imodel_with_short_string_namespaceSafeDispatcherSubPointersMutImpl of stark
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_short_string_namespaceSafeDispatcher>>) -> Imodel_with_short_string_namespaceSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_short_string_namespaceSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23854,12 +23874,12 @@ impl Imodel_with_string_namespaceDispatcherSubPointersImpl of starknet::storage:
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_string_namespaceDispatcher>) -> Imodel_with_string_namespaceDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23872,12 +23892,12 @@ impl Imodel_with_string_namespaceDispatcherSubPointersMutImpl of starknet::stora
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_string_namespaceDispatcher>>) -> Imodel_with_string_namespaceDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -23934,12 +23954,12 @@ impl Imodel_with_string_namespaceLibraryDispatcherSubPointersImpl of starknet::s
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_string_namespaceLibraryDispatcher>) -> Imodel_with_string_namespaceLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -23952,12 +23972,12 @@ impl Imodel_with_string_namespaceLibraryDispatcherSubPointersMutImpl of starknet
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_string_namespaceLibraryDispatcher>>) -> Imodel_with_string_namespaceLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24014,12 +24034,12 @@ impl Imodel_with_string_namespaceSafeLibraryDispatcherSubPointersImpl of starkne
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_string_namespaceSafeLibraryDispatcher>) -> Imodel_with_string_namespaceSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24032,12 +24052,12 @@ impl Imodel_with_string_namespaceSafeLibraryDispatcherSubPointersMutImpl of star
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_string_namespaceSafeLibraryDispatcher>>) -> Imodel_with_string_namespaceSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24094,12 +24114,12 @@ impl Imodel_with_string_namespaceSafeDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_string_namespaceSafeDispatcher>) -> Imodel_with_string_namespaceSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24112,12 +24132,12 @@ impl Imodel_with_string_namespaceSafeDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_string_namespaceSafeDispatcher>>) -> Imodel_with_string_namespaceSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_string_namespaceSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24174,12 +24194,12 @@ impl IpositionDispatcherSubPointersImpl of starknet::storage::SubPointers<Iposit
     fn sub_pointers(self: starknet::storage::StoragePointer<IpositionDispatcher>) -> IpositionDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24192,12 +24212,12 @@ impl IpositionDispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IpositionDispatcher>>) -> IpositionDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24254,12 +24274,12 @@ impl IpositionLibraryDispatcherSubPointersImpl of starknet::storage::SubPointers
     fn sub_pointers(self: starknet::storage::StoragePointer<IpositionLibraryDispatcher>) -> IpositionLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24272,12 +24292,12 @@ impl IpositionLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPoint
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IpositionLibraryDispatcher>>) -> IpositionLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24334,12 +24354,12 @@ impl IpositionSafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPoin
     fn sub_pointers(self: starknet::storage::StoragePointer<IpositionSafeLibraryDispatcher>) -> IpositionSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24352,12 +24372,12 @@ impl IpositionSafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubP
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IpositionSafeLibraryDispatcher>>) -> IpositionSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24414,12 +24434,12 @@ impl IpositionSafeDispatcherSubPointersImpl of starknet::storage::SubPointers<Ip
     fn sub_pointers(self: starknet::storage::StoragePointer<IpositionSafeDispatcher>) -> IpositionSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24432,12 +24452,12 @@ impl IpositionSafeDispatcherSubPointersMutImpl of starknet::storage::SubPointers
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IpositionSafeDispatcher>>) -> IpositionSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IpositionSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24494,12 +24514,12 @@ impl IrolesDispatcherSubPointersImpl of starknet::storage::SubPointers<IrolesDis
     fn sub_pointers(self: starknet::storage::StoragePointer<IrolesDispatcher>) -> IrolesDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24512,12 +24532,12 @@ impl IrolesDispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<Iro
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IrolesDispatcher>>) -> IrolesDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24574,12 +24594,12 @@ impl IrolesLibraryDispatcherSubPointersImpl of starknet::storage::SubPointers<Ir
     fn sub_pointers(self: starknet::storage::StoragePointer<IrolesLibraryDispatcher>) -> IrolesLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24592,12 +24612,12 @@ impl IrolesLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPointers
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IrolesLibraryDispatcher>>) -> IrolesLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24654,12 +24674,12 @@ impl IrolesSafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPointer
     fn sub_pointers(self: starknet::storage::StoragePointer<IrolesSafeLibraryDispatcher>) -> IrolesSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24672,12 +24692,12 @@ impl IrolesSafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPoin
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IrolesSafeLibraryDispatcher>>) -> IrolesSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24734,12 +24754,12 @@ impl IrolesSafeDispatcherSubPointersImpl of starknet::storage::SubPointers<Irole
     fn sub_pointers(self: starknet::storage::StoragePointer<IrolesSafeDispatcher>) -> IrolesSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24752,12 +24772,12 @@ impl IrolesSafeDispatcherSubPointersMutImpl of starknet::storage::SubPointersMut
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IrolesSafeDispatcher>>) -> IrolesSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IrolesSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24814,12 +24834,12 @@ impl Ionly_key_modelDispatcherSubPointersImpl of starknet::storage::SubPointers<
     fn sub_pointers(self: starknet::storage::StoragePointer<Ionly_key_modelDispatcher>) -> Ionly_key_modelDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24832,12 +24852,12 @@ impl Ionly_key_modelDispatcherSubPointersMutImpl of starknet::storage::SubPointe
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ionly_key_modelDispatcher>>) -> Ionly_key_modelDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -24894,12 +24914,12 @@ impl Ionly_key_modelLibraryDispatcherSubPointersImpl of starknet::storage::SubPo
     fn sub_pointers(self: starknet::storage::StoragePointer<Ionly_key_modelLibraryDispatcher>) -> Ionly_key_modelLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24912,12 +24932,12 @@ impl Ionly_key_modelLibraryDispatcherSubPointersMutImpl of starknet::storage::Su
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ionly_key_modelLibraryDispatcher>>) -> Ionly_key_modelLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24974,12 +24994,12 @@ impl Ionly_key_modelSafeLibraryDispatcherSubPointersImpl of starknet::storage::S
     fn sub_pointers(self: starknet::storage::StoragePointer<Ionly_key_modelSafeLibraryDispatcher>) -> Ionly_key_modelSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -24992,12 +25012,12 @@ impl Ionly_key_modelSafeLibraryDispatcherSubPointersMutImpl of starknet::storage
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ionly_key_modelSafeLibraryDispatcher>>) -> Ionly_key_modelSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25054,12 +25074,12 @@ impl Ionly_key_modelSafeDispatcherSubPointersImpl of starknet::storage::SubPoint
     fn sub_pointers(self: starknet::storage::StoragePointer<Ionly_key_modelSafeDispatcher>) -> Ionly_key_modelSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25072,12 +25092,12 @@ impl Ionly_key_modelSafeDispatcherSubPointersMutImpl of starknet::storage::SubPo
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Ionly_key_modelSafeDispatcher>>) -> Ionly_key_modelSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Ionly_key_modelSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25134,12 +25154,12 @@ impl Iu_256_key_modelDispatcherSubPointersImpl of starknet::storage::SubPointers
     fn sub_pointers(self: starknet::storage::StoragePointer<Iu_256_key_modelDispatcher>) -> Iu_256_key_modelDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25152,12 +25172,12 @@ impl Iu_256_key_modelDispatcherSubPointersMutImpl of starknet::storage::SubPoint
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Iu_256_key_modelDispatcher>>) -> Iu_256_key_modelDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25214,12 +25234,12 @@ impl Iu_256_key_modelLibraryDispatcherSubPointersImpl of starknet::storage::SubP
     fn sub_pointers(self: starknet::storage::StoragePointer<Iu_256_key_modelLibraryDispatcher>) -> Iu_256_key_modelLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25232,12 +25252,12 @@ impl Iu_256_key_modelLibraryDispatcherSubPointersMutImpl of starknet::storage::S
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Iu_256_key_modelLibraryDispatcher>>) -> Iu_256_key_modelLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25294,12 +25314,12 @@ impl Iu_256_key_modelSafeLibraryDispatcherSubPointersImpl of starknet::storage::
     fn sub_pointers(self: starknet::storage::StoragePointer<Iu_256_key_modelSafeLibraryDispatcher>) -> Iu_256_key_modelSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25312,12 +25332,12 @@ impl Iu_256_key_modelSafeLibraryDispatcherSubPointersMutImpl of starknet::storag
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Iu_256_key_modelSafeLibraryDispatcher>>) -> Iu_256_key_modelSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25374,12 +25394,12 @@ impl Iu_256_key_modelSafeDispatcherSubPointersImpl of starknet::storage::SubPoin
     fn sub_pointers(self: starknet::storage::StoragePointer<Iu_256_key_modelSafeDispatcher>) -> Iu_256_key_modelSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25392,12 +25412,12 @@ impl Iu_256_key_modelSafeDispatcherSubPointersMutImpl of starknet::storage::SubP
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Iu_256_key_modelSafeDispatcher>>) -> Iu_256_key_modelSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Iu_256_key_modelSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25454,12 +25474,12 @@ impl IplayerDispatcherSubPointersImpl of starknet::storage::SubPointers<IplayerD
     fn sub_pointers(self: starknet::storage::StoragePointer<IplayerDispatcher>) -> IplayerDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25472,12 +25492,12 @@ impl IplayerDispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<Ip
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IplayerDispatcher>>) -> IplayerDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25534,12 +25554,12 @@ impl IplayerLibraryDispatcherSubPointersImpl of starknet::storage::SubPointers<I
     fn sub_pointers(self: starknet::storage::StoragePointer<IplayerLibraryDispatcher>) -> IplayerLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25552,12 +25572,12 @@ impl IplayerLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPointer
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IplayerLibraryDispatcher>>) -> IplayerLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25614,12 +25634,12 @@ impl IplayerSafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPointe
     fn sub_pointers(self: starknet::storage::StoragePointer<IplayerSafeLibraryDispatcher>) -> IplayerSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25632,12 +25652,12 @@ impl IplayerSafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPoi
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IplayerSafeLibraryDispatcher>>) -> IplayerSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25694,12 +25714,12 @@ impl IplayerSafeDispatcherSubPointersImpl of starknet::storage::SubPointers<Ipla
     fn sub_pointers(self: starknet::storage::StoragePointer<IplayerSafeDispatcher>) -> IplayerSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25712,12 +25732,12 @@ impl IplayerSafeDispatcherSubPointersMutImpl of starknet::storage::SubPointersMu
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IplayerSafeDispatcher>>) -> IplayerSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IplayerSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25774,12 +25794,12 @@ impl Imodel_with_simple_arrayDispatcherSubPointersImpl of starknet::storage::Sub
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_simple_arrayDispatcher>) -> Imodel_with_simple_arrayDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arrayDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25792,12 +25812,12 @@ impl Imodel_with_simple_arrayDispatcherSubPointersMutImpl of starknet::storage::
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_simple_arrayDispatcher>>) -> Imodel_with_simple_arrayDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arrayDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -25854,12 +25874,12 @@ impl Imodel_with_simple_arrayLibraryDispatcherSubPointersImpl of starknet::stora
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_simple_arrayLibraryDispatcher>) -> Imodel_with_simple_arrayLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arrayLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25872,12 +25892,12 @@ impl Imodel_with_simple_arrayLibraryDispatcherSubPointersMutImpl of starknet::st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_simple_arrayLibraryDispatcher>>) -> Imodel_with_simple_arrayLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arrayLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25934,12 +25954,12 @@ impl Imodel_with_simple_arraySafeLibraryDispatcherSubPointersImpl of starknet::s
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_simple_arraySafeLibraryDispatcher>) -> Imodel_with_simple_arraySafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arraySafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -25952,12 +25972,12 @@ impl Imodel_with_simple_arraySafeLibraryDispatcherSubPointersMutImpl of starknet
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_simple_arraySafeLibraryDispatcher>>) -> Imodel_with_simple_arraySafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arraySafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26014,12 +26034,12 @@ impl Imodel_with_simple_arraySafeDispatcherSubPointersImpl of starknet::storage:
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_simple_arraySafeDispatcher>) -> Imodel_with_simple_arraySafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arraySafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26032,12 +26052,12 @@ impl Imodel_with_simple_arraySafeDispatcherSubPointersMutImpl of starknet::stora
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_simple_arraySafeDispatcher>>) -> Imodel_with_simple_arraySafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_simple_arraySafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26094,12 +26114,12 @@ impl Imodel_with_byte_arrayDispatcherSubPointersImpl of starknet::storage::SubPo
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_byte_arrayDispatcher>) -> Imodel_with_byte_arrayDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arrayDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26112,12 +26132,12 @@ impl Imodel_with_byte_arrayDispatcherSubPointersMutImpl of starknet::storage::Su
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_byte_arrayDispatcher>>) -> Imodel_with_byte_arrayDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arrayDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26174,12 +26194,12 @@ impl Imodel_with_byte_arrayLibraryDispatcherSubPointersImpl of starknet::storage
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_byte_arrayLibraryDispatcher>) -> Imodel_with_byte_arrayLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arrayLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26192,12 +26212,12 @@ impl Imodel_with_byte_arrayLibraryDispatcherSubPointersMutImpl of starknet::stor
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_byte_arrayLibraryDispatcher>>) -> Imodel_with_byte_arrayLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arrayLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26254,12 +26274,12 @@ impl Imodel_with_byte_arraySafeLibraryDispatcherSubPointersImpl of starknet::sto
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_byte_arraySafeLibraryDispatcher>) -> Imodel_with_byte_arraySafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arraySafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26272,12 +26292,12 @@ impl Imodel_with_byte_arraySafeLibraryDispatcherSubPointersMutImpl of starknet::
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_byte_arraySafeLibraryDispatcher>>) -> Imodel_with_byte_arraySafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arraySafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26334,12 +26354,12 @@ impl Imodel_with_byte_arraySafeDispatcherSubPointersImpl of starknet::storage::S
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_byte_arraySafeDispatcher>) -> Imodel_with_byte_arraySafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arraySafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26352,12 +26372,12 @@ impl Imodel_with_byte_arraySafeDispatcherSubPointersMutImpl of starknet::storage
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_byte_arraySafeDispatcher>>) -> Imodel_with_byte_arraySafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_byte_arraySafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26414,12 +26434,12 @@ impl Imodel_with_complex_arrayDispatcherSubPointersImpl of starknet::storage::Su
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_complex_arrayDispatcher>) -> Imodel_with_complex_arrayDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arrayDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26432,12 +26452,12 @@ impl Imodel_with_complex_arrayDispatcherSubPointersMutImpl of starknet::storage:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_complex_arrayDispatcher>>) -> Imodel_with_complex_arrayDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arrayDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26494,12 +26514,12 @@ impl Imodel_with_complex_arrayLibraryDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_complex_arrayLibraryDispatcher>) -> Imodel_with_complex_arrayLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arrayLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26512,12 +26532,12 @@ impl Imodel_with_complex_arrayLibraryDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_complex_arrayLibraryDispatcher>>) -> Imodel_with_complex_arrayLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arrayLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26574,12 +26594,12 @@ impl Imodel_with_complex_arraySafeLibraryDispatcherSubPointersImpl of starknet::
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_complex_arraySafeLibraryDispatcher>) -> Imodel_with_complex_arraySafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arraySafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26592,12 +26612,12 @@ impl Imodel_with_complex_arraySafeLibraryDispatcherSubPointersMutImpl of starkne
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_complex_arraySafeLibraryDispatcher>>) -> Imodel_with_complex_arraySafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arraySafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26654,12 +26674,12 @@ impl Imodel_with_complex_arraySafeDispatcherSubPointersImpl of starknet::storage
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_complex_arraySafeDispatcher>) -> Imodel_with_complex_arraySafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arraySafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26672,12 +26692,12 @@ impl Imodel_with_complex_arraySafeDispatcherSubPointersMutImpl of starknet::stor
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_complex_arraySafeDispatcher>>) -> Imodel_with_complex_arraySafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_complex_arraySafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26734,12 +26754,12 @@ impl Imodel_with_tupleDispatcherSubPointersImpl of starknet::storage::SubPointer
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tupleDispatcher>) -> Imodel_with_tupleDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26752,12 +26772,12 @@ impl Imodel_with_tupleDispatcherSubPointersMutImpl of starknet::storage::SubPoin
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tupleDispatcher>>) -> Imodel_with_tupleDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26814,12 +26834,12 @@ impl Imodel_with_tupleLibraryDispatcherSubPointersImpl of starknet::storage::Sub
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tupleLibraryDispatcher>) -> Imodel_with_tupleLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26832,12 +26852,12 @@ impl Imodel_with_tupleLibraryDispatcherSubPointersMutImpl of starknet::storage::
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tupleLibraryDispatcher>>) -> Imodel_with_tupleLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26894,12 +26914,12 @@ impl Imodel_with_tupleSafeLibraryDispatcherSubPointersImpl of starknet::storage:
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tupleSafeLibraryDispatcher>) -> Imodel_with_tupleSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26912,12 +26932,12 @@ impl Imodel_with_tupleSafeLibraryDispatcherSubPointersMutImpl of starknet::stora
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tupleSafeLibraryDispatcher>>) -> Imodel_with_tupleSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -26974,12 +26994,12 @@ impl Imodel_with_tupleSafeDispatcherSubPointersImpl of starknet::storage::SubPoi
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tupleSafeDispatcher>) -> Imodel_with_tupleSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -26992,12 +27012,12 @@ impl Imodel_with_tupleSafeDispatcherSubPointersMutImpl of starknet::storage::Sub
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tupleSafeDispatcher>>) -> Imodel_with_tupleSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tupleSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -27054,12 +27074,12 @@ impl Imodel_with_tuple_no_primitivesDispatcherSubPointersImpl of starknet::stora
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tuple_no_primitivesDispatcher>) -> Imodel_with_tuple_no_primitivesDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -27072,12 +27092,12 @@ impl Imodel_with_tuple_no_primitivesDispatcherSubPointersMutImpl of starknet::st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tuple_no_primitivesDispatcher>>) -> Imodel_with_tuple_no_primitivesDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -27134,12 +27154,12 @@ impl Imodel_with_tuple_no_primitivesLibraryDispatcherSubPointersImpl of starknet
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tuple_no_primitivesLibraryDispatcher>) -> Imodel_with_tuple_no_primitivesLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -27152,12 +27172,12 @@ impl Imodel_with_tuple_no_primitivesLibraryDispatcherSubPointersMutImpl of stark
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tuple_no_primitivesLibraryDispatcher>>) -> Imodel_with_tuple_no_primitivesLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -27214,12 +27234,12 @@ impl Imodel_with_tuple_no_primitivesSafeLibraryDispatcherSubPointersImpl of star
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tuple_no_primitivesSafeLibraryDispatcher>) -> Imodel_with_tuple_no_primitivesSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -27232,12 +27252,12 @@ impl Imodel_with_tuple_no_primitivesSafeLibraryDispatcherSubPointersMutImpl of s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tuple_no_primitivesSafeLibraryDispatcher>>) -> Imodel_with_tuple_no_primitivesSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -27294,12 +27314,12 @@ impl Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersImpl of starknet::s
     fn sub_pointers(self: starknet::storage::StoragePointer<Imodel_with_tuple_no_primitivesSafeDispatcher>) -> Imodel_with_tuple_no_primitivesSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -27312,12 +27332,12 @@ impl Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersMutImpl of starknet
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<Imodel_with_tuple_no_primitivesSafeDispatcher>>) -> Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 Imodel_with_tuple_no_primitivesSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }

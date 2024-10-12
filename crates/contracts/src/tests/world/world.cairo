@@ -58,29 +58,29 @@ fn test_model() {
 
 #[test]
 fn test_system() {
-    let (_world, bar_contract) = deploy_world_and_bar();
+    let (world, bar_contract) = deploy_world_and_bar();
 
     bar_contract.set_foo(1337, 1337);
 
-    let stored: Foo = get!(world, get_caller_address(), Foo);
+    let stored: Foo = get!(world, starknet::get_caller_address(), Foo);
     assert(stored.a == 1337, 'data not stored');
     assert(stored.b == 1337, 'data not stored');
 }
 
 #[test]
 fn test_delete() {
-    let (_world, bar_contract) = deploy_world_and_bar();
+    let (world, bar_contract) = deploy_world_and_bar();
 
     // set model
     bar_contract.set_foo(1337, 1337);
-    let stored: Foo = get!(world, get_caller_address(), Foo);
+    let stored: Foo = get!(world, starknet::get_caller_address(), Foo);
     assert(stored.a == 1337, 'data not stored');
     assert(stored.b == 1337, 'data not stored');
 
     // delete model
     bar_contract.delete_foo_macro(stored);
 
-    let deleted: Foo = get!(world, get_caller_address(), Foo);
+    let deleted: Foo = get!(world, starknet::get_caller_address(), Foo);
     assert(deleted.a == 0, 'data not deleted');
     assert(deleted.b == 0, 'data not deleted');
 }
@@ -175,7 +175,7 @@ fn test_execute_multiple_worlds() {
 #[test]
 #[available_gas(60000000)]
 fn bench_execute() {
-    let (_world, bar_contract) = deploy_world_and_bar();
+    let (world, bar_contract) = deploy_world_and_bar();
 
     let alice = starknet::contract_address_const::<0x1337>();
     starknet::testing::set_contract_address(alice);
