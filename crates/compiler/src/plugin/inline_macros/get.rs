@@ -85,7 +85,7 @@ impl InlineMacroExprPlugin for GetMacro {
             lookup_err_msg.truncate(CAIRO_ERR_MSG_LEN);
 
             builder.add_str(&format!(
-                "let __{model}: {model} = dojo::model::ModelStore::get(@{}, ({}));\n",
+                "let __{model}: {model} = dojo::model::ModelStore::get(@{}, {});\n",
                 world.as_syntax_node().get_text(db),
                 args,
             ));

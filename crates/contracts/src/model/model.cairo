@@ -108,10 +108,10 @@ pub trait ModelStore<M> {
     fn delete(self: IWorldDispatcher, model: @M);
     fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K);
     fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: @IWorldDispatcher, member_id: felt252, key: K
+        self: @IWorldDispatcher, key: K, member_id: felt252
     ) -> T;
     fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: IWorldDispatcher, member_id: felt252, key: K, value: T
+        self: IWorldDispatcher, key: K, member_id: felt252, value: T
     );
 }
 

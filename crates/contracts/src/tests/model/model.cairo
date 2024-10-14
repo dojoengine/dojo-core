@@ -97,12 +97,12 @@ fn test_get_and_set_member_from_entity() {
 
     let v1: u128 = EntityStore::<
         FooEntity
-    >::get_member_from_id(@world, selector!("v1"), foo.entity_id());
+    >::get_member_from_id(@world, foo.entity_id(), selector!("v1"));
 
     assert_eq!(v1, 3);
 
     let entity: FooEntity = world.get_entity_from_id(foo.entity_id());
-    EntityStore::<FooEntity>::update_member_from_id(world, selector!("v1"), entity.id(), 42);
+    EntityStore::<FooEntity>::update_member_from_id(world, entity.id(), selector!("v1"), 42);
 
     let entity: FooEntity = world.get_entity_from_id(foo.entity_id());
     assert_eq!(entity.v1, 42);

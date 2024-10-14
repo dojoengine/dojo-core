@@ -1,4 +1,4 @@
-#[derive($derive_tags$)]
+#[derive($entity_derive_attr_names$)]
 pub struct $model_type$Entity {
     __id: felt252, // private field
     $members_values$

@@ -97,10 +97,10 @@ pub trait EntityStore<E> {
     fn delete_entity(self: IWorldDispatcher, entity: @E);
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252);
     fn get_member_from_id<T, +MemberStore<E, T>>(
-        self: @IWorldDispatcher, member_id: felt252, entity_id: felt252
+        self: @IWorldDispatcher, entity_id: felt252, member_id: felt252
     ) -> T;
     fn update_member_from_id<T, +MemberStore<E, T>>(
-        self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T
+        self: IWorldDispatcher, entity_id: felt252, member_id: felt252, value: T
     );
 }
 
@@ -187,15 +187,15 @@ pub impl EntityStoreImpl<E, +Entity<E>, +Drop<E>> of EntityStore<E> {
     }
 
     fn get_member_from_id<T, +MemberStore<E, T>>(
-        self: @IWorldDispatcher, member_id: felt252, entity_id: felt252
+        self: @IWorldDispatcher, entity_id: felt252, member_id: felt252
     ) -> T {
-        MemberStore::<E, T>::get_member(self, member_id, entity_id)
+        MemberStore::<E, T>::get_member(self, entity_id, member_id)
     }
 
     fn update_member_from_id<T, +MemberStore<E, T>>(
-        self: IWorldDispatcher, member_id: felt252, entity_id: felt252, value: T
+        self: IWorldDispatcher, entity_id: felt252, member_id: felt252, value: T
     ) {
-        MemberStore::<E, T>::update_member(self, member_id, entity_id, value);
+        MemberStore::<E, T>::update_member(self, entity_id, member_id, value);
     }
 }
 

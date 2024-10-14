@@ -28,7 +28,7 @@ use super::element::{
 use super::DOJO_MODEL_ATTR;
 
 const MODEL_CODE_PATCH: &str = include_str!("./templates/model_store.generate.cairo");
-const MODEL_FIELD_CODE_STRING: &str = include_str!("./templates/model_field_store.generate.cairo");
+const MODEL_FIELD_CODE_PATCH: &str = include_str!("./templates/model_field_store.generate.cairo");
 type ModelParameters = CommonStructParameters;
 const ENTITY_DERIVE_IGNORE: [&str; 2] = [DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE];
 
@@ -172,7 +172,7 @@ impl DojoModel {
         );
 
         // Ensures models always derive Introspect if not already derived.
-        let derive_tags = derive_attr_names
+        let entity_derive_attr_names = derive_attr_names
             .iter()
             .map(|tag| tag.as_str())
             .filter(|&tag| !ENTITY_DERIVE_IGNORE.contains(&tag))
@@ -244,7 +244,10 @@ impl DojoModel {
                     "field_accessors".to_string(),
                     RewriteNode::new_modified(field_accessors),
                 ),
-                ("derive_tags".to_string(), RewriteNode::Text(derive_tags)),
+                (
+                    "entity_derive_attr_names".to_string(),
+                    RewriteNode::Text(entity_derive_attr_names),
+                ),
             ]),
         );
 
@@ -296,7 +299,7 @@ impl DojoModel {
 /// A [`RewriteNode`] containing accessors code.
 fn generate_field_accessors(model_type: String, member: &Member) -> RewriteNode {
     RewriteNode::interpolate_patched(
-        MODEL_FIELD_CODE_STRING,
+        MODEL_FIELD_CODE_PATCH,
         &UnorderedHashMap::from([
             ("model_type".to_string(), RewriteNode::Text(model_type)),
             (
