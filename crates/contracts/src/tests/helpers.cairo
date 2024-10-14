@@ -199,6 +199,8 @@ pub mod test_contract {}
 
 #[dojo::contract]
 pub mod test_contract_with_dojo_init_args {
+    use dojo::world::IWorldDispatcherTrait;
+
     fn dojo_init(world: @IWorldDispatcher, _arg1: felt252) {
         let _a = world.uuid();
     }

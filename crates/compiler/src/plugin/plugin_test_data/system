@@ -650,15 +650,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod spawn {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -1099,15 +1093,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod proxy {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -1545,15 +1533,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod ctxnamed {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -1994,15 +1976,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod withevent {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -2476,15 +2452,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod withcomponent {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -3036,15 +3006,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod MyFaultyContract {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -3655,15 +3619,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod MyNominalContract {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -4297,15 +4255,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod constructor_test {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
@@ -4743,15 +4695,9 @@ impl StorageStorageBaseMutCopy of core::traits::Copy::<StorageStorageBaseMut>;
 
                 #[starknet::contract]
                 pub mod no_init_test {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, StoragePointerWriteAccess
-                    };
 
                     #[abi(embed_v0)]
                     impl WorldProviderImpl = world_provider_cpt::WorldProviderImpl<ContractState>;
