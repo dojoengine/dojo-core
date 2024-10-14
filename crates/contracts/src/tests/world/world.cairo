@@ -1,11 +1,9 @@
-use starknet::{contract_address_const, ContractAddress, get_caller_address};
-
 use dojo::world::Resource;
-use dojo::world::world::{Event, EventEmitted};
-use dojo::model::{Model, ResourceMetadata};
+use dojo::world::world::Event;
+use dojo::model::Model;
 use dojo::utils::bytearray_hash;
 use dojo::world::{
-    IWorldDispatcher, IWorldDispatcherTrait, world, IUpgradeableWorld, IUpgradeableWorldDispatcher,
+    IWorldDispatcher, IWorldDispatcherTrait, IUpgradeableWorldDispatcher,
     IUpgradeableWorldDispatcherTrait
 };
 use dojo::tests::helpers::{
@@ -64,7 +62,7 @@ fn test_system() {
 
     bar_contract.set_foo(1337, 1337);
 
-    let stored: Foo = get!(world, get_caller_address(), Foo);
+    let stored: Foo = get!(world, starknet::get_caller_address(), Foo);
     assert(stored.a == 1337, 'data not stored');
     assert(stored.b == 1337, 'data not stored');
 }
@@ -75,14 +73,14 @@ fn test_delete() {
 
     // set model
     bar_contract.set_foo(1337, 1337);
-    let stored: Foo = get!(world, get_caller_address(), Foo);
+    let stored: Foo = get!(world, starknet::get_caller_address(), Foo);
     assert(stored.a == 1337, 'data not stored');
     assert(stored.b == 1337, 'data not stored');
 
     // delete model
     bar_contract.delete_foo_macro(stored);
 
-    let deleted: Foo = get!(world, get_caller_address(), Foo);
+    let deleted: Foo = get!(world, starknet::get_caller_address(), Foo);
     assert(deleted.a == 0, 'data not deleted');
     assert(deleted.b == 0, 'data not deleted');
 }
@@ -225,8 +223,7 @@ trait IWorldUpgrade<TContractState> {
 
 #[starknet::contract]
 mod worldupgrade {
-    use super::{IWorldUpgrade, IWorldDispatcher, ContractAddress};
-    use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
+    use super::IWorldDispatcher;
 
     #[storage]
     struct Storage {

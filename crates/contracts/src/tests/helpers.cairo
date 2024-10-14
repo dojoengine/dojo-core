@@ -184,11 +184,10 @@ pub trait IFooSetter {
 
 #[dojo::contract]
 pub mod foo_setter {
-    use super::IFooSetter;
-    use super::Foo;
+    use super::{Foo, IFooSetter};
 
     #[abi(embed_v0)]
-    impl IFooSetterImpl of super::IFooSetter<ContractState> {
+    impl IFooSetterImpl of IFooSetter<ContractState> {
         fn set_foo(ref world: IWorldDispatcher, a: felt252, b: u128) {
             set!(world, (Foo { caller: starknet::get_caller_address(), a, b }));
         }
@@ -200,6 +199,8 @@ pub mod test_contract {}
 
 #[dojo::contract]
 pub mod test_contract_with_dojo_init_args {
+    use dojo::world::IWorldDispatcherTrait;
+
     fn dojo_init(world: @IWorldDispatcher, _arg1: felt252) {
         let _a = world.uuid();
     }

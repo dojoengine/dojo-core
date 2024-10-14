@@ -1,12 +1,10 @@
-use core::array::{ArrayTrait, SpanTrait};
+use core::array::SpanTrait;
 use core::option::OptionTrait;
 use core::result::ResultTrait;
 use core::traits::{Into, TryInto};
 
-use starknet::{ClassHash, ContractAddress, syscalls::deploy_syscall, get_caller_address};
+use starknet::{ContractAddress, syscalls::deploy_syscall};
 
-use dojo::model::resource_metadata;
-use dojo::storage::packing::{shl, shr};
 use dojo::world::{world, IWorldDispatcher, IWorldDispatcherTrait};
 
 /// Deploy classhash with calldata for constructor

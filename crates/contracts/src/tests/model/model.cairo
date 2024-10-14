@@ -1,8 +1,7 @@
 use dojo::model::{Model, ModelEntity};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::IWorldDispatcherTrait;
 
 use dojo::tests::helpers::{deploy_world};
-use dojo::utils::test::{spawn_test_world};
 
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]

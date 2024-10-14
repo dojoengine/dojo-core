@@ -3,14 +3,10 @@
 
 #[starknet::contract]
 pub mod attacker_contract {
-    use dojo::world;
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::IWorldDispatcher;
     use dojo::contract::components::world_provider::IWorldProvider;
     use dojo::contract::IContract;
-    use starknet::storage::{
-        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess
-    };
+    use starknet::storage::StoragePointerReadAccess;
 
     #[storage]
     struct Storage {

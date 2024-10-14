@@ -2,12 +2,12 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-use cairo_lang_defs::db::{DefsDatabase, DefsGroup};
+use cairo_lang_defs::db::{ext_as_virtual_impl, DefsDatabase, DefsGroup};
 use cairo_lang_defs::ids::{FunctionWithBodyId, ModuleId};
 use cairo_lang_diagnostics::{Diagnostics, DiagnosticsBuilder};
 use cairo_lang_filesystem::db::{
-    init_dev_corelib, init_files_group, AsFilesGroupMut, CrateConfiguration, FilesDatabase,
-    FilesGroup, FilesGroupEx,
+    init_dev_corelib, init_files_group, AsFilesGroupMut, CrateConfiguration, ExternalFiles,
+    FilesDatabase, FilesGroup, FilesGroupEx,
 };
 use cairo_lang_filesystem::ids::{
     CrateId, CrateLongId, Directory, FileKind, FileLongId, VirtualFile,
@@ -40,6 +40,11 @@ pub struct DojoSemanticDatabase {
     storage: salsa::Storage<DojoSemanticDatabase>,
 }
 impl salsa::Database for DojoSemanticDatabase {}
+impl ExternalFiles for DojoSemanticDatabase {
+    fn ext_as_virtual(&self, external_id: salsa::InternId) -> VirtualFile {
+        ext_as_virtual_impl(self.upcast(), external_id)
+    }
+}
 impl salsa::ParallelDatabase for DojoSemanticDatabase {
     fn snapshot(&self) -> salsa::Snapshot<DojoSemanticDatabase> {
         salsa::Snapshot::new(DojoSemanticDatabase {

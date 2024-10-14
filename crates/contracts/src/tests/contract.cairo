@@ -53,7 +53,7 @@ pub trait IQuantumLeap<T> {
 #[starknet::contract]
 pub mod test_contract_upgrade {
     use dojo::contract::IContract;
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::IWorldDispatcher;
     use dojo::contract::components::world_provider::IWorldProvider;
 
     #[storage]

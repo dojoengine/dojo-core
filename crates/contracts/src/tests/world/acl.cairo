@@ -1,8 +1,6 @@
-use starknet::contract_address_const;
-
 use dojo::model::Model;
-use dojo::utils::{bytearray_hash, entity_id_from_keys};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, world};
+use dojo::utils::bytearray_hash;
+use dojo::world::IWorldDispatcherTrait;
 
 use dojo::tests::helpers::{
     deploy_world, Foo, foo, foo_setter, IFooSetterDispatcher, IFooSetterDispatcherTrait

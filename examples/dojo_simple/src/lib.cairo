@@ -83,7 +83,8 @@ pub mod sn_actions {
 
 #[cfg(test)]
 mod tests {
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::IWorldDispatcherTrait;
+
     #[test]
     fn test_spawn_world_full() {
         let _world = spawn_test_world!();

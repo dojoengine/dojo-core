@@ -1,13 +1,13 @@
-use core::array::{ArrayTrait, SpanTrait};
+use core::array::SpanTrait;
 
-use starknet::{contract_address_const, ContractAddress};
+use starknet::ContractAddress;
 
 use dojo::meta::introspect::Introspect;
-use dojo::meta::{Layout, FieldLayout};
+use dojo::meta::Layout;
 use dojo::model::{ModelIndex, Model};
 use dojo::storage::database::MAX_ARRAY_LENGTH;
 use dojo::utils::entity_id_from_keys;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait, world};
+use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 use dojo::tests::helpers::{
     deploy_world, deploy_world_and_bar, IbarDispatcher, IbarDispatcherTrait, Foo, foo, bar

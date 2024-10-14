@@ -34,7 +34,6 @@ pub mod model {
 
     pub mod metadata;
     pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
-    pub(crate) use metadata::{initial_address, initial_class_hash};
 }
 
 pub(crate) mod storage {
@@ -127,7 +126,6 @@ mod tests {
         mod entities;
         mod resources;
         mod world;
-        mod init;
     }
     mod utils {
         mod hash;

@@ -138,7 +138,7 @@ impl NamespaceConfig {
 
 impl From<&CfgSet> for NamespaceConfig {
     fn from(cfg_set: &CfgSet) -> Self {
-        let mut default = "".to_string();
+        let mut default = "DEFAULT_NAMESPACE_CFG".to_string();
         let mut mappings = HashMap::new();
 
         for cfg in cfg_set.into_iter() {
@@ -293,7 +293,7 @@ mod tests {
         let empty_cfg_set = CfgSet::new();
         let empty_namespace_config = NamespaceConfig::from(&empty_cfg_set);
 
-        assert_eq!(empty_namespace_config.default, "");
+        assert_eq!(empty_namespace_config.default, "DEFAULT_NAMESPACE_CFG");
         assert_eq!(empty_namespace_config.mappings, None);
     }
 }

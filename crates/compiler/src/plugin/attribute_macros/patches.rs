@@ -19,16 +19,9 @@ pub impl IDojoInitImpl of IDojoInit {
 pub const CONTRACT_PATCH: &str = "
                 #[starknet::contract]
                 pub mod $name$ {
-                    use dojo::world;
-                    use dojo::world::IWorldDispatcher;
-                    use dojo::world::IWorldDispatcherTrait;
                     use dojo::contract::components::world_provider::{world_provider_cpt, world_provider_cpt::InternalTrait as WorldProviderInternal, IWorldProvider};
                     use dojo::contract::components::upgradeable::upgradeable_cpt;
                     use dojo::contract::IContract;
-                    use starknet::storage::{
-                        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess, \
-                        StoragePointerWriteAccess
-                    };
 
                     component!(path: world_provider_cpt, storage: world_provider, event: WorldProviderEvent);
                     component!(path: upgradeable_cpt, storage: upgradeable, event: UpgradeableEvent);

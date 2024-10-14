@@ -7,10 +7,10 @@ pub trait IWorldProvider<T> {
 
 #[starknet::component]
 pub mod world_provider_cpt {
-    use starknet::{ClassHash, ContractAddress, get_caller_address};
+    use starknet::get_caller_address;
     use starknet::storage::{StoragePointerReadAccess, StoragePointerWriteAccess};
 
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::IWorldDispatcher;
 
     #[storage]
     pub struct Storage {
