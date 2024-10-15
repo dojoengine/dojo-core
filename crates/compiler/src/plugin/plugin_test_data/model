@@ -463,19 +463,19 @@ pub impl Modelv0EntityStore = dojo::model::entity::EntityStoreImpl<Modelv0Entity
 #[generate_trait]
 pub impl Modelv0MembersStoreImpl of Modelv0MembersStore {
     fn get_v(self: @dojo::world::IWorldDispatcher, key: Modelv0KeyType) -> Vec3 {
-        Modelv0Store::get_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key)
+        Modelv0Store::get_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn get_v_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Vec3 {
-        Modelv0EntityStore::get_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id)
+        Modelv0EntityStore::get_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn update_v(self: dojo::world::IWorldDispatcher, key: Modelv0KeyType, value: Vec3) {
-        Modelv0Store::update_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key, value);
+        Modelv0Store::update_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
     fn update_v_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Vec3) {
-        Modelv0EntityStore::update_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id, value);
+        Modelv0EntityStore::update_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
 
@@ -1041,19 +1041,19 @@ pub impl ModelWithBadNamespaceFormatEntityStore = dojo::model::entity::EntitySto
 #[generate_trait]
 pub impl ModelWithBadNamespaceFormatMembersStoreImpl of ModelWithBadNamespaceFormatMembersStore {
     fn get_v(self: @dojo::world::IWorldDispatcher, key: ModelWithBadNamespaceFormatKeyType) -> Vec3 {
-        ModelWithBadNamespaceFormatStore::get_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key)
+        ModelWithBadNamespaceFormatStore::get_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn get_v_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Vec3 {
-        ModelWithBadNamespaceFormatEntityStore::get_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id)
+        ModelWithBadNamespaceFormatEntityStore::get_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn update_v(self: dojo::world::IWorldDispatcher, key: ModelWithBadNamespaceFormatKeyType, value: Vec3) {
-        ModelWithBadNamespaceFormatStore::update_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key, value);
+        ModelWithBadNamespaceFormatStore::update_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
     fn update_v_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Vec3) {
-        ModelWithBadNamespaceFormatEntityStore::update_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id, value);
+        ModelWithBadNamespaceFormatEntityStore::update_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
 
@@ -1619,19 +1619,19 @@ pub impl ModelWithShortStringNamespaceEntityStore = dojo::model::entity::EntityS
 #[generate_trait]
 pub impl ModelWithShortStringNamespaceMembersStoreImpl of ModelWithShortStringNamespaceMembersStore {
     fn get_v(self: @dojo::world::IWorldDispatcher, key: ModelWithShortStringNamespaceKeyType) -> Vec3 {
-        ModelWithShortStringNamespaceStore::get_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key)
+        ModelWithShortStringNamespaceStore::get_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn get_v_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Vec3 {
-        ModelWithShortStringNamespaceEntityStore::get_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id)
+        ModelWithShortStringNamespaceEntityStore::get_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn update_v(self: dojo::world::IWorldDispatcher, key: ModelWithShortStringNamespaceKeyType, value: Vec3) {
-        ModelWithShortStringNamespaceStore::update_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key, value);
+        ModelWithShortStringNamespaceStore::update_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
     fn update_v_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Vec3) {
-        ModelWithShortStringNamespaceEntityStore::update_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id, value);
+        ModelWithShortStringNamespaceEntityStore::update_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
 
@@ -2197,19 +2197,19 @@ pub impl ModelWithStringNamespaceEntityStore = dojo::model::entity::EntityStoreI
 #[generate_trait]
 pub impl ModelWithStringNamespaceMembersStoreImpl of ModelWithStringNamespaceMembersStore {
     fn get_v(self: @dojo::world::IWorldDispatcher, key: ModelWithStringNamespaceKeyType) -> Vec3 {
-        ModelWithStringNamespaceStore::get_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key)
+        ModelWithStringNamespaceStore::get_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn get_v_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Vec3 {
-        ModelWithStringNamespaceEntityStore::get_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id)
+        ModelWithStringNamespaceEntityStore::get_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn update_v(self: dojo::world::IWorldDispatcher, key: ModelWithStringNamespaceKeyType, value: Vec3) {
-        ModelWithStringNamespaceStore::update_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key, value);
+        ModelWithStringNamespaceStore::update_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
     fn update_v_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Vec3) {
-        ModelWithStringNamespaceEntityStore::update_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id, value);
+        ModelWithStringNamespaceEntityStore::update_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
 
@@ -2775,19 +2775,19 @@ pub impl PositionEntityStore = dojo::model::entity::EntityStoreImpl<PositionEnti
 #[generate_trait]
 pub impl PositionMembersStoreImpl of PositionMembersStore {
     fn get_v(self: @dojo::world::IWorldDispatcher, key: PositionKeyType) -> Vec3 {
-        PositionStore::get_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key)
+        PositionStore::get_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn get_v_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Vec3 {
-        PositionEntityStore::get_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id)
+        PositionEntityStore::get_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080)
     }
 
     fn update_v(self: dojo::world::IWorldDispatcher, key: PositionKeyType, value: Vec3) {
-        PositionStore::update_member(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, key, value);
+        PositionStore::update_member(self, key, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
     fn update_v_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Vec3) {
-        PositionEntityStore::update_member_from_id(self, 578691550836206188651404750433984985630363913126316857592149308417275000080, entity_id, value);
+        PositionEntityStore::update_member_from_id(self, entity_id, 578691550836206188651404750433984985630363913126316857592149308417275000080, value);
     }
 
 
@@ -3359,19 +3359,19 @@ pub impl PlayerEntityStore = dojo::model::entity::EntityStoreImpl<PlayerEntity>;
 #[generate_trait]
 pub impl PlayerMembersStoreImpl of PlayerMembersStore {
     fn get_name(self: @dojo::world::IWorldDispatcher, key: PlayerKeyType) -> felt252 {
-        PlayerStore::get_member(self, 1528802474226268325865027367859591458315299653151958663884057507666229546336, key)
+        PlayerStore::get_member(self, key, 1528802474226268325865027367859591458315299653151958663884057507666229546336)
     }
 
     fn get_name_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> felt252 {
-        PlayerEntityStore::get_member_from_id(self, 1528802474226268325865027367859591458315299653151958663884057507666229546336, entity_id)
+        PlayerEntityStore::get_member_from_id(self, entity_id, 1528802474226268325865027367859591458315299653151958663884057507666229546336)
     }
 
     fn update_name(self: dojo::world::IWorldDispatcher, key: PlayerKeyType, value: felt252) {
-        PlayerStore::update_member(self, 1528802474226268325865027367859591458315299653151958663884057507666229546336, key, value);
+        PlayerStore::update_member(self, key, 1528802474226268325865027367859591458315299653151958663884057507666229546336, value);
     }
 
     fn update_name_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: felt252) {
-        PlayerEntityStore::update_member_from_id(self, 1528802474226268325865027367859591458315299653151958663884057507666229546336, entity_id, value);
+        PlayerEntityStore::update_member_from_id(self, entity_id, 1528802474226268325865027367859591458315299653151958663884057507666229546336, value);
     }
 
 
@@ -3954,35 +3954,35 @@ pub impl ModelWithSimpleArrayEntityStore = dojo::model::entity::EntityStoreImpl<
 #[generate_trait]
 pub impl ModelWithSimpleArrayMembersStoreImpl of ModelWithSimpleArrayMembersStore {
     fn get_x(self: @dojo::world::IWorldDispatcher, key: ModelWithSimpleArrayKeyType) -> u16 {
-        ModelWithSimpleArrayStore::get_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key)
+        ModelWithSimpleArrayStore::get_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn get_x_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> u16 {
-        ModelWithSimpleArrayEntityStore::get_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id)
+        ModelWithSimpleArrayEntityStore::get_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn update_x(self: dojo::world::IWorldDispatcher, key: ModelWithSimpleArrayKeyType, value: u16) {
-        ModelWithSimpleArrayStore::update_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key, value);
+        ModelWithSimpleArrayStore::update_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn update_x_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: u16) {
-        ModelWithSimpleArrayEntityStore::update_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id, value);
+        ModelWithSimpleArrayEntityStore::update_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn get_y(self: @dojo::world::IWorldDispatcher, key: ModelWithSimpleArrayKeyType) -> Array<u8> {
-        ModelWithSimpleArrayStore::get_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key)
+        ModelWithSimpleArrayStore::get_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn get_y_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Array<u8> {
-        ModelWithSimpleArrayEntityStore::get_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id)
+        ModelWithSimpleArrayEntityStore::get_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn update_y(self: dojo::world::IWorldDispatcher, key: ModelWithSimpleArrayKeyType, value: Array<u8>) {
-        ModelWithSimpleArrayStore::update_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key, value);
+        ModelWithSimpleArrayStore::update_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
     fn update_y_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Array<u8>) {
-        ModelWithSimpleArrayEntityStore::update_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id, value);
+        ModelWithSimpleArrayEntityStore::update_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
 
@@ -4561,35 +4561,35 @@ pub impl ModelWithByteArrayEntityStore = dojo::model::entity::EntityStoreImpl<Mo
 #[generate_trait]
 pub impl ModelWithByteArrayMembersStoreImpl of ModelWithByteArrayMembersStore {
     fn get_x(self: @dojo::world::IWorldDispatcher, key: ModelWithByteArrayKeyType) -> u16 {
-        ModelWithByteArrayStore::get_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key)
+        ModelWithByteArrayStore::get_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn get_x_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> u16 {
-        ModelWithByteArrayEntityStore::get_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id)
+        ModelWithByteArrayEntityStore::get_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn update_x(self: dojo::world::IWorldDispatcher, key: ModelWithByteArrayKeyType, value: u16) {
-        ModelWithByteArrayStore::update_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key, value);
+        ModelWithByteArrayStore::update_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn update_x_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: u16) {
-        ModelWithByteArrayEntityStore::update_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id, value);
+        ModelWithByteArrayEntityStore::update_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn get_y(self: @dojo::world::IWorldDispatcher, key: ModelWithByteArrayKeyType) -> ByteArray {
-        ModelWithByteArrayStore::get_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key)
+        ModelWithByteArrayStore::get_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn get_y_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> ByteArray {
-        ModelWithByteArrayEntityStore::get_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id)
+        ModelWithByteArrayEntityStore::get_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn update_y(self: dojo::world::IWorldDispatcher, key: ModelWithByteArrayKeyType, value: ByteArray) {
-        ModelWithByteArrayStore::update_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key, value);
+        ModelWithByteArrayStore::update_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
     fn update_y_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: ByteArray) {
-        ModelWithByteArrayEntityStore::update_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id, value);
+        ModelWithByteArrayEntityStore::update_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
 
@@ -5172,35 +5172,35 @@ pub impl ModelWithComplexArrayEntityStore = dojo::model::entity::EntityStoreImpl
 #[generate_trait]
 pub impl ModelWithComplexArrayMembersStoreImpl of ModelWithComplexArrayMembersStore {
     fn get_x(self: @dojo::world::IWorldDispatcher, key: ModelWithComplexArrayKeyType) -> u16 {
-        ModelWithComplexArrayStore::get_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key)
+        ModelWithComplexArrayStore::get_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn get_x_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> u16 {
-        ModelWithComplexArrayEntityStore::get_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id)
+        ModelWithComplexArrayEntityStore::get_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn update_x(self: dojo::world::IWorldDispatcher, key: ModelWithComplexArrayKeyType, value: u16) {
-        ModelWithComplexArrayStore::update_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key, value);
+        ModelWithComplexArrayStore::update_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn update_x_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: u16) {
-        ModelWithComplexArrayEntityStore::update_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id, value);
+        ModelWithComplexArrayEntityStore::update_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn get_y(self: @dojo::world::IWorldDispatcher, key: ModelWithComplexArrayKeyType) -> Array<Vec3> {
-        ModelWithComplexArrayStore::get_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key)
+        ModelWithComplexArrayStore::get_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn get_y_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> Array<Vec3> {
-        ModelWithComplexArrayEntityStore::get_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id)
+        ModelWithComplexArrayEntityStore::get_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn update_y(self: dojo::world::IWorldDispatcher, key: ModelWithComplexArrayKeyType, value: Array<Vec3>) {
-        ModelWithComplexArrayStore::update_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key, value);
+        ModelWithComplexArrayStore::update_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
     fn update_y_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: Array<Vec3>) {
-        ModelWithComplexArrayEntityStore::update_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id, value);
+        ModelWithComplexArrayEntityStore::update_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
 
@@ -5790,35 +5790,35 @@ pub impl ModelWithTupleEntityStore = dojo::model::entity::EntityStoreImpl<ModelW
 #[generate_trait]
 pub impl ModelWithTupleMembersStoreImpl of ModelWithTupleMembersStore {
     fn get_x(self: @dojo::world::IWorldDispatcher, key: ModelWithTupleKeyType) -> u16 {
-        ModelWithTupleStore::get_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key)
+        ModelWithTupleStore::get_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn get_x_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> u16 {
-        ModelWithTupleEntityStore::get_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id)
+        ModelWithTupleEntityStore::get_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn update_x(self: dojo::world::IWorldDispatcher, key: ModelWithTupleKeyType, value: u16) {
-        ModelWithTupleStore::update_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key, value);
+        ModelWithTupleStore::update_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn update_x_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: u16) {
-        ModelWithTupleEntityStore::update_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id, value);
+        ModelWithTupleEntityStore::update_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn get_y(self: @dojo::world::IWorldDispatcher, key: ModelWithTupleKeyType) -> (u8, u16, u32) {
-        ModelWithTupleStore::get_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key)
+        ModelWithTupleStore::get_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn get_y_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> (u8, u16, u32) {
-        ModelWithTupleEntityStore::get_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id)
+        ModelWithTupleEntityStore::get_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn update_y(self: dojo::world::IWorldDispatcher, key: ModelWithTupleKeyType, value: (u8, u16, u32)) {
-        ModelWithTupleStore::update_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key, value);
+        ModelWithTupleStore::update_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
     fn update_y_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: (u8, u16, u32)) {
-        ModelWithTupleEntityStore::update_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id, value);
+        ModelWithTupleEntityStore::update_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
 
@@ -6417,35 +6417,35 @@ pub impl ModelWithTupleNoPrimitivesEntityStore = dojo::model::entity::EntityStor
 #[generate_trait]
 pub impl ModelWithTupleNoPrimitivesMembersStoreImpl of ModelWithTupleNoPrimitivesMembersStore {
     fn get_x(self: @dojo::world::IWorldDispatcher, key: ModelWithTupleNoPrimitivesKeyType) -> u16 {
-        ModelWithTupleNoPrimitivesStore::get_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key)
+        ModelWithTupleNoPrimitivesStore::get_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn get_x_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> u16 {
-        ModelWithTupleNoPrimitivesEntityStore::get_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id)
+        ModelWithTupleNoPrimitivesEntityStore::get_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331)
     }
 
     fn update_x(self: dojo::world::IWorldDispatcher, key: ModelWithTupleNoPrimitivesKeyType, value: u16) {
-        ModelWithTupleNoPrimitivesStore::update_member(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, key, value);
+        ModelWithTupleNoPrimitivesStore::update_member(self, key, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn update_x_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: u16) {
-        ModelWithTupleNoPrimitivesEntityStore::update_member_from_id(self, 512066735765477566404754172672287371265995314501343422459174036873487219331, entity_id, value);
+        ModelWithTupleNoPrimitivesEntityStore::update_member_from_id(self, entity_id, 512066735765477566404754172672287371265995314501343422459174036873487219331, value);
     }
 
     fn get_y(self: @dojo::world::IWorldDispatcher, key: ModelWithTupleNoPrimitivesKeyType) -> (u8, Vec3, u32) {
-        ModelWithTupleNoPrimitivesStore::get_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key)
+        ModelWithTupleNoPrimitivesStore::get_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn get_y_from_id(self: @dojo::world::IWorldDispatcher, entity_id: felt252) -> (u8, Vec3, u32) {
-        ModelWithTupleNoPrimitivesEntityStore::get_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id)
+        ModelWithTupleNoPrimitivesEntityStore::get_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819)
     }
 
     fn update_y(self: dojo::world::IWorldDispatcher, key: ModelWithTupleNoPrimitivesKeyType, value: (u8, Vec3, u32)) {
-        ModelWithTupleNoPrimitivesStore::update_member(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, key, value);
+        ModelWithTupleNoPrimitivesStore::update_member(self, key, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
     fn update_y_from_id(self: dojo::world::IWorldDispatcher, entity_id: felt252, value: (u8, Vec3, u32)) {
-        ModelWithTupleNoPrimitivesEntityStore::update_member_from_id(self, 1591024729085637502504777720563487898377940395575083379770417352976841400819, entity_id, value);
+        ModelWithTupleNoPrimitivesEntityStore::update_member_from_id(self, entity_id, 1591024729085637502504777720563487898377940395575083379770417352976841400819, value);
     }
 
 

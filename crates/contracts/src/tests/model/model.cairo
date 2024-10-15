@@ -171,11 +171,11 @@ fn test_get_and_set_member_from_model() {
     let foo = Foo { k1: 1, k2: 2, v1: 3, v2: 4 };
     world.set(@foo);
     let key: (u8, felt252) = foo.key();
-    let v1: u128 = ModelStore::<Foo>::get_member(@world, selector!("v1"), key);
+    let v1: u128 = ModelStore::<Foo>::get_member(@world, key, selector!("v1"));
 
     assert!(v1 == 3);
 
-    ModelStore::<Foo>::update_member(world, selector!("v1"), key, 42);
+    ModelStore::<Foo>::update_member(world, key, selector!("v1"), 42);
     let foo: Foo = world.get((foo.k1, foo.k2));
     assert!(foo.v1 == 42);
 }

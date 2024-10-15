@@ -55,8 +55,8 @@ pub impl MemberStoreImpl<M, T, +ModelDefinition<M>, +Serde<T>, +Drop<T>> of Memb
                 *self,
                 ModelDefinition::<M>::selector(),
                 ModelDefinition::<M>::layout(),
+                entity_id,
                 member_id,
-                entity_id
             )
         )
     }

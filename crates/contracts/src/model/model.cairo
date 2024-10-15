@@ -213,15 +213,15 @@ pub impl ModelStoreImpl<M, +Model<M>, +Drop<M>> of ModelStore<M> {
     }
 
     fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: @IWorldDispatcher, member_id: felt252, key: K
+        self: @IWorldDispatcher, key: K, member_id: felt252
     ) -> T {
-        MemberStore::<M, T>::get_member(self, member_id, entity_id_from_key::<K>(@key))
+        MemberStore::<M, T>::get_member(self, entity_id_from_key::<K>(@key), member_id)
     }
 
     fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: IWorldDispatcher, member_id: felt252, key: K, value: T
+        self: IWorldDispatcher, key: K, member_id: felt252, value: T
     ) {
-        MemberStore::<M, T>::update_member(self, member_id, entity_id_from_key::<K>(@key), value);
+        MemberStore::<M, T>::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
     }
 }
 
