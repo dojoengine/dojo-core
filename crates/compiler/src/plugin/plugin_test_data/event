@@ -187,12 +187,24 @@ pub impl MessageEventImpl of dojo::event::Event<Message> {
     }
 
     #[inline(always)]
+    fn definition() -> dojo::event::EventDefinition {
+        dojo::event::EventDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema()
+        }
+    }
+
+    #[inline(always)]
     fn layout() -> dojo::meta::Layout {
         dojo::meta::introspect::Introspect::<Message>::layout()
     }
 
     #[inline(always)]
-    fn schema(self: @Message) -> dojo::meta::introspect::Ty {
+    fn schema() -> dojo::meta::introspect::Ty {
         dojo::meta::introspect::Introspect::<Message>::ty()
     }
 
@@ -252,6 +264,10 @@ pub mod message {
 
         fn namespace_hash(self: @ContractState) -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
+        }
+
+        fn definition(self: @ContractState) -> dojo::event::EventDefinition {
+            dojo::event::Event::<Message>::definition()
         }
 
         fn layout(self: @ContractState) -> dojo::meta::Layout {
@@ -319,6 +335,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -455,6 +472,25 @@ fn __wrapper__DojoEventImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoEventImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoEventImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::event::EventDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoEventImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -501,6 +537,7 @@ pub mod __external {
     pub use super::__wrapper__DojoEventImpl__selector as selector;
     pub use super::__wrapper__DojoEventImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoEventImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoEventImpl__definition as definition;
     pub use super::__wrapper__DojoEventImpl__layout as layout;
     pub use super::__wrapper__DojoEventImpl__schema as schema;
 }
@@ -648,12 +685,24 @@ pub impl MyEventWithNamespaceEventImpl of dojo::event::Event<MyEventWithNamespac
     }
 
     #[inline(always)]
+    fn definition() -> dojo::event::EventDefinition {
+        dojo::event::EventDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema()
+        }
+    }
+
+    #[inline(always)]
     fn layout() -> dojo::meta::Layout {
         dojo::meta::introspect::Introspect::<MyEventWithNamespace>::layout()
     }
 
     #[inline(always)]
-    fn schema(self: @MyEventWithNamespace) -> dojo::meta::introspect::Ty {
+    fn schema() -> dojo::meta::introspect::Ty {
         dojo::meta::introspect::Introspect::<MyEventWithNamespace>::ty()
     }
 
@@ -711,6 +760,10 @@ pub mod my_event_with_namespace {
 
         fn namespace_hash(self: @ContractState) -> felt252 {
             1685136890688416384941629523783652800960468745356230625531475538826800548713
+        }
+
+        fn definition(self: @ContractState) -> dojo::event::EventDefinition {
+            dojo::event::Event::<MyEventWithNamespace>::definition()
         }
 
         fn layout(self: @ContractState) -> dojo::meta::Layout {
@@ -778,6 +831,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -914,6 +968,25 @@ fn __wrapper__DojoEventImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoEventImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoEventImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::event::EventDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoEventImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -960,6 +1033,7 @@ pub mod __external {
     pub use super::__wrapper__DojoEventImpl__selector as selector;
     pub use super::__wrapper__DojoEventImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoEventImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoEventImpl__definition as definition;
     pub use super::__wrapper__DojoEventImpl__layout as layout;
     pub use super::__wrapper__DojoEventImpl__schema as schema;
 }
@@ -1107,12 +1181,24 @@ pub impl MyEventNoHistoricalEventImpl of dojo::event::Event<MyEventNoHistorical>
     }
 
     #[inline(always)]
+    fn definition() -> dojo::event::EventDefinition {
+        dojo::event::EventDefinition {
+            name: Self::name(),
+            namespace: Self::namespace(),
+            namespace_selector: Self::namespace_hash(),
+            version: Self::version(),
+            layout: Self::layout(),
+            schema: Self::schema()
+        }
+    }
+
+    #[inline(always)]
     fn layout() -> dojo::meta::Layout {
         dojo::meta::introspect::Introspect::<MyEventNoHistorical>::layout()
     }
 
     #[inline(always)]
-    fn schema(self: @MyEventNoHistorical) -> dojo::meta::introspect::Ty {
+    fn schema() -> dojo::meta::introspect::Ty {
         dojo::meta::introspect::Introspect::<MyEventNoHistorical>::ty()
     }
 
@@ -1170,6 +1256,10 @@ pub mod my_event_no_historical {
 
         fn namespace_hash(self: @ContractState) -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
+        }
+
+        fn definition(self: @ContractState) -> dojo::event::EventDefinition {
+            dojo::event::Event::<MyEventNoHistorical>::definition()
         }
 
         fn layout(self: @ContractState) -> dojo::meta::Layout {
@@ -1237,6 +1327,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -1373,6 +1464,25 @@ fn __wrapper__DojoEventImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoEventImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoEventImpl::definition(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::event::EventDefinition>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoEventImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -1419,6 +1529,7 @@ pub mod __external {
     pub use super::__wrapper__DojoEventImpl__selector as selector;
     pub use super::__wrapper__DojoEventImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoEventImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoEventImpl__definition as definition;
     pub use super::__wrapper__DojoEventImpl__layout as layout;
     pub use super::__wrapper__DojoEventImpl__schema as schema;
 }

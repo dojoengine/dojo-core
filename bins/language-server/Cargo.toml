@@ -1,0 +1,9 @@
+[package]
+edition.workspace = true
+name = "dojo-language-server"
+version.workspace = true
+
+[dependencies]
+cairo-lang-language-server.workspace = true
+clap.workspace = true
+dojo-compiler.workspace = true

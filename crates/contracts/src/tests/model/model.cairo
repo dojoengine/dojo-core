@@ -1,8 +1,7 @@
 use dojo::model::{Model, Entity, ModelStore, EntityStore};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::world::{IWorldDispatcherTrait};
 
 use dojo::tests::helpers::{deploy_world};
-use dojo::utils::test::{spawn_test_world};
 
 #[derive(Copy, Drop, Serde, Debug)]
 #[dojo::model]
@@ -15,6 +14,20 @@ struct Foo {
     v2: u32
 }
 
+
+#[test]
+fn test_model_definition() {
+    let definition = dojo::model::Model::<Foo>::definition();
+
+    assert_eq!(definition.name, dojo::model::Model::<Foo>::name());
+    assert_eq!(definition.namespace, dojo::model::Model::<Foo>::namespace());
+    assert_eq!(definition.namespace_hash, dojo::model::Model::<Foo>::namespace_hash());
+    assert_eq!(definition.version, dojo::model::Model::<Foo>::version());
+    assert_eq!(definition.layout, dojo::model::Model::<Foo>::layout());
+    assert_eq!(definition.schema, dojo::model::Model::<Foo>::schema());
+    assert_eq!(definition.packed_size, dojo::model::Model::<Foo>::packed_size());
+    assert_eq!(definition.unpacked_size, dojo::meta::introspect::Introspect::<Foo>::size());
+}
 
 #[test]
 fn test_id() {

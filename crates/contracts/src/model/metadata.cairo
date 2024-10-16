@@ -3,17 +3,13 @@
 //! Manually expand to ensure that dojo-core
 //! does not depend on dojo plugin to be built.
 //!
-use core::array::ArrayTrait;
-use core::byte_array::ByteArray;
 use core::poseidon::poseidon_hash_span;
-use core::serde::Serde;
 
-use dojo::model::{ModelIndex, model::{ModelImpl, ModelParser, KeyParser}};
+use dojo::model::model::{ModelImpl, ModelParser, KeyParser};
 use dojo::meta::introspect::{Introspect, Ty, Struct, Member};
 use dojo::meta::{Layout, FieldLayout};
 use dojo::utils;
 use dojo::utils::{serialize_inline};
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 
 pub fn initial_address() -> starknet::ContractAddress {
     starknet::contract_address_const::<0>()
@@ -72,6 +68,16 @@ pub impl ResourceMetadataDefinitionImpl of dojo::model::ModelDefinition<Resource
     fn layout() -> Layout {
         Introspect::<ResourceMetadata>::layout()
     }
+
+    #[inline(always)]
+    fn schema() -> Ty {
+        Introspect::<ResourceMetadata>::ty()
+    }
+
+    #[inline(always)]
+    fn size() -> Option<usize> {
+        Introspect::<ResourceMetadata>::size()
+    }
 }
 
 
@@ -124,49 +130,53 @@ pub impl ResourceMetadataIntrospect<> of Introspect<ResourceMetadata<>> {
 
 #[starknet::contract]
 pub mod resource_metadata {
-    use super::{ResourceMetadata, ResourceMetadataDefinitionImpl};
+    use super::{ResourceMetadata};
 
-    use dojo::meta::introspect::{Introspect, Ty};
-    use dojo::meta::Layout;
+    use dojo::{meta::{Layout, Ty}, model::{ModelDef, Model}};
 
     #[storage]
     struct Storage {}
 
     #[external(v0)]
     fn selector(self: @ContractState) -> felt252 {
-        ResourceMetadataDefinitionImpl::selector()
+        Model::<ResourceMetadata>::selector()
     }
 
     fn name(self: @ContractState) -> ByteArray {
-        ResourceMetadataDefinitionImpl::name()
+        Model::<ResourceMetadata>::name()
     }
 
     fn version(self: @ContractState) -> u8 {
-        ResourceMetadataDefinitionImpl::version()
+        Model::<ResourceMetadata>::version()
     }
 
     fn namespace(self: @ContractState) -> ByteArray {
-        ResourceMetadataDefinitionImpl::namespace()
+        Model::<ResourceMetadata>::namespace()
     }
 
     #[external(v0)]
     fn unpacked_size(self: @ContractState) -> Option<usize> {
-        Introspect::<ResourceMetadata>::size()
+        Model::<ResourceMetadata>::unpacked_size()
     }
 
     #[external(v0)]
     fn packed_size(self: @ContractState) -> Option<usize> {
-        dojo::meta::layout::compute_packed_size(Introspect::<ResourceMetadata>::layout())
+        Model::<ResourceMetadata>::packed_size()
     }
 
     #[external(v0)]
     fn layout(self: @ContractState) -> Layout {
-        Introspect::<ResourceMetadata>::layout()
+        Model::<ResourceMetadata>::layout()
     }
 
     #[external(v0)]
     fn schema(self: @ContractState) -> Ty {
-        Introspect::<ResourceMetadata>::ty()
+        Model::<ResourceMetadata>::schema()
+    }
+
+    #[external(v0)]
+    fn definition(self: @ContractState) -> ModelDef {
+        Model::<ResourceMetadata>::definition()
     }
 
     #[external(v0)]

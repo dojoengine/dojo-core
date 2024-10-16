@@ -6,11 +6,11 @@ use cairo_lang_compiler::project::{ProjectConfig, ProjectConfigContent};
 use cairo_lang_filesystem::cfg::{Cfg, CfgSet};
 use cairo_lang_filesystem::ids::Directory;
 use cairo_lang_starknet::starknet_plugin_suite;
-use cairo_lang_test_plugin::test_plugin_suite;
+use cairo_lang_test_plugin::{test_plugin_suite, TestsCompilationConfig};
 use cairo_lang_test_runner::{CompiledTestRunner, RunProfilerConfig, TestCompiler, TestRunConfig};
 use clap::Args;
 use dojo_compiler::compiler::cairo_compiler::{
-    collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
+    collect_all_crate_ids, collect_crates_ids_from_selectors, collect_main_crate_ids, Props,
 };
 use dojo_compiler::compiler::config::{CompilerConfig, DojoConfigLoader};
 use dojo_compiler::compiler::scarb_internal::{
@@ -18,7 +18,6 @@ use dojo_compiler::compiler::scarb_internal::{
 };
 use dojo_compiler::compiler::version::check_package_dojo_version;
 use dojo_compiler::plugin::dojo_plugin_suite;
-use scarb::compiler::helpers::collect_all_crate_ids;
 use scarb::compiler::{CairoCompilationUnit, CompilationUnit, CompilationUnitAttributes};
 use scarb::core::{Config, Package, TargetKind};
 use scarb::ops::{self, CompileOpts};
@@ -164,8 +163,9 @@ impl TestArgs {
                 bail!("failed to compile");
             }
 
-            let mut main_crate_ids = collect_all_crate_ids(&unit, &db);
             let test_crate_ids = collect_main_crate_ids(&unit, &db, false);
+
+            let mut main_crate_ids = collect_all_crate_ids(&unit, &db);
 
             if let Some(external_contracts) = props.build_external_contracts {
                 main_crate_ids.extend(collect_crates_ids_from_selectors(&db, &external_contracts));
@@ -184,7 +184,12 @@ impl TestArgs {
                 db: db.snapshot(),
                 main_crate_ids,
                 test_crate_ids,
-                starknet: true,
+                allow_warnings: true,
+                config: TestsCompilationConfig {
+                    starknet: true,
+                    add_statements_functions: false,
+                    add_statements_code_locations: false,
+                },
             };
 
             let compiled = compiler.build()?;

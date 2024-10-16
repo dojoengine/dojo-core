@@ -62,7 +62,7 @@ pub mod actions {
     use dojo::model::ModelStore;
     use super::{
         IActions,
-        models::{Position, PositionEntity, ModelA, UnmappedModel, PositionMembersStore, Point},
+        models::{Position, PositionEntity, PositionMembersStore, Point},
         events::PositionUpdated
     };
 
@@ -74,9 +74,9 @@ pub mod actions {
         pub a: u8,
     }
 
-    #[constructor]
-    fn constructor(ref self: ContractState, a: u32) {
-        let _b = a + 1;
+    fn dojo_init(ref world: IWorldDispatcher, id: u32, a: u8) {
+        let m = ModelInContract { id, a };
+        world.set(@m);
     }
 
     #[abi(embed_v0)]
@@ -131,8 +131,28 @@ pub mod sn_actions {
 
 #[cfg(test)]
 mod tests {
+    use dojo::world::IWorldDispatcherTrait;
+    use dojo::model::ModelStore;
+    use super::actions::ModelInContract;
+
     #[test]
     fn test_spawn_world_full() {
         let _world = spawn_test_world!();
     }
+
+    #[test]
+    fn test_dojo_init_flow() {
+        let world = spawn_test_world!();
+
+        let actions_addr = world
+            .register_contract('salt1', super::actions::TEST_CLASS_HASH.try_into().unwrap());
+
+        world.grant_writer(dojo::utils::bytearray_hash(@"ds"), actions_addr);
+
+        world.init_contract(selector_from_tag!("ds-actions"), [10, 20].span());
+        
+        let model: ModelInContract = world.get(10);
+        assert_eq!(model.a, 20);
+    }
 }
+

@@ -379,6 +379,21 @@ pub mod modelv_0_definition {
     use super::Modelv0;
     pub impl Modelv0DefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "Modelv0"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-Modelv0"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             0
         }
@@ -397,25 +412,21 @@ pub mod modelv_0_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "Modelv0"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-Modelv0"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<Modelv0>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<Modelv0>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<Modelv0>::size()
         }
     }
     
@@ -497,47 +508,51 @@ pub mod modelv_0 {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            Modelv0Definition::name()
+            dojo::model::Model::<Modelv0>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            Modelv0Definition::namespace()
+            dojo::model::Model::<Modelv0>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            Modelv0Definition::tag()
+            dojo::model::Model::<Modelv0>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            Modelv0Definition::version()
+            dojo::model::Model::<Modelv0>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            Modelv0Definition::selector()
+            dojo::model::Model::<Modelv0>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            Modelv0Definition::name_hash()
+            dojo::model::Model::<Modelv0>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            Modelv0Definition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<Modelv0>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(Modelv0Definition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            Modelv0Definition::layout()
+            dojo::model::Model::<Modelv0>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<Modelv0>::ty()
+            dojo::model::Model::<Modelv0>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<Modelv0>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<Modelv0>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<Modelv0>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<Modelv0>::definition()
         }
     }
 
@@ -603,6 +618,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -739,6 +755,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -777,7 +831,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -787,30 +841,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -844,10 +879,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__Modelv0Impl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -957,6 +993,21 @@ pub mod model_with_bad_namespace_format_definition {
     use super::ModelWithBadNamespaceFormat;
     pub impl ModelWithBadNamespaceFormatDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithBadNamespaceFormat"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "MyNamespace"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "MyNamespace-ModelWithBadNamespaceFormat"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -975,25 +1026,21 @@ pub mod model_with_bad_namespace_format_definition {
         fn namespace_hash() -> felt252 {
             2518247443458975119180817677753479732439290689944304814934908400279022945373
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithBadNamespaceFormat"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "MyNamespace"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "MyNamespace-ModelWithBadNamespaceFormat"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithBadNamespaceFormat>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithBadNamespaceFormat>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithBadNamespaceFormat>::size()
         }
     }
     
@@ -1075,47 +1122,51 @@ pub mod model_with_bad_namespace_format {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithBadNamespaceFormatDefinition::name()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithBadNamespaceFormatDefinition::namespace()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithBadNamespaceFormatDefinition::tag()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithBadNamespaceFormatDefinition::version()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithBadNamespaceFormatDefinition::selector()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithBadNamespaceFormatDefinition::name_hash()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithBadNamespaceFormatDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithBadNamespaceFormat>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithBadNamespaceFormatDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithBadNamespaceFormatDefinition::layout()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithBadNamespaceFormat>::ty()
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithBadNamespaceFormat>::definition()
         }
     }
 
@@ -1181,6 +1232,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -1317,6 +1369,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -1355,7 +1445,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -1365,30 +1455,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -1422,10 +1493,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithBadNamespaceFormatImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -1535,6 +1607,21 @@ pub mod model_with_short_string_namespace_definition {
     use super::ModelWithShortStringNamespace;
     pub impl ModelWithShortStringNamespaceDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithShortStringNamespace"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "my_namespace"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "my_namespace-ModelWithShortStringNamespace"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -1553,25 +1640,21 @@ pub mod model_with_short_string_namespace_definition {
         fn namespace_hash() -> felt252 {
             1685136890688416384941629523783652800960468745356230625531475538826800548713
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithShortStringNamespace"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "my_namespace"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "my_namespace-ModelWithShortStringNamespace"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithShortStringNamespace>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithShortStringNamespace>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithShortStringNamespace>::size()
         }
     }
     
@@ -1653,47 +1736,51 @@ pub mod model_with_short_string_namespace {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithShortStringNamespaceDefinition::name()
+            dojo::model::Model::<ModelWithShortStringNamespace>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithShortStringNamespaceDefinition::namespace()
+            dojo::model::Model::<ModelWithShortStringNamespace>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithShortStringNamespaceDefinition::tag()
+            dojo::model::Model::<ModelWithShortStringNamespace>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithShortStringNamespaceDefinition::version()
+            dojo::model::Model::<ModelWithShortStringNamespace>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithShortStringNamespaceDefinition::selector()
+            dojo::model::Model::<ModelWithShortStringNamespace>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithShortStringNamespaceDefinition::name_hash()
+            dojo::model::Model::<ModelWithShortStringNamespace>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithShortStringNamespaceDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithShortStringNamespace>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithShortStringNamespaceDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithShortStringNamespaceDefinition::layout()
+            dojo::model::Model::<ModelWithShortStringNamespace>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithShortStringNamespace>::ty()
+            dojo::model::Model::<ModelWithShortStringNamespace>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithShortStringNamespace>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithShortStringNamespace>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithShortStringNamespace>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithShortStringNamespace>::definition()
         }
     }
 
@@ -1759,6 +1846,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -1895,6 +1983,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -1933,7 +2059,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -1943,30 +2069,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -2000,10 +2107,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithShortStringNamespaceImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -2113,6 +2221,21 @@ pub mod model_with_string_namespace_definition {
     use super::ModelWithStringNamespace;
     pub impl ModelWithStringNamespaceDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithStringNamespace"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "my_namespace"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "my_namespace-ModelWithStringNamespace"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -2131,25 +2254,21 @@ pub mod model_with_string_namespace_definition {
         fn namespace_hash() -> felt252 {
             1685136890688416384941629523783652800960468745356230625531475538826800548713
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithStringNamespace"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "my_namespace"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "my_namespace-ModelWithStringNamespace"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithStringNamespace>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithStringNamespace>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithStringNamespace>::size()
         }
     }
     
@@ -2231,47 +2350,51 @@ pub mod model_with_string_namespace {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithStringNamespaceDefinition::name()
+            dojo::model::Model::<ModelWithStringNamespace>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithStringNamespaceDefinition::namespace()
+            dojo::model::Model::<ModelWithStringNamespace>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithStringNamespaceDefinition::tag()
+            dojo::model::Model::<ModelWithStringNamespace>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithStringNamespaceDefinition::version()
+            dojo::model::Model::<ModelWithStringNamespace>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithStringNamespaceDefinition::selector()
+            dojo::model::Model::<ModelWithStringNamespace>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithStringNamespaceDefinition::name_hash()
+            dojo::model::Model::<ModelWithStringNamespace>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithStringNamespaceDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithStringNamespace>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithStringNamespaceDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithStringNamespaceDefinition::layout()
+            dojo::model::Model::<ModelWithStringNamespace>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithStringNamespace>::ty()
+            dojo::model::Model::<ModelWithStringNamespace>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithStringNamespace>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithStringNamespace>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithStringNamespace>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithStringNamespace>::definition()
         }
     }
 
@@ -2337,6 +2460,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -2473,6 +2597,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -2511,7 +2673,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -2521,30 +2683,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -2578,10 +2721,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithStringNamespaceImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -2691,6 +2835,21 @@ pub mod position_definition {
     use super::Position;
     pub impl PositionDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "Position"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-Position"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -2709,25 +2868,21 @@ pub mod position_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "Position"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-Position"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<Position>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<Position>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<Position>::size()
         }
     }
     
@@ -2809,47 +2964,51 @@ pub mod position {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            PositionDefinition::name()
+            dojo::model::Model::<Position>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            PositionDefinition::namespace()
+            dojo::model::Model::<Position>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            PositionDefinition::tag()
+            dojo::model::Model::<Position>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            PositionDefinition::version()
+            dojo::model::Model::<Position>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            PositionDefinition::selector()
+            dojo::model::Model::<Position>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            PositionDefinition::name_hash()
+            dojo::model::Model::<Position>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            PositionDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<Position>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(PositionDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            PositionDefinition::layout()
+            dojo::model::Model::<Position>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<Position>::ty()
+            dojo::model::Model::<Position>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<Position>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<Position>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<Position>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<Position>::definition()
         }
     }
 
@@ -2915,6 +3074,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -3051,6 +3211,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -3089,7 +3287,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -3099,30 +3297,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -3156,10 +3335,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__PositionImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -3274,6 +3454,21 @@ pub mod player_definition {
     use super::Player;
     pub impl PlayerDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "Player"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-Player"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -3292,25 +3487,21 @@ pub mod player_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "Player"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-Player"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<Player>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<Player>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<Player>::size()
         }
     }
     
@@ -3393,47 +3584,51 @@ pub mod player {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            PlayerDefinition::name()
+            dojo::model::Model::<Player>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            PlayerDefinition::namespace()
+            dojo::model::Model::<Player>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            PlayerDefinition::tag()
+            dojo::model::Model::<Player>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            PlayerDefinition::version()
+            dojo::model::Model::<Player>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            PlayerDefinition::selector()
+            dojo::model::Model::<Player>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            PlayerDefinition::name_hash()
+            dojo::model::Model::<Player>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            PlayerDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<Player>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(PlayerDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            PlayerDefinition::layout()
+            dojo::model::Model::<Player>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<Player>::ty()
+            dojo::model::Model::<Player>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<Player>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<Player>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<Player>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<Player>::definition()
         }
     }
 
@@ -3499,6 +3694,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -3635,6 +3831,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -3673,7 +3907,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -3683,30 +3917,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -3740,10 +3955,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__PlayerImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -3868,6 +4084,21 @@ pub mod model_with_simple_array_definition {
     use super::ModelWithSimpleArray;
     pub impl ModelWithSimpleArrayDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithSimpleArray"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-ModelWithSimpleArray"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -3886,25 +4117,21 @@ pub mod model_with_simple_array_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithSimpleArray"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-ModelWithSimpleArray"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithSimpleArray>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithSimpleArray>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithSimpleArray>::size()
         }
     }
     
@@ -4004,47 +4231,51 @@ pub mod model_with_simple_array {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithSimpleArrayDefinition::name()
+            dojo::model::Model::<ModelWithSimpleArray>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithSimpleArrayDefinition::namespace()
+            dojo::model::Model::<ModelWithSimpleArray>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithSimpleArrayDefinition::tag()
+            dojo::model::Model::<ModelWithSimpleArray>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithSimpleArrayDefinition::version()
+            dojo::model::Model::<ModelWithSimpleArray>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithSimpleArrayDefinition::selector()
+            dojo::model::Model::<ModelWithSimpleArray>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithSimpleArrayDefinition::name_hash()
+            dojo::model::Model::<ModelWithSimpleArray>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithSimpleArrayDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithSimpleArray>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithSimpleArrayDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithSimpleArrayDefinition::layout()
+            dojo::model::Model::<ModelWithSimpleArray>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithSimpleArray>::ty()
+            dojo::model::Model::<ModelWithSimpleArray>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithSimpleArray>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithSimpleArray>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithSimpleArray>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithSimpleArray>::definition()
         }
     }
 
@@ -4110,6 +4341,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -4246,6 +4478,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -4284,7 +4554,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -4294,30 +4564,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -4351,10 +4602,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithSimpleArrayImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -4475,6 +4727,21 @@ pub mod model_with_byte_array_definition {
     use super::ModelWithByteArray;
     pub impl ModelWithByteArrayDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithByteArray"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-ModelWithByteArray"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -4493,25 +4760,21 @@ pub mod model_with_byte_array_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithByteArray"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-ModelWithByteArray"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithByteArray>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithByteArray>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithByteArray>::size()
         }
     }
     
@@ -4611,47 +4874,51 @@ pub mod model_with_byte_array {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithByteArrayDefinition::name()
+            dojo::model::Model::<ModelWithByteArray>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithByteArrayDefinition::namespace()
+            dojo::model::Model::<ModelWithByteArray>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithByteArrayDefinition::tag()
+            dojo::model::Model::<ModelWithByteArray>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithByteArrayDefinition::version()
+            dojo::model::Model::<ModelWithByteArray>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithByteArrayDefinition::selector()
+            dojo::model::Model::<ModelWithByteArray>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithByteArrayDefinition::name_hash()
+            dojo::model::Model::<ModelWithByteArray>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithByteArrayDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithByteArray>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithByteArrayDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithByteArrayDefinition::layout()
+            dojo::model::Model::<ModelWithByteArray>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithByteArray>::ty()
+            dojo::model::Model::<ModelWithByteArray>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithByteArray>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithByteArray>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithByteArray>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithByteArray>::definition()
         }
     }
 
@@ -4717,6 +4984,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -4853,6 +5121,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -4891,7 +5197,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -4901,30 +5207,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -4958,10 +5245,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithByteArrayImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -5086,6 +5374,21 @@ pub mod model_with_complex_array_definition {
     use super::ModelWithComplexArray;
     pub impl ModelWithComplexArrayDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithComplexArray"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-ModelWithComplexArray"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -5104,25 +5407,21 @@ pub mod model_with_complex_array_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithComplexArray"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-ModelWithComplexArray"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithComplexArray>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithComplexArray>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithComplexArray>::size()
         }
     }
     
@@ -5222,47 +5521,51 @@ pub mod model_with_complex_array {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithComplexArrayDefinition::name()
+            dojo::model::Model::<ModelWithComplexArray>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithComplexArrayDefinition::namespace()
+            dojo::model::Model::<ModelWithComplexArray>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithComplexArrayDefinition::tag()
+            dojo::model::Model::<ModelWithComplexArray>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithComplexArrayDefinition::version()
+            dojo::model::Model::<ModelWithComplexArray>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithComplexArrayDefinition::selector()
+            dojo::model::Model::<ModelWithComplexArray>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithComplexArrayDefinition::name_hash()
+            dojo::model::Model::<ModelWithComplexArray>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithComplexArrayDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithComplexArray>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithComplexArrayDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithComplexArrayDefinition::layout()
+            dojo::model::Model::<ModelWithComplexArray>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithComplexArray>::ty()
+            dojo::model::Model::<ModelWithComplexArray>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithComplexArray>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithComplexArray>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithComplexArray>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithComplexArray>::definition()
         }
     }
 
@@ -5328,6 +5631,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -5464,6 +5768,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -5502,7 +5844,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -5512,30 +5854,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -5569,10 +5892,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithComplexArrayImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -5704,6 +6028,21 @@ pub mod model_with_tuple_definition {
     use super::ModelWithTuple;
     pub impl ModelWithTupleDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithTuple"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-ModelWithTuple"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -5722,25 +6061,21 @@ pub mod model_with_tuple_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithTuple"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-ModelWithTuple"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithTuple>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithTuple>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithTuple>::size()
         }
     }
     
@@ -5840,47 +6175,51 @@ pub mod model_with_tuple {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithTupleDefinition::name()
+            dojo::model::Model::<ModelWithTuple>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithTupleDefinition::namespace()
+            dojo::model::Model::<ModelWithTuple>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithTupleDefinition::tag()
+            dojo::model::Model::<ModelWithTuple>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithTupleDefinition::version()
+            dojo::model::Model::<ModelWithTuple>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithTupleDefinition::selector()
+            dojo::model::Model::<ModelWithTuple>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithTupleDefinition::name_hash()
+            dojo::model::Model::<ModelWithTuple>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithTupleDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithTuple>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithTupleDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithTupleDefinition::layout()
+            dojo::model::Model::<ModelWithTuple>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithTuple>::ty()
+            dojo::model::Model::<ModelWithTuple>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithTuple>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithTuple>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithTuple>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithTuple>::definition()
         }
     }
 
@@ -5946,6 +6285,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -6082,6 +6422,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -6120,7 +6498,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -6130,30 +6508,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -6187,10 +6546,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithTupleImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -6331,6 +6691,21 @@ pub mod model_with_tuple_no_primitives_definition {
     use super::ModelWithTupleNoPrimitives;
     pub impl ModelWithTupleNoPrimitivesDefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "ModelWithTupleNoPrimitives"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "dojo_test"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "dojo_test-ModelWithTupleNoPrimitives"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             1
         }
@@ -6349,25 +6724,21 @@ pub mod model_with_tuple_no_primitives_definition {
         fn namespace_hash() -> felt252 {
             1452123528942907587532668415362544424816022573043154497385993678618948064048
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "ModelWithTupleNoPrimitives"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "dojo_test"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "dojo_test-ModelWithTupleNoPrimitives"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<ModelWithTupleNoPrimitives>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<ModelWithTupleNoPrimitives>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<ModelWithTupleNoPrimitives>::size()
         }
     }
     
@@ -6467,47 +6838,51 @@ pub mod model_with_tuple_no_primitives {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            ModelWithTupleNoPrimitivesDefinition::name()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            ModelWithTupleNoPrimitivesDefinition::namespace()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            ModelWithTupleNoPrimitivesDefinition::tag()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            ModelWithTupleNoPrimitivesDefinition::version()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            ModelWithTupleNoPrimitivesDefinition::selector()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            ModelWithTupleNoPrimitivesDefinition::name_hash()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            ModelWithTupleNoPrimitivesDefinition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<ModelWithTupleNoPrimitives>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size(ModelWithTupleNoPrimitivesDefinition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            ModelWithTupleNoPrimitivesDefinition::layout()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<ModelWithTupleNoPrimitives>::ty()
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<ModelWithTupleNoPrimitives>::definition()
         }
     }
 
@@ -6573,6 +6948,7 @@ pub fn unsafe_new_contract_state() -> ContractState {
     feature: "deprecated_legacy_map",
     note: "Use `starknet::storage::Map` instead."
 )]
+#[allow(unused_imports)]
 use starknet::storage::Map as LegacyMap;
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
@@ -6709,6 +7085,44 @@ fn __wrapper__DojoModelImpl__namespace_hash(mut data: Span::<felt252>) -> Span::
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::schema(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
+fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+    core::internal::require_implicit::<System>();
+    core::internal::revoke_ap_tracking();
+    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
+    
+    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
+    core::option::OptionTraitImpl::expect(
+        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
+    );
+    let mut contract_state = unsafe_new_contract_state();
+    let res = DojoModelImpl::layout(@contract_state, );
+    let mut arr = ArrayTrait::new();
+    // References.
+    // Result.
+    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
+    core::array::ArrayTrait::span(@arr)
+}
+
+#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
 fn __wrapper__DojoModelImpl__unpacked_size(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
@@ -6747,7 +7161,7 @@ fn __wrapper__DojoModelImpl__packed_size(mut data: Span::<felt252>) -> Span::<fe
 }
 
 #[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252> {
+fn __wrapper__DojoModelImpl__definition(mut data: Span::<felt252>) -> Span::<felt252> {
     core::internal::require_implicit::<System>();
     core::internal::revoke_ap_tracking();
     core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
@@ -6757,30 +7171,11 @@ fn __wrapper__DojoModelImpl__layout(mut data: Span::<felt252>) -> Span::<felt252
         core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
     );
     let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::layout(@contract_state, );
+    let res = DojoModelImpl::definition(@contract_state, );
     let mut arr = ArrayTrait::new();
     // References.
     // Result.
-    core::serde::Serde::<dojo::meta::Layout>::serialize(@res, ref arr);
-    core::array::ArrayTrait::span(@arr)
-}
-
-#[implicit_precedence(core::pedersen::Pedersen, core::RangeCheck, core::integer::Bitwise, core::ec::EcOp, core::poseidon::Poseidon, core::SegmentArena, core::circuit::RangeCheck96, core::circuit::AddMod, core::circuit::MulMod, core::gas::GasBuiltin, System)]
-fn __wrapper__DojoModelImpl__schema(mut data: Span::<felt252>) -> Span::<felt252> {
-    core::internal::require_implicit::<System>();
-    core::internal::revoke_ap_tracking();
-    core::option::OptionTraitImpl::expect(core::gas::withdraw_gas(), 'Out of gas');
-    
-    assert(core::array::SpanTrait::is_empty(data), 'Input too long for arguments');
-    core::option::OptionTraitImpl::expect(
-        core::gas::withdraw_gas_all(core::gas::get_builtin_costs()), 'Out of gas',
-    );
-    let mut contract_state = unsafe_new_contract_state();
-    let res = DojoModelImpl::schema(@contract_state, );
-    let mut arr = ArrayTrait::new();
-    // References.
-    // Result.
-    core::serde::Serde::<dojo::meta::introspect::Ty>::serialize(@res, ref arr);
+    core::serde::Serde::<dojo::model::ModelDef>::serialize(@res, ref arr);
     core::array::ArrayTrait::span(@arr)
 }
 
@@ -6814,10 +7209,11 @@ pub mod __external {
     pub use super::__wrapper__DojoModelImpl__selector as selector;
     pub use super::__wrapper__DojoModelImpl__name_hash as name_hash;
     pub use super::__wrapper__DojoModelImpl__namespace_hash as namespace_hash;
+    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__layout as layout;
     pub use super::__wrapper__DojoModelImpl__unpacked_size as unpacked_size;
     pub use super::__wrapper__DojoModelImpl__packed_size as packed_size;
-    pub use super::__wrapper__DojoModelImpl__layout as layout;
-    pub use super::__wrapper__DojoModelImpl__schema as schema;
+    pub use super::__wrapper__DojoModelImpl__definition as definition;
     pub use super::__wrapper__ModelWithTupleNoPrimitivesImpl__ensure_abi as ensure_abi;
 }
 pub mod __l1_handler {
@@ -8099,12 +8495,12 @@ impl IModelv0DispatcherSubPointersImpl of starknet::storage::SubPointers<IModelv
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelv0Dispatcher>) -> IModelv0DispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0DispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8117,12 +8513,12 @@ impl IModelv0DispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<I
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelv0Dispatcher>>) -> IModelv0DispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0DispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8179,12 +8575,12 @@ impl IModelv0LibraryDispatcherSubPointersImpl of starknet::storage::SubPointers<
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelv0LibraryDispatcher>) -> IModelv0LibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0LibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8197,12 +8593,12 @@ impl IModelv0LibraryDispatcherSubPointersMutImpl of starknet::storage::SubPointe
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelv0LibraryDispatcher>>) -> IModelv0LibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0LibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8259,12 +8655,12 @@ impl IModelv0SafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPoint
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelv0SafeLibraryDispatcher>) -> IModelv0SafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0SafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8277,12 +8673,12 @@ impl IModelv0SafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPo
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelv0SafeLibraryDispatcher>>) -> IModelv0SafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0SafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8339,12 +8735,12 @@ impl IModelv0SafeDispatcherSubPointersImpl of starknet::storage::SubPointers<IMo
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelv0SafeDispatcher>) -> IModelv0SafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0SafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8357,12 +8753,12 @@ impl IModelv0SafeDispatcherSubPointersMutImpl of starknet::storage::SubPointersM
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelv0SafeDispatcher>>) -> IModelv0SafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelv0SafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8419,12 +8815,12 @@ impl IModelWithBadNamespaceFormatDispatcherSubPointersImpl of starknet::storage:
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithBadNamespaceFormatDispatcher>) -> IModelWithBadNamespaceFormatDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8437,12 +8833,12 @@ impl IModelWithBadNamespaceFormatDispatcherSubPointersMutImpl of starknet::stora
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithBadNamespaceFormatDispatcher>>) -> IModelWithBadNamespaceFormatDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8499,12 +8895,12 @@ impl IModelWithBadNamespaceFormatLibraryDispatcherSubPointersImpl of starknet::s
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithBadNamespaceFormatLibraryDispatcher>) -> IModelWithBadNamespaceFormatLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8517,12 +8913,12 @@ impl IModelWithBadNamespaceFormatLibraryDispatcherSubPointersMutImpl of starknet
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithBadNamespaceFormatLibraryDispatcher>>) -> IModelWithBadNamespaceFormatLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8579,12 +8975,12 @@ impl IModelWithBadNamespaceFormatSafeLibraryDispatcherSubPointersImpl of starkne
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithBadNamespaceFormatSafeLibraryDispatcher>) -> IModelWithBadNamespaceFormatSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8597,12 +8993,12 @@ impl IModelWithBadNamespaceFormatSafeLibraryDispatcherSubPointersMutImpl of star
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithBadNamespaceFormatSafeLibraryDispatcher>>) -> IModelWithBadNamespaceFormatSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8659,12 +9055,12 @@ impl IModelWithBadNamespaceFormatSafeDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithBadNamespaceFormatSafeDispatcher>) -> IModelWithBadNamespaceFormatSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8677,12 +9073,12 @@ impl IModelWithBadNamespaceFormatSafeDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithBadNamespaceFormatSafeDispatcher>>) -> IModelWithBadNamespaceFormatSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithBadNamespaceFormatSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8739,12 +9135,12 @@ impl IModelWithShortStringNamespaceDispatcherSubPointersImpl of starknet::storag
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithShortStringNamespaceDispatcher>) -> IModelWithShortStringNamespaceDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8757,12 +9153,12 @@ impl IModelWithShortStringNamespaceDispatcherSubPointersMutImpl of starknet::sto
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithShortStringNamespaceDispatcher>>) -> IModelWithShortStringNamespaceDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8819,12 +9215,12 @@ impl IModelWithShortStringNamespaceLibraryDispatcherSubPointersImpl of starknet:
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithShortStringNamespaceLibraryDispatcher>) -> IModelWithShortStringNamespaceLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8837,12 +9233,12 @@ impl IModelWithShortStringNamespaceLibraryDispatcherSubPointersMutImpl of starkn
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithShortStringNamespaceLibraryDispatcher>>) -> IModelWithShortStringNamespaceLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8899,12 +9295,12 @@ impl IModelWithShortStringNamespaceSafeLibraryDispatcherSubPointersImpl of stark
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithShortStringNamespaceSafeLibraryDispatcher>) -> IModelWithShortStringNamespaceSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8917,12 +9313,12 @@ impl IModelWithShortStringNamespaceSafeLibraryDispatcherSubPointersMutImpl of st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithShortStringNamespaceSafeLibraryDispatcher>>) -> IModelWithShortStringNamespaceSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -8979,12 +9375,12 @@ impl IModelWithShortStringNamespaceSafeDispatcherSubPointersImpl of starknet::st
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithShortStringNamespaceSafeDispatcher>) -> IModelWithShortStringNamespaceSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -8997,12 +9393,12 @@ impl IModelWithShortStringNamespaceSafeDispatcherSubPointersMutImpl of starknet:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithShortStringNamespaceSafeDispatcher>>) -> IModelWithShortStringNamespaceSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithShortStringNamespaceSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9059,12 +9455,12 @@ impl IModelWithStringNamespaceDispatcherSubPointersImpl of starknet::storage::Su
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithStringNamespaceDispatcher>) -> IModelWithStringNamespaceDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9077,12 +9473,12 @@ impl IModelWithStringNamespaceDispatcherSubPointersMutImpl of starknet::storage:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithStringNamespaceDispatcher>>) -> IModelWithStringNamespaceDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9139,12 +9535,12 @@ impl IModelWithStringNamespaceLibraryDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithStringNamespaceLibraryDispatcher>) -> IModelWithStringNamespaceLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9157,12 +9553,12 @@ impl IModelWithStringNamespaceLibraryDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithStringNamespaceLibraryDispatcher>>) -> IModelWithStringNamespaceLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9219,12 +9615,12 @@ impl IModelWithStringNamespaceSafeLibraryDispatcherSubPointersImpl of starknet::
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithStringNamespaceSafeLibraryDispatcher>) -> IModelWithStringNamespaceSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9237,12 +9633,12 @@ impl IModelWithStringNamespaceSafeLibraryDispatcherSubPointersMutImpl of starkne
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithStringNamespaceSafeLibraryDispatcher>>) -> IModelWithStringNamespaceSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9299,12 +9695,12 @@ impl IModelWithStringNamespaceSafeDispatcherSubPointersImpl of starknet::storage
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithStringNamespaceSafeDispatcher>) -> IModelWithStringNamespaceSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9317,12 +9713,12 @@ impl IModelWithStringNamespaceSafeDispatcherSubPointersMutImpl of starknet::stor
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithStringNamespaceSafeDispatcher>>) -> IModelWithStringNamespaceSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithStringNamespaceSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9379,12 +9775,12 @@ impl IPositionDispatcherSubPointersImpl of starknet::storage::SubPointers<IPosit
     fn sub_pointers(self: starknet::storage::StoragePointer<IPositionDispatcher>) -> IPositionDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9397,12 +9793,12 @@ impl IPositionDispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPositionDispatcher>>) -> IPositionDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9459,12 +9855,12 @@ impl IPositionLibraryDispatcherSubPointersImpl of starknet::storage::SubPointers
     fn sub_pointers(self: starknet::storage::StoragePointer<IPositionLibraryDispatcher>) -> IPositionLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9477,12 +9873,12 @@ impl IPositionLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPoint
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPositionLibraryDispatcher>>) -> IPositionLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9539,12 +9935,12 @@ impl IPositionSafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPoin
     fn sub_pointers(self: starknet::storage::StoragePointer<IPositionSafeLibraryDispatcher>) -> IPositionSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9557,12 +9953,12 @@ impl IPositionSafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubP
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPositionSafeLibraryDispatcher>>) -> IPositionSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9619,12 +10015,12 @@ impl IPositionSafeDispatcherSubPointersImpl of starknet::storage::SubPointers<IP
     fn sub_pointers(self: starknet::storage::StoragePointer<IPositionSafeDispatcher>) -> IPositionSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9637,12 +10033,12 @@ impl IPositionSafeDispatcherSubPointersMutImpl of starknet::storage::SubPointers
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPositionSafeDispatcher>>) -> IPositionSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPositionSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9699,12 +10095,12 @@ impl IPlayerDispatcherSubPointersImpl of starknet::storage::SubPointers<IPlayerD
     fn sub_pointers(self: starknet::storage::StoragePointer<IPlayerDispatcher>) -> IPlayerDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9717,12 +10113,12 @@ impl IPlayerDispatcherSubPointersMutImpl of starknet::storage::SubPointersMut<IP
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPlayerDispatcher>>) -> IPlayerDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9779,12 +10175,12 @@ impl IPlayerLibraryDispatcherSubPointersImpl of starknet::storage::SubPointers<I
     fn sub_pointers(self: starknet::storage::StoragePointer<IPlayerLibraryDispatcher>) -> IPlayerLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9797,12 +10193,12 @@ impl IPlayerLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPointer
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPlayerLibraryDispatcher>>) -> IPlayerLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9859,12 +10255,12 @@ impl IPlayerSafeLibraryDispatcherSubPointersImpl of starknet::storage::SubPointe
     fn sub_pointers(self: starknet::storage::StoragePointer<IPlayerSafeLibraryDispatcher>) -> IPlayerSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9877,12 +10273,12 @@ impl IPlayerSafeLibraryDispatcherSubPointersMutImpl of starknet::storage::SubPoi
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPlayerSafeLibraryDispatcher>>) -> IPlayerSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -9939,12 +10335,12 @@ impl IPlayerSafeDispatcherSubPointersImpl of starknet::storage::SubPointers<IPla
     fn sub_pointers(self: starknet::storage::StoragePointer<IPlayerSafeDispatcher>) -> IPlayerSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -9957,12 +10353,12 @@ impl IPlayerSafeDispatcherSubPointersMutImpl of starknet::storage::SubPointersMu
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IPlayerSafeDispatcher>>) -> IPlayerSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IPlayerSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10019,12 +10415,12 @@ impl IModelWithSimpleArrayDispatcherSubPointersImpl of starknet::storage::SubPoi
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithSimpleArrayDispatcher>) -> IModelWithSimpleArrayDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArrayDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10037,12 +10433,12 @@ impl IModelWithSimpleArrayDispatcherSubPointersMutImpl of starknet::storage::Sub
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithSimpleArrayDispatcher>>) -> IModelWithSimpleArrayDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArrayDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10099,12 +10495,12 @@ impl IModelWithSimpleArrayLibraryDispatcherSubPointersImpl of starknet::storage:
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithSimpleArrayLibraryDispatcher>) -> IModelWithSimpleArrayLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArrayLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10117,12 +10513,12 @@ impl IModelWithSimpleArrayLibraryDispatcherSubPointersMutImpl of starknet::stora
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithSimpleArrayLibraryDispatcher>>) -> IModelWithSimpleArrayLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArrayLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10179,12 +10575,12 @@ impl IModelWithSimpleArraySafeLibraryDispatcherSubPointersImpl of starknet::stor
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithSimpleArraySafeLibraryDispatcher>) -> IModelWithSimpleArraySafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArraySafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10197,12 +10593,12 @@ impl IModelWithSimpleArraySafeLibraryDispatcherSubPointersMutImpl of starknet::s
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithSimpleArraySafeLibraryDispatcher>>) -> IModelWithSimpleArraySafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArraySafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10259,12 +10655,12 @@ impl IModelWithSimpleArraySafeDispatcherSubPointersImpl of starknet::storage::Su
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithSimpleArraySafeDispatcher>) -> IModelWithSimpleArraySafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArraySafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10277,12 +10673,12 @@ impl IModelWithSimpleArraySafeDispatcherSubPointersMutImpl of starknet::storage:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithSimpleArraySafeDispatcher>>) -> IModelWithSimpleArraySafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithSimpleArraySafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10339,12 +10735,12 @@ impl IModelWithByteArrayDispatcherSubPointersImpl of starknet::storage::SubPoint
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithByteArrayDispatcher>) -> IModelWithByteArrayDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArrayDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10357,12 +10753,12 @@ impl IModelWithByteArrayDispatcherSubPointersMutImpl of starknet::storage::SubPo
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithByteArrayDispatcher>>) -> IModelWithByteArrayDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArrayDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10419,12 +10815,12 @@ impl IModelWithByteArrayLibraryDispatcherSubPointersImpl of starknet::storage::S
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithByteArrayLibraryDispatcher>) -> IModelWithByteArrayLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArrayLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10437,12 +10833,12 @@ impl IModelWithByteArrayLibraryDispatcherSubPointersMutImpl of starknet::storage
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithByteArrayLibraryDispatcher>>) -> IModelWithByteArrayLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArrayLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10499,12 +10895,12 @@ impl IModelWithByteArraySafeLibraryDispatcherSubPointersImpl of starknet::storag
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithByteArraySafeLibraryDispatcher>) -> IModelWithByteArraySafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArraySafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10517,12 +10913,12 @@ impl IModelWithByteArraySafeLibraryDispatcherSubPointersMutImpl of starknet::sto
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithByteArraySafeLibraryDispatcher>>) -> IModelWithByteArraySafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArraySafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10579,12 +10975,12 @@ impl IModelWithByteArraySafeDispatcherSubPointersImpl of starknet::storage::SubP
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithByteArraySafeDispatcher>) -> IModelWithByteArraySafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArraySafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10597,12 +10993,12 @@ impl IModelWithByteArraySafeDispatcherSubPointersMutImpl of starknet::storage::S
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithByteArraySafeDispatcher>>) -> IModelWithByteArraySafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithByteArraySafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10659,12 +11055,12 @@ impl IModelWithComplexArrayDispatcherSubPointersImpl of starknet::storage::SubPo
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithComplexArrayDispatcher>) -> IModelWithComplexArrayDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArrayDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10677,12 +11073,12 @@ impl IModelWithComplexArrayDispatcherSubPointersMutImpl of starknet::storage::Su
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithComplexArrayDispatcher>>) -> IModelWithComplexArrayDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArrayDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10739,12 +11135,12 @@ impl IModelWithComplexArrayLibraryDispatcherSubPointersImpl of starknet::storage
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithComplexArrayLibraryDispatcher>) -> IModelWithComplexArrayLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArrayLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10757,12 +11153,12 @@ impl IModelWithComplexArrayLibraryDispatcherSubPointersMutImpl of starknet::stor
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithComplexArrayLibraryDispatcher>>) -> IModelWithComplexArrayLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArrayLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10819,12 +11215,12 @@ impl IModelWithComplexArraySafeLibraryDispatcherSubPointersImpl of starknet::sto
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithComplexArraySafeLibraryDispatcher>) -> IModelWithComplexArraySafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArraySafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10837,12 +11233,12 @@ impl IModelWithComplexArraySafeLibraryDispatcherSubPointersMutImpl of starknet::
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithComplexArraySafeLibraryDispatcher>>) -> IModelWithComplexArraySafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArraySafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -10899,12 +11295,12 @@ impl IModelWithComplexArraySafeDispatcherSubPointersImpl of starknet::storage::S
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithComplexArraySafeDispatcher>) -> IModelWithComplexArraySafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArraySafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10917,12 +11313,12 @@ impl IModelWithComplexArraySafeDispatcherSubPointersMutImpl of starknet::storage
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithComplexArraySafeDispatcher>>) -> IModelWithComplexArraySafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithComplexArraySafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10979,12 +11375,12 @@ impl IModelWithTupleDispatcherSubPointersImpl of starknet::storage::SubPointers<
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleDispatcher>) -> IModelWithTupleDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -10997,12 +11393,12 @@ impl IModelWithTupleDispatcherSubPointersMutImpl of starknet::storage::SubPointe
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleDispatcher>>) -> IModelWithTupleDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -11059,12 +11455,12 @@ impl IModelWithTupleLibraryDispatcherSubPointersImpl of starknet::storage::SubPo
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleLibraryDispatcher>) -> IModelWithTupleLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11077,12 +11473,12 @@ impl IModelWithTupleLibraryDispatcherSubPointersMutImpl of starknet::storage::Su
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleLibraryDispatcher>>) -> IModelWithTupleLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11139,12 +11535,12 @@ impl IModelWithTupleSafeLibraryDispatcherSubPointersImpl of starknet::storage::S
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleSafeLibraryDispatcher>) -> IModelWithTupleSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11157,12 +11553,12 @@ impl IModelWithTupleSafeLibraryDispatcherSubPointersMutImpl of starknet::storage
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleSafeLibraryDispatcher>>) -> IModelWithTupleSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11219,12 +11615,12 @@ impl IModelWithTupleSafeDispatcherSubPointersImpl of starknet::storage::SubPoint
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleSafeDispatcher>) -> IModelWithTupleSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -11237,12 +11633,12 @@ impl IModelWithTupleSafeDispatcherSubPointersMutImpl of starknet::storage::SubPo
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleSafeDispatcher>>) -> IModelWithTupleSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -11299,12 +11695,12 @@ impl IModelWithTupleNoPrimitivesDispatcherSubPointersImpl of starknet::storage::
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleNoPrimitivesDispatcher>) -> IModelWithTupleNoPrimitivesDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -11317,12 +11713,12 @@ impl IModelWithTupleNoPrimitivesDispatcherSubPointersMutImpl of starknet::storag
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleNoPrimitivesDispatcher>>) -> IModelWithTupleNoPrimitivesDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -11379,12 +11775,12 @@ impl IModelWithTupleNoPrimitivesLibraryDispatcherSubPointersImpl of starknet::st
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleNoPrimitivesLibraryDispatcher>) -> IModelWithTupleNoPrimitivesLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11397,12 +11793,12 @@ impl IModelWithTupleNoPrimitivesLibraryDispatcherSubPointersMutImpl of starknet:
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleNoPrimitivesLibraryDispatcher>>) -> IModelWithTupleNoPrimitivesLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11459,12 +11855,12 @@ impl IModelWithTupleNoPrimitivesSafeLibraryDispatcherSubPointersImpl of starknet
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleNoPrimitivesSafeLibraryDispatcher>) -> IModelWithTupleNoPrimitivesSafeLibraryDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesSafeLibraryDispatcherSubPointers {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11477,12 +11873,12 @@ impl IModelWithTupleNoPrimitivesSafeLibraryDispatcherSubPointersMutImpl of stark
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleNoPrimitivesSafeLibraryDispatcher>>) -> IModelWithTupleNoPrimitivesSafeLibraryDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let class_hash_value = starknet::storage::StoragePointer {
+        let __class_hash_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesSafeLibraryDispatcherSubPointersMut {
-           class_hash: class_hash_value,
+           class_hash: __class_hash_value__,
         }
     }
 }
@@ -11539,12 +11935,12 @@ impl IModelWithTupleNoPrimitivesSafeDispatcherSubPointersImpl of starknet::stora
     fn sub_pointers(self: starknet::storage::StoragePointer<IModelWithTupleNoPrimitivesSafeDispatcher>) -> IModelWithTupleNoPrimitivesSafeDispatcherSubPointers {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesSafeDispatcherSubPointers {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }
@@ -11557,12 +11953,12 @@ impl IModelWithTupleNoPrimitivesSafeDispatcherSubPointersMutImpl of starknet::st
     fn sub_pointers_mut(self: starknet::storage::StoragePointer<starknet::storage::Mutable::<IModelWithTupleNoPrimitivesSafeDispatcher>>) -> IModelWithTupleNoPrimitivesSafeDispatcherSubPointersMut {
         let base_address = self.__storage_pointer_address__;
         let mut current_offset = self.__storage_pointer_offset__;
-        let contract_address_value = starknet::storage::StoragePointer {
+        let __contract_address_value__ = starknet::storage::StoragePointer {
             __storage_pointer_address__: base_address,
             __storage_pointer_offset__: current_offset,
         };
                 IModelWithTupleNoPrimitivesSafeDispatcherSubPointersMut {
-           contract_address: contract_address_value,
+           contract_address: __contract_address_value__,
         }
     }
 }

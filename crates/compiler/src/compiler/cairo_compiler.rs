@@ -161,7 +161,7 @@ impl Compiler for DojoCompiler {
         props.verify()?;
 
         let main_crate_ids = collect_main_crate_ids(&unit, db, true);
-        let compiler_config = build_compiler_config(&unit, &main_crate_ids, ws);
+        let compiler_config = build_compiler_config(db, &unit, &main_crate_ids, ws);
 
         trace!(unit = %unit.name(), ?props, "Compiling unit dojo compiler.");
 
@@ -376,4 +376,11 @@ pub fn collect_crates_ids_from_selectors(
         .unique()
         .map(|package_name: SmolStr| db.intern_crate(CrateLongId::Real(package_name)))
         .collect::<Vec<_>>()
+}
+
+pub fn collect_all_crate_ids(unit: &CairoCompilationUnit, db: &RootDatabase) -> Vec<CrateId> {
+    unit.components
+        .iter()
+        .map(|component| db.intern_crate(CrateLongId::Real(component.cairo_package_name())))
+        .collect()
 }

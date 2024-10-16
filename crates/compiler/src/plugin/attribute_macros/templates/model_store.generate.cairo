@@ -21,6 +21,21 @@ pub mod $model_type_snake$_definition {
     use super::$model_type$;
     pub impl $model_type$DefinitionImpl<T> of dojo::model::ModelDefinition<T>{
         #[inline(always)]
+        fn name() -> ByteArray {
+            "$model_type$"
+        }
+        
+        #[inline(always)]
+        fn namespace() -> ByteArray {
+            "$model_namespace$"
+        }
+        
+        #[inline(always)]
+        fn tag() -> ByteArray {
+            "$model_tag$"
+        }
+
+        #[inline(always)]
         fn version() -> u8 {
             $model_version$
         }
@@ -39,25 +54,21 @@ pub mod $model_type_snake$_definition {
         fn namespace_hash() -> felt252 {
             $model_namespace_hash$
         }
-    
-        #[inline(always)]
-        fn name() -> ByteArray {
-            "$model_type$"
-        }
         
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "$model_namespace$"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "$model_tag$"
-        }
     
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<$model_type$>::layout()
+        }
+
+        #[inline(always)]
+        fn schema() -> dojo::meta::introspect::Ty {
+            dojo::meta::Introspect::<$model_type$>::ty()
+        }
+
+        #[inline(always)]
+        fn size() -> Option<usize> {
+            dojo::meta::Introspect::<$model_type$>::size()
         }
     }
     
@@ -122,47 +133,51 @@ pub mod $model_type_snake$ {
     #[abi(embed_v0)]
     impl DojoModelImpl of dojo::model::IModel<ContractState>{
         fn name(self: @ContractState) -> ByteArray {
-            $model_type$Definition::name()
+            dojo::model::Model::<$model_type$>::name()
         }
 
         fn namespace(self: @ContractState) -> ByteArray {
-            $model_type$Definition::namespace()
+            dojo::model::Model::<$model_type$>::namespace()
         }
 
         fn tag(self: @ContractState) -> ByteArray {
-            $model_type$Definition::tag()
+            dojo::model::Model::<$model_type$>::tag()
         }
 
         fn version(self: @ContractState) -> u8 {
-            $model_type$Definition::version()
+            dojo::model::Model::<$model_type$>::version()
         }
 
         fn selector(self: @ContractState) -> felt252 {
-            $model_type$Definition::selector()
+            dojo::model::Model::<$model_type$>::selector()
         }
 
         fn name_hash(self: @ContractState) -> felt252 {
-            $model_type$Definition::name_hash()
+            dojo::model::Model::<$model_type$>::name_hash()
         }
 
         fn namespace_hash(self: @ContractState) -> felt252 {
-            $model_type$Definition::namespace_hash()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::Introspect::<$model_type$>::size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::meta::layout::compute_packed_size($model_type$Definition::layout())
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            $model_type$Definition::layout()
+            dojo::model::Model::<$model_type$>::namespace_hash()
         }
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::meta::Introspect::<$model_type$>::ty()
+            dojo::model::Model::<$model_type$>::schema()
+        }
+
+        fn layout(self: @ContractState) -> dojo::meta::Layout {
+            dojo::model::Model::<$model_type$>::layout()
+        }
+
+        fn unpacked_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<$model_type$>::unpacked_size()
+        }
+
+        fn packed_size(self: @ContractState) -> Option<usize> {
+            dojo::model::Model::<$model_type$>::packed_size()
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::Model::<$model_type$>::definition()
         }
     }
 

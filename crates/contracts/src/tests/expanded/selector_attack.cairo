@@ -3,14 +3,10 @@
 
 #[starknet::contract]
 pub mod attacker_contract {
-    use dojo::world;
-    use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+    use dojo::world::IWorldDispatcher;
     use dojo::contract::components::world_provider::IWorldProvider;
     use dojo::contract::IContract;
-    use starknet::storage::{
-        StorageMapReadAccess, StorageMapWriteAccess, StoragePointerReadAccess,
-        StoragePointerWriteAccess
-    };
+    use starknet::storage::StoragePointerReadAccess;
 
     #[storage]
     struct Storage {
@@ -103,6 +99,21 @@ pub mod attacker_model {
 
         fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
             dojo::meta::introspect::Ty::Primitive('felt252')
+        }
+
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::ModelDef {
+                name: Self::name(self),
+                namespace: Self::namespace(self),
+                version: Self::version(self),
+                selector: Self::selector(self),
+                name_hash: Self::name_hash(self),
+                namespace_hash: Self::namespace_hash(self),
+                layout: Self::layout(self),
+                schema: Self::schema(self),
+                packed_size: Self::packed_size(self),
+                unpacked_size: Self::unpacked_size(self),
+            }
         }
     }
 }

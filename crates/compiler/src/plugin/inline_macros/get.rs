@@ -97,6 +97,8 @@ impl InlineMacroExprPlugin for GetMacro {
 
         let (code, code_mappings) = builder.build();
 
+        crate::debug_expand(&format!("GET MACRO: {args}"), &code);
+
         InlinePluginResult {
             code: Some(PluginGeneratedFile {
                 name: "get_inline_macro".into(),

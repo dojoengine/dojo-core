@@ -186,14 +186,13 @@ impl DojoAnnotation {
         for crate_id in crate_ids {
             for module_id in db.crate_modules(*crate_id).as_ref() {
                 let file_infos = db
-                    .module_generated_file_infos(*module_id)
+                    .module_generated_file_aux_data(*module_id)
                     .unwrap_or(std::sync::Arc::new([]));
 
                 // Skip(1) to avoid internal aux data of Starknet aux data.
                 for aux_data in file_infos
                     .iter()
                     .skip(1)
-                    .filter_map(|info| info.as_ref().map(|i| &i.aux_data))
                     .filter_map(|aux_data| aux_data.as_ref().map(|aux_data| aux_data.0.as_any()))
                 {
                     let module_path = module_id.full_path(db);
@@ -281,7 +280,7 @@ impl DojoAnnotation {
         let target_dir = workspace.target_dir_profile();
         let content = toml::to_string(&self)?;
 
-        let mut file = target_dir.open_rw(
+        let mut file = target_dir.create_rw(
             format!("{}.toml", DOJO_ANNOTATION_FILE_NAME),
             "Dojo annotations",
             workspace.config(),

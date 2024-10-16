@@ -231,7 +231,7 @@ impl<'w> ArtifactManager<'w> {
             .get_artifact(qualified_path)
             .context(format!("Artifact file for `{}` not found.", qualified_path))?;
 
-        let mut file = target_dir.open_rw(
+        let mut file = target_dir.create_rw(
             format!("{file_name}.json"),
             &format!("sierra class file for `{}`", qualified_path),
             self.workspace.config(),
@@ -241,7 +241,7 @@ impl<'w> ArtifactManager<'w> {
             .with_context(|| format!("failed to serialize sierra class file: {qualified_path}"))?;
 
         if let Some(debug_info) = &artifact.debug_info {
-            let mut file = target_dir.open_rw(
+            let mut file = target_dir.create_rw(
                 format!("{file_name}.debug.json"),
                 &format!("sierra debug info for `{}`", qualified_path),
                 self.workspace.config(),
