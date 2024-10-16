@@ -167,7 +167,7 @@ pub impl $type_name$ModelEntityImpl of dojo::model::ModelEntity<$type_name$Entit
             world,
             dojo::model::Model::<$type_name$>::selector(),
             dojo::model::ModelIndex::Id(self.id()),
-            Self::values(self),
+            self.values(),
             dojo::model::Model::<$type_name$>::layout()
         );
     }
@@ -232,7 +232,7 @@ pub impl $type_name$ModelEntityTestImpl of dojo::model::ModelEntityTest<$type_na
             world_test,
             dojo::model::Model::<$type_name$>::selector(),
             dojo::model::ModelIndex::Id(self.id()),
-            dojo::model::Model::<$type_name$>::values(self),
+            self.values(),
             dojo::model::Model::<$type_name$>::layout()
         );
     }
