@@ -25,6 +25,8 @@ pub mod meta {
 }
 
 pub mod model {
+    pub mod component;
+
     pub mod definition;
     pub use definition::{ModelIndex, ModelDefinition, ModelDef};
 
