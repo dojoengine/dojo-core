@@ -16,14 +16,6 @@ pub struct M {
 
 #[dojo_contract(namespace: "sn")]
 pub mod c1 {
-    #[abi(per_item)]
-    #[generate_trait]
-    impl MyImpl of SuperTrait {
-        #[external(v0)]
-        fn func1(self: @ContractState) {
-            assert(true, 'aa');
-        }
-    }
 }
 
 #[cfg(test)]
