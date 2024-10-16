@@ -80,7 +80,6 @@ pub fn dojo_derive_all(
     let mut diagnostics = vec![];
 
     let derive_attr_names = extract_derive_attr_names(db, &mut diagnostics, attrs);
-    dbg!(&derive_attr_names);
 
     let (rewrite_nodes, derive_diagnostics) = handle_derive_attrs(db, &derive_attr_names, item_ast);
 

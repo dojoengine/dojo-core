@@ -56,6 +56,8 @@ pub mod utils {
     // core, we place it under the test target manually.
     #[cfg(target: "test")]
     pub mod test;
+    #[cfg(target: "test")]
+    pub mod snf_test;
 
     pub mod descriptor;
     pub use descriptor::{

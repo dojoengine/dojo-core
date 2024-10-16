@@ -18,16 +18,31 @@ pub struct M {
 pub mod c1 {
 }
 
+#[derive(Introspect, Drop, Serde)]
+#[dojo_event(namespace: "sn")]
+pub struct MyEvent {
+    #[key]
+    pub a: felt252,
+    pub b: felt252,
+}
+
 #[cfg(test)]
 mod tests {
-    //use snforge_std::{declare, ContractClassTrait, DeclareResultTrait};
+    use dojo::utils::snf_test::{spawn_test_world, TestResource, WorldTestExt};
+
+    use super::{MyEvent, MyEventEmitter};
 
     #[test]
-    fn test_1() {
-        // First declare and deploy a contract
-        // let contract = declare("m").unwrap().contract_class();
-        // Alternatively we could use `deploy_syscall` here
-        //let (contract_address, _) = contract.deploy(@array![]).unwrap();
-        assert(true, 'aa');
+    fn dojo_event_emit() {
+        let resources: Span<TestResource> = [
+            TestResource::Event("my_event"),
+        ].span();
+
+        let world = spawn_test_world(["sn"].span(), resources);
+
+        let e1 = MyEvent { a: 1, b: 2 };
+        e1.emit(world);
+
+        let _e1_address = world.resource_contract_address("sn", "MyEvent");
     }
 }
