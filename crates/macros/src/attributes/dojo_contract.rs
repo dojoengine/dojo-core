@@ -102,7 +102,7 @@ impl DojoContract {
             namespace: String::new(),
         };
 
-        let contract_tag = naming::get_tag(&contract_namespace, &name);
+        let contract_tag = naming::get_tag(contract_namespace, &name);
 
         contract.namespace = contract_namespace.to_string();
 
@@ -111,12 +111,12 @@ impl DojoContract {
             .extend(validate_attributes(db, module_ast));
 
         contract.diagnostics.extend(validate_namings_diagnostics(&[
-            ("contract namespace", &contract_namespace),
+            ("contract namespace", contract_namespace),
             ("contract name", &name),
         ]));
 
         let contract_name_hash = naming::compute_bytearray_hash(&name);
-        let contract_namespace_hash = naming::compute_bytearray_hash(&contract_namespace);
+        let contract_namespace_hash = naming::compute_bytearray_hash(contract_namespace);
         let contract_selector =
             naming::compute_selector_from_hashes(contract_namespace_hash, contract_name_hash);
 
@@ -460,9 +460,8 @@ impl DojoContract {
             world_param::parse_world_injection(db, param_list.clone(), &mut self.diagnostics);
 
         if is_self_used && world_injection != WorldParamInjectionKind::None {
-            self.diagnostics.push_error(format!(
-                "You cannot use `self` and `world` parameters together."
-            ));
+            self.diagnostics
+                .push_error("You cannot use `self` and `world` parameters together.".to_string());
         }
 
         let mut params = param_list
@@ -547,10 +546,11 @@ impl DojoContract {
             .collect::<Vec<_>>();
 
         if has_generate_trait && was_world_injected {
-            self.diagnostics.push_error(format!(
+            self.diagnostics.push_error(
                 "You cannot use `world` and `#[generate_trait]` together. Use `self` \
-                          instead."
-            ));
+                instead."
+                    .to_string(),
+            );
         }
 
         let mut nodes = vec![declaration_node, world_line_node];
@@ -585,7 +585,7 @@ impl DojoContract {
                 })
                 .collect();
 
-            let body_node = TokenStream::new(format!("{}", body_nodes.join("\n")));
+            let body_node = TokenStream::new(body_nodes.join("\n"));
 
             return vec![impl_node, body_node, TokenStream::new("}".to_string())]
                 .join_to_token_stream("");

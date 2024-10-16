@@ -136,13 +136,13 @@ impl DojoModel {
             .to_string();
 
         model.diagnostics.extend(validate_namings_diagnostics(&[
-            ("model namespace", &model_namespace),
+            ("model namespace", model_namespace),
             ("model name", &model_name),
         ]));
 
-        let model_tag = naming::get_tag(&model_namespace, &model_name);
+        let model_tag = naming::get_tag(model_namespace, &model_name);
         let model_name_hash = naming::compute_bytearray_hash(&model_name);
-        let model_namespace_hash = naming::compute_bytearray_hash(&model_namespace);
+        let model_namespace_hash = naming::compute_bytearray_hash(model_namespace);
         let model_selector =
             naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash);
 
@@ -233,6 +233,7 @@ impl DojoModel {
             );
         }
 
+        #[allow(clippy::nonminimal_bool)]
         if !(has_introspect || has_introspect_packed) && !has_drop && !has_serde {
             model.diagnostics.push_error(
                 "Model must derive from Introspect or IntrospectPacked, Drop and Serde."
@@ -250,7 +251,7 @@ impl DojoModel {
 
         // Must remove the derives from the original struct since they would create duplicates
         // with the derives of other plugins.
-        let original_struct = remove_derives(db, &struct_ast);
+        let original_struct = remove_derives(db, struct_ast);
 
         let node = TokenStream::interpolate_patched(
             MODEL_PATCH,

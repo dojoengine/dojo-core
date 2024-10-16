@@ -146,13 +146,13 @@ impl DojoEvent {
             .to_string();
 
         event.diagnostics.extend(validate_namings_diagnostics(&[
-            ("event namespace", &event_namespace),
+            ("event namespace", event_namespace),
             ("event name", &event_name),
         ]));
 
-        let event_tag = naming::get_tag(&event_namespace, &event_name);
+        let event_tag = naming::get_tag(event_namespace, &event_name);
         let event_name_hash = naming::compute_bytearray_hash(&event_name);
-        let event_namespace_hash = naming::compute_bytearray_hash(&event_namespace);
+        let event_namespace_hash = naming::compute_bytearray_hash(event_namespace);
         let event_selector =
             naming::compute_selector_from_hashes(event_namespace_hash, event_name_hash);
 
@@ -210,7 +210,7 @@ impl DojoEvent {
 
         // Must remove the derives from the original struct since they would create duplicates
         // with the derives of other plugins.
-        let original_struct = remove_derives(db, &struct_ast);
+        let original_struct = remove_derives(db, struct_ast);
 
         let node = TokenStream::interpolate_patched(
             EVENT_PATCH,

@@ -47,10 +47,12 @@ impl TokenStreamExt for TokenStream {
             children.push(
                 patches
                     .get(&name)
-                    .expect(&format!(
-                        "Patch with name `{}` not found while interpolating: {}",
-                        name, code
-                    ))
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "Patch with name `{}` not found while interpolating: {}",
+                            name, code
+                        )
+                    })
                     .clone(),
             );
         }

@@ -53,16 +53,16 @@ pub fn parse_world_injection(
 
             if !is_world_param(&name, &param_type) {
                 if name.eq(super::self_param::SELF_PARAM_NAME) && has_world_injected {
-                    diagnostics.push_error(format!(
-                        "You cannot use `self` and `world` parameters together."
-                    ));
+                    diagnostics.push_error(
+                        "You cannot use `self` and `world` parameters together.".to_string(),
+                    );
                 }
 
                 return;
             }
 
             if has_world_injected {
-                diagnostics.push_error(format!("Only one world parameter is allowed"));
+                diagnostics.push_error("Only one world parameter is allowed".to_string());
 
                 return;
             } else {
@@ -70,7 +70,7 @@ pub fn parse_world_injection(
             }
 
             if idx != 0 {
-                diagnostics.push_error(format!("World parameter must be the first parameter."));
+                diagnostics.push_error("World parameter must be the first parameter.".to_string());
 
                 return;
             }
@@ -81,9 +81,9 @@ pub fn parse_world_injection(
                 injection_kind = WorldParamInjectionKind::View;
 
                 if param_type == WORLD_PARAM_TYPE {
-                    diagnostics.push_error(format!(
-                        "World parameter must be a snapshot if `ref` is not used."
-                    ));
+                    diagnostics.push_error(
+                        "World parameter must be a snapshot if `ref` is not used.".to_string(),
+                    );
                 }
             }
         });

@@ -165,9 +165,10 @@ pub fn handle_derive_attrs(
         }
         _ => {
             // Currently Dojo plugin doesn't support derive macros on other items than struct and enum.
-            diagnostics.push_error(format!(
+            diagnostics.push_error(
                 "Dojo plugin doesn't support derive macros on other items than struct and enum."
-            ));
+                    .to_string(),
+            );
         }
     }
 
