@@ -15,6 +15,17 @@ struct Foo {
 }
 
 
+#[derive(Copy, Drop, Serde, Debug)]
+#[dojo::model]
+struct Foo2 {
+    #[key]
+    k1: u8,
+    #[key]
+    k2: felt252,
+    v1: u128,
+    v2: u32
+}
+
 #[test]
 fn test_model_definition() {
     let definition = dojo::model::Model::<Foo>::definition();
