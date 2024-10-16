@@ -35,8 +35,6 @@ const CONTRACT_NAMESPACE: &str = "namespace";
 
 #[attribute_macro]
 pub fn dojo_contract(args: TokenStream, token_stream: TokenStream) -> ProcMacroResult {
-    println!("args: {}", args);
-
     // Arguments of the macro are already parsed. Hence, we can't use the query_attr since the
     // attribute that triggered the macro execution is not available in the syntax node.
     let parsed_args = parse_arguments_kv(&args.to_string());
@@ -204,7 +202,7 @@ impl DojoContract {
                 body_nodes.push(contract.create_storage());
             }
 
-            let code = TokenStream::interpolate_patched(
+            contract.token_stream = TokenStream::interpolate_patched(
                 CONTRACT_PATCH,
                 &HashMap::from([
                     ("name".to_string(), name.to_string()),
@@ -234,7 +232,7 @@ impl DojoContract {
 
             crate::debug_expand(
                 &format!("CONTRACT PATCH: {contract_namespace}-{name}"),
-                &code.to_string(),
+                &contract.token_stream.to_string(),
             );
 
             return Some(contract);
