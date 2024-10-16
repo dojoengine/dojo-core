@@ -1,4 +1,4 @@
-use dojo::meta::{Layout, introspect::Ty};
+use dojo::meta::{Layout, Ty};
 use dojo::model::ModelDef;
 
 #[starknet::interface]

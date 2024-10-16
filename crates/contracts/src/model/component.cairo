@@ -1,64 +1,52 @@
-#[starknet::component]
-mod DojoModelComponent {
-    use dojo::{model::{Model, ModelDef}, meta::{Layout, Ty}};
+use dojo::{model::{Model, IModel, ModelDef}, meta::{Layout, Ty}};
 
-    #[storage]
-    struct Storage {}
+#[starknet::embeddable]
+pub impl IModelImpl<TContractState, M, +Model<M>> of IModel<TContractState> {
+    fn name(self: @TContractState) -> ByteArray {
+        Model::<M>::name()
+    }
 
-    #[event]
-    #[derive(Drop, PartialEq, starknet::Event)]
-    enum Event{}
+    fn namespace(self: @TContractState) -> ByteArray {
+        Model::<M>::namespace()
+    }
 
-    #[embeddable_as(ModelImpl)]
-    impl IModelImpl<
-        TContractState, M, +HasComponent<TContractState>, +Model<M>
-    > of dojo::model::IModel<ComponentState<TContractState>> {
-        fn name(self: @ComponentState<TContractState>) -> ByteArray {
-            Model::<M>::name()
-        }
+    fn tag(self: @TContractState) -> ByteArray {
+        Model::<M>::tag()
+    }
 
-        fn namespace(self: @ComponentState<TContractState>) -> ByteArray {
-            Model::<M>::namespace()
-        }
+    fn version(self: @TContractState) -> u8 {
+        Model::<M>::version()
+    }
 
-        fn tag(self: @ComponentState<TContractState>) -> ByteArray {
-            Model::<M>::tag()
-        }
+    fn selector(self: @TContractState) -> felt252 {
+        Model::<M>::selector()
+    }
 
-        fn version(self: @ComponentState<TContractState>) -> u8 {
-            Model::<M>::version()
-        }
+    fn name_hash(self: @TContractState) -> felt252 {
+        Model::<M>::name_hash()
+    }
 
-        fn selector(self: @ComponentState<TContractState>) -> felt252 {
-            Model::<M>::selector()
-        }
+    fn namespace_hash(self: @TContractState) -> felt252 {
+        Model::<M>::namespace_hash()
+    }
 
-        fn name_hash(self: @ComponentState<TContractState>) -> felt252 {
-            Model::<M>::name_hash()
-        }
+    fn schema(self: @TContractState) -> Ty {
+        Model::<M>::schema()
+    }
 
-        fn namespace_hash(self: @ComponentState<TContractState>) -> felt252 {
-            Model::<M>::namespace_hash()
-        }
+    fn layout(self: @TContractState) -> Layout {
+        Model::<M>::layout()
+    }
 
-        fn schema(self: @ComponentState<TContractState>) -> Ty {
-            Model::<M>::schema()
-        }
+    fn unpacked_size(self: @TContractState) -> Option<usize> {
+        Model::<M>::unpacked_size()
+    }
 
-        fn layout(self: @ComponentState<TContractState>) -> Layout {
-            Model::<M>::layout()
-        }
+    fn packed_size(self: @TContractState) -> Option<usize> {
+        Model::<M>::packed_size()
+    }
 
-        fn unpacked_size(self: @ComponentState<TContractState>) -> Option<usize> {
-            Model::<M>::unpacked_size()
-        }
-
-        fn packed_size(self: @ComponentState<TContractState>) -> Option<usize> {
-            Model::<M>::packed_size()
-        }
-
-        fn definition(self: @ComponentState<TContractState>) -> ModelDef {
-            Model::<M>::definition()
-        }
+    fn definition(self: @TContractState) -> ModelDef {
+        Model::<M>::definition()
     }
 }

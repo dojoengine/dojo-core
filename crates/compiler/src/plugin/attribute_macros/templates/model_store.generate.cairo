@@ -125,61 +125,12 @@ pub trait I$model_type$<T> {
 pub mod $model_type_snake$ {
     use super::$model_type$;
     use super::I$model_type$;
-    use super::$model_type$Definition;
-    use super::$model_type$ModelImpl;
+
     #[storage]
     struct Storage {}
 
     #[abi(embed_v0)]
-    impl DojoModelImpl of dojo::model::IModel<ContractState>{
-        fn name(self: @ContractState) -> ByteArray {
-            dojo::model::Model::<$model_type$>::name()
-        }
-
-        fn namespace(self: @ContractState) -> ByteArray {
-            dojo::model::Model::<$model_type$>::namespace()
-        }
-
-        fn tag(self: @ContractState) -> ByteArray {
-            dojo::model::Model::<$model_type$>::tag()
-        }
-
-        fn version(self: @ContractState) -> u8 {
-            dojo::model::Model::<$model_type$>::version()
-        }
-
-        fn selector(self: @ContractState) -> felt252 {
-            dojo::model::Model::<$model_type$>::selector()
-        }
-
-        fn name_hash(self: @ContractState) -> felt252 {
-            dojo::model::Model::<$model_type$>::name_hash()
-        }
-
-        fn namespace_hash(self: @ContractState) -> felt252 {
-            dojo::model::Model::<$model_type$>::namespace_hash()
-        }
-
-        fn schema(self: @ContractState) -> dojo::meta::introspect::Ty {
-            dojo::model::Model::<$model_type$>::schema()
-        }
-
-        fn layout(self: @ContractState) -> dojo::meta::Layout {
-            dojo::model::Model::<$model_type$>::layout()
-        }
-
-        fn unpacked_size(self: @ContractState) -> Option<usize> {
-            dojo::model::Model::<$model_type$>::unpacked_size()
-        }
-
-        fn packed_size(self: @ContractState) -> Option<usize> {
-            dojo::model::Model::<$model_type$>::packed_size()
-        }
-
-        fn definition(self: @ContractState) -> dojo::model::ModelDef {
-            dojo::model::Model::<$model_type$>::definition()
-        }
-    }
+    impl DojoModelImpl = dojo::model::component::IModelImpl<ContractState, $model_type$>;
 
     #[abi(embed_v0)]
     impl $model_type$Impl of I$model_type$<ContractState>{
