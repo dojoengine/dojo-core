@@ -17,10 +17,9 @@ use std::collections::HashMap;
 
 use dojo_types::naming;
 
+use crate::attributes::struct_parser::remove_derives;
 use crate::aux_data::{Member, ModelAuxData};
-use crate::derives::{
-    extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
-};
+use crate::derives::{extract_derive_attr_names, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE};
 use crate::diagnostic_ext::DiagnosticsExt;
 use crate::syntax::utils::parse_arguments_kv;
 use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
@@ -35,24 +34,21 @@ const DOJO_MODEL_ATTR: &str = "dojo_model";
 const MODEL_NAMESPACE: &str = "namespace";
 const DEFAULT_VERSION: u64 = 0;
 
+/// `#[dojo_model(...)]` attribute macro.
+///
+/// This macro removes the original node passed as a [`TokenStream`] and replaces it with a new
+/// generated node. The generated node must then contain the original struct to ensure other
+/// plugins work correctly.
+///
+/// A tricky thing too keep in mind is that, if the original struct has derives applied,
+/// those derives must be removed if they don't belong to this plugin. Otherwise, Cairo will throw a compilation error as derived code will be duplicated.
+///
+/// # Arguments of the macro
+///
+/// * `namespace` - the namespace of the model.
+/// * `version` - the version of the model.
 #[attribute_macro]
 pub fn dojo_model(args: TokenStream, token_stream: TokenStream) -> ProcMacroResult {
-    println!("args: {}", args);
-    fn remove_first_line(s: &str) -> String {
-        let mut filtered = vec![];
-
-        for l in s.lines() {
-            if !l.starts_with("#[derive") {
-                filtered.push(l);
-            }
-        }
-
-        filtered.join("\n")
-    }
-
-    let original_input = remove_first_line(&token_stream.clone().to_string());
-    println!("original_input: {}", original_input);
-
     // Arguments of the macro are already parsed. Hence, we can't use the query_attr since the
     // attribute that triggered the macro execution is not available in the syntax node.
     let parsed_args = parse_arguments_kv(&args.to_string());
@@ -89,9 +85,7 @@ pub fn dojo_model(args: TokenStream, token_stream: TokenStream) -> ProcMacroResu
 
             match DojoModel::from_struct(&model_namespace, model_version, &db, &struct_ast) {
                 Some(c) => {
-                    // Output the original struct.
-                    let ts = vec![TokenStream::new(original_input), c.token_stream].join_to_token_stream("");
-                    return ProcMacroResult::new(ts)
+                    return ProcMacroResult::new(c.token_stream)
                         .with_diagnostics(Diagnostics::new(c.diagnostics))
                         .with_aux_data(AuxData::new(
                             serde_json::to_vec(&ModelAuxData {
@@ -100,7 +94,7 @@ pub fn dojo_model(args: TokenStream, token_stream: TokenStream) -> ProcMacroResu
                                 members: c.members,
                             })
                             .expect("Failed to serialize contract aux data to bytes"),
-                        ))
+                        ));
                 }
                 None => return ProcMacroResult::new(TokenStream::empty()),
             };
@@ -222,13 +216,40 @@ impl DojoModel {
                 .push(generate_entity_field_accessors(model_name.clone(), member));
         });
 
-        let mut derive_attr_names = extract_derive_attr_names(
+        let derive_attr_names = extract_derive_attr_names(
             db,
             &mut model.diagnostics,
             struct_ast.attributes(db).query_attr(db, "derive"),
         );
 
-        // TODO: validate that a model has: Introspect/IntrospectPacked, Drop, Serde.
+        let has_introspect = derive_attr_names.contains(&DOJO_INTROSPECT_DERIVE.to_string());
+        let has_introspect_packed = derive_attr_names.contains(&DOJO_PACKED_DERIVE.to_string());
+        let has_drop = derive_attr_names.contains(&"Drop".to_string());
+        let has_serde = derive_attr_names.contains(&"Serde".to_string());
+
+        if has_introspect && has_introspect_packed {
+            model.diagnostics.push_error(
+                "Model cannot derive from both Introspect and IntrospectPacked.".to_string(),
+            );
+        }
+
+        if !(has_introspect || has_introspect_packed) && !has_drop && !has_serde {
+            model.diagnostics.push_error(
+                "Model must derive from Introspect or IntrospectPacked, Drop and Serde.".to_string(),
+            );
+        }
+
+        let derive_node = if has_introspect {
+            TokenStream::new(format!("#[derive({})]", DOJO_INTROSPECT_DERIVE))
+        } else if has_introspect_packed {
+            TokenStream::new(format!("#[derive({})]", DOJO_PACKED_DERIVE))
+        } else {
+            TokenStream::empty()
+        };
+
+        // Must remove the derives from the original struct since they would create duplicates
+        // with the derives of other plugins.
+        let original_struct = remove_derives(db, &struct_ast);
 
         let node = TokenStream::interpolate_patched(
             MODEL_PATCH,
@@ -291,7 +312,7 @@ impl DojoModel {
         model.namespace = model_namespace.to_string();
         model.name = model_name.to_string();
         model.members = members;
-        model.token_stream = node;
+        model.token_stream = vec![derive_node, original_struct, node].join_to_token_stream("");
 
         crate::debug_expand(
             &format!("MODEL PATCH: {model_namespace}-{model_name}"),

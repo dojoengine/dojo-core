@@ -317,3 +317,18 @@ pub fn validate_namings_diagnostics(namings: &[(&str, &str)]) -> Vec<Diagnostic>
 
     diagnostics
 }
+
+/// Removes the derives from the original struct.
+pub fn remove_derives(db: &dyn SyntaxGroup, struct_ast: &ItemStruct) -> TokenStream {
+    let mut out_lines = vec![];
+
+    let struct_str = struct_ast.as_syntax_node().get_text_without_trivia(db).to_string();
+
+    for l in struct_str.lines() {
+        if !l.starts_with("#[derive") {
+            out_lines.push(l);
+        }
+    }
+
+    TokenStream::new(out_lines.join("\n"))
+}
