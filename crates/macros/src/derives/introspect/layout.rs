@@ -169,9 +169,8 @@ pub fn build_item_layout_from_type(
     } else {
         // For Option<T>, T cannot be a tuple
         if is_unsupported_option_type(item_type) {
-            diagnostics.push_error(
-                "Option<T> cannot be used with tuples. Prefer using a struct.".into(),
-            );
+            diagnostics
+                .push_error("Option<T> cannot be used with tuples. Prefer using a struct.".into());
         }
 
         format!(

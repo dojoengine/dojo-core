@@ -4,8 +4,6 @@ pub mod sn_actions {
     struct Storage {}
 }
 
-// MODELS nested in contracts not supported anymore.
-
 #[derive(Introspect, Drop, Serde)]
 #[dojo_model(namespace: "sn")]
 pub struct M {

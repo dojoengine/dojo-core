@@ -1,10 +1,9 @@
-
 pub mod attributes;
-pub mod derives;
-pub mod syntax;
 pub mod aux_data;
-pub mod token_stream_ext;
+pub mod derives;
 pub mod diagnostic_ext;
+pub mod syntax;
+pub mod token_stream_ext;
 
 /// Prints the given string only if the `DOJO_EXPAND` environemnt variable is set.
 /// This is useful for debugging the compiler with verbose output.
@@ -15,9 +14,6 @@ pub mod diagnostic_ext;
 /// * `code` - The code to be expanded.
 pub fn debug_expand(loc: &str, code: &str) {
     if std::env::var("DOJO_EXPAND").is_ok() {
-        println!(
-            "\n// *> EXPAND {} <*\n{}\n\n",
-            loc, code
-        );
+        println!("\n// *> EXPAND {} <*\n{}\n\n", loc, code);
     }
 }

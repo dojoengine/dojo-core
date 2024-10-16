@@ -11,16 +11,18 @@ pub enum TestResource {
 }
 
 /// Spawns a test world registering namespaces and resources.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `namespaces` - Namespaces to register.
 /// * `resources` - Resources to register.
-/// 
+///
 /// # Returns
-/// 
+///
 /// * World dispatcher
-pub fn spawn_test_world(namespaces: Span<ByteArray>, resources: Span<TestResource>) -> IWorldDispatcher {
+pub fn spawn_test_world(
+    namespaces: Span<ByteArray>, resources: Span<TestResource>
+) -> IWorldDispatcher {
     let world_contract = declare("world").unwrap().contract_class();
     let class_hash_felt: felt252 = (*world_contract.class_hash).into();
     let (world_address, _) = world_contract.deploy(@array![class_hash_felt]).unwrap();
@@ -54,26 +56,38 @@ pub fn spawn_test_world(namespaces: Span<ByteArray>, resources: Span<TestResourc
 
 /// Extension trait for world dispatcher to test resources.
 pub trait WorldTestExt {
-    fn resource_contract_address(self: IWorldDispatcher, namespace: ByteArray, name: ByteArray) -> ContractAddress;
-    fn resource_class_hash(self: IWorldDispatcher, namespace: ByteArray, name: ByteArray) -> ClassHash;
+    fn resource_contract_address(
+        self: IWorldDispatcher, namespace: ByteArray, name: ByteArray
+    ) -> ContractAddress;
+    fn resource_class_hash(
+        self: IWorldDispatcher, namespace: ByteArray, name: ByteArray
+    ) -> ClassHash;
 }
 
 impl WorldTestExtImpl of WorldTestExt {
-    fn resource_contract_address(self: IWorldDispatcher, namespace: ByteArray, name: ByteArray) -> ContractAddress {
+    fn resource_contract_address(
+        self: IWorldDispatcher, namespace: ByteArray, name: ByteArray
+    ) -> ContractAddress {
         match self.resource(dojo::utils::selector_from_names(@namespace, @name)) {
             Resource::Contract((ca, _)) => ca,
             Resource::Event((ca, _)) => ca,
             Resource::Model((ca, _)) => ca,
-            _ => panic_with_byte_array(@format!("Resource is not registered: {}-{}", namespace, name))
+            _ => panic_with_byte_array(
+                @format!("Resource is not registered: {}-{}", namespace, name)
+            )
         }
     }
 
-    fn resource_class_hash(self: IWorldDispatcher, namespace: ByteArray, name: ByteArray) -> ClassHash {
+    fn resource_class_hash(
+        self: IWorldDispatcher, namespace: ByteArray, name: ByteArray
+    ) -> ClassHash {
         match self.resource(dojo::utils::selector_from_names(@namespace, @name)) {
             Resource::Contract((_, ch)) => ch.try_into().unwrap(),
             Resource::Event((_, ch)) => ch.try_into().unwrap(),
             Resource::Model((_, ch)) => ch.try_into().unwrap(),
-            _ => panic_with_byte_array(@format!("Resource is not registered: {}-{}", namespace, name)),
+            _ => panic_with_byte_array(
+                @format!("Resource is not registered: {}-{}", namespace, name)
+            ),
         }
     }
 }

@@ -3,18 +3,12 @@ use std::collections::HashMap;
 use cairo_lang_macro::TokenStream;
 
 pub trait TokenStreamExt {
-    fn interpolate_patched(
-        code: &str,
-        patches: &HashMap<String, String>,
-    ) -> TokenStream;
+    fn interpolate_patched(code: &str, patches: &HashMap<String, String>) -> TokenStream;
 }
 
 impl TokenStreamExt for TokenStream {
     /// Simplified implementation taken from `RewriteNode::interpolate_patches`.
-    fn interpolate_patched(
-        code: &str,
-        patches: &HashMap<String, String>,
-    ) -> TokenStream {
+    fn interpolate_patched(code: &str, patches: &HashMap<String, String>) -> TokenStream {
         let mut chars = code.chars().peekable();
         let mut pending_text = String::new();
         let mut children = Vec::new();

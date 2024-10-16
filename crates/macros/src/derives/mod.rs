@@ -60,7 +60,9 @@ fn handle_derives_macros(token_stream: TokenStream) -> ProcMacroResult {
 
                 ProcMacroResult::new(code).with_diagnostics(Diagnostics::new(diagnostics))
             }
-            _ => { continue; }
+            _ => {
+                continue;
+            }
         };
     }
 

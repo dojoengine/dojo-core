@@ -1,6 +1,6 @@
 use cairo_lang_macro::Diagnostic;
-use cairo_lang_syntax::node::db::SyntaxGroup;
 use cairo_lang_syntax::node::ast;
+use cairo_lang_syntax::node::db::SyntaxGroup;
 
 use crate::diagnostic_ext::DiagnosticsExt;
 
@@ -62,9 +62,7 @@ pub fn parse_world_injection(
             }
 
             if has_world_injected {
-                diagnostics.push_error(format!(
-                    "Only one world parameter is allowed"
-                ));
+                diagnostics.push_error(format!("Only one world parameter is allowed"));
 
                 return;
             } else {
@@ -72,9 +70,7 @@ pub fn parse_world_injection(
             }
 
             if idx != 0 {
-                diagnostics.push_error(format!(
-                    "World parameter must be the first parameter."
-                ));
+                diagnostics.push_error(format!("World parameter must be the first parameter."));
 
                 return;
             }

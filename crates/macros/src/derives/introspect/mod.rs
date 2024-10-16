@@ -121,10 +121,7 @@ impl $name$Introspect<$generics$> of dojo::meta::introspect::Introspect<$name$<$
         &HashMap::from([
             ("name".to_string(), name.to_string()),
             ("generics".to_string(), generic_impls),
-            (
-                "generics_types".to_string(),
-                generic_types.join(", "),
-            ),
+            ("generics_types".to_string(), generic_types.join(", ")),
             ("size".to_string(), size.to_string()),
             ("layout".to_string(), layout.to_string()),
             ("ty".to_string(), ty.to_string()),

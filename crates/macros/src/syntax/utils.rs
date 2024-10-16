@@ -35,7 +35,7 @@ pub fn get_parameter_info(db: &dyn SyntaxGroup, param: ast::Param) -> (String, S
 /// Extracts all arguments that are `key: value`, separated by commas.
 /// This is used mainly with new proc macros that are already extracting the
 /// arguments and passing them as a string.
-/// 
+///
 /// `#[dojo_contract(namespace: "sn")]` is given as input as `(namespace: "sn")`.
 ///
 /// # Arguments
@@ -48,7 +48,7 @@ pub fn get_parameter_info(db: &dyn SyntaxGroup, param: ast::Param) -> (String, S
 pub fn parse_arguments_kv(args: &str) -> HashMap<String, String> {
     let mut arguments = HashMap::new();
     let args = args.trim_start_matches('(').trim_end_matches(')');
-    
+
     for arg in args.split(',') {
         let parts: Vec<&str> = arg.split(':').map(|s| s.trim()).collect();
         if parts.len() == 2 {
@@ -111,4 +111,3 @@ mod tests {
         assert_eq!(result, expected);
     }
 }
-

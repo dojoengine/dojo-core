@@ -235,7 +235,8 @@ impl DojoModel {
 
         if !(has_introspect || has_introspect_packed) && !has_drop && !has_serde {
             model.diagnostics.push_error(
-                "Model must derive from Introspect or IntrospectPacked, Drop and Serde.".to_string(),
+                "Model must derive from Introspect or IntrospectPacked, Drop and Serde."
+                    .to_string(),
             );
         }
 

@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use crate::aux_data::Member;
+use crate::diagnostic_ext::DiagnosticsExt;
 use cairo_lang_macro::{Diagnostic, Severity, TokenStream};
 use cairo_lang_syntax::node::ast::{
     ArgClause, ArgClauseNamed, Expr, ItemStruct, Member as MemberAst, OptionArgListParenthesized,
@@ -8,8 +10,6 @@ use cairo_lang_syntax::node::db::SyntaxGroup;
 use cairo_lang_syntax::node::helpers::QueryAttrs;
 use cairo_lang_syntax::node::{Terminal, TypedSyntaxNode};
 use dojo_types::naming;
-use crate::aux_data::Member;
-use crate::diagnostic_ext::DiagnosticsExt;
 
 pub const DEFAULT_VERSION: u8 = 1;
 
@@ -322,7 +322,10 @@ pub fn validate_namings_diagnostics(namings: &[(&str, &str)]) -> Vec<Diagnostic>
 pub fn remove_derives(db: &dyn SyntaxGroup, struct_ast: &ItemStruct) -> TokenStream {
     let mut out_lines = vec![];
 
-    let struct_str = struct_ast.as_syntax_node().get_text_without_trivia(db).to_string();
+    let struct_str = struct_ast
+        .as_syntax_node()
+        .get_text_without_trivia(db)
+        .to_string();
 
     for l in struct_str.lines() {
         if !l.starts_with("#[derive") {

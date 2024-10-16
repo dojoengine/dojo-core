@@ -28,8 +28,7 @@ use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
 
 use super::patches::EVENT_PATCH;
 use super::struct_parser::{
-    parse_members, serialize_keys_and_values,
-    validate_namings_diagnostics,
+    parse_members, serialize_keys_and_values, validate_namings_diagnostics,
 };
 
 const DOJO_EVENT_ATTR: &str = "dojo_event";
@@ -89,7 +88,13 @@ pub fn dojo_event(args: TokenStream, token_stream: TokenStream) -> ProcMacroResu
         if n.kind(&db) == ItemStruct {
             let struct_ast = ast::ItemStruct::from_syntax_node(&db, n);
 
-            match DojoEvent::from_struct(&event_namespace, event_version, event_historical, &db, &struct_ast) {
+            match DojoEvent::from_struct(
+                &event_namespace,
+                event_version,
+                event_historical,
+                &db,
+                &struct_ast,
+            ) {
                 Some(c) => {
                     return ProcMacroResult::new(c.token_stream)
                         .with_diagnostics(Diagnostics::new(c.diagnostics))
@@ -192,9 +197,9 @@ impl DojoEvent {
         }
 
         if !has_introspect && !has_drop && !has_serde {
-            event.diagnostics.push_error(
-                "Event must derive from Introspect, Drop and Serde.".to_string(),
-            );
+            event
+                .diagnostics
+                .push_error("Event must derive from Introspect, Drop and Serde.".to_string());
         }
 
         let derive_node = if has_introspect {
@@ -210,14 +215,8 @@ impl DojoEvent {
         let node = TokenStream::interpolate_patched(
             EVENT_PATCH,
             &HashMap::from([
-                (
-                    "contract_name".to_string(),
-                    event_name.to_case(Case::Snake),
-                ),
-                (
-                    "type_name".to_string(),
-                    event_name.clone(),
-                ),
+                ("contract_name".to_string(), event_name.to_case(Case::Snake)),
+                ("type_name".to_string(), event_name.clone()),
                 (
                     "serialized_keys".to_string(),
                     serialized_keys.join_to_token_stream("").to_string(),
@@ -227,26 +226,11 @@ impl DojoEvent {
                     serialized_values.join_to_token_stream("").to_string(),
                 ),
                 ("event_tag".to_string(), event_tag),
-                (
-                    "event_version".to_string(),
-                    event_version.to_string(),
-                ),
-                (
-                    "event_historical".to_string(),
-                    event_historical.to_string(),
-                ),
-                (
-                    "event_selector".to_string(),
-                    event_selector.to_string(),
-                ),
-                (
-                    "event_namespace".to_string(),
-                    event_namespace.to_string(),
-                ),
-                (
-                    "event_name_hash".to_string(),
-                    event_name_hash.to_string(),
-                ),
+                ("event_version".to_string(), event_version.to_string()),
+                ("event_historical".to_string(), event_historical.to_string()),
+                ("event_selector".to_string(), event_selector.to_string()),
+                ("event_namespace".to_string(), event_namespace.to_string()),
+                ("event_name_hash".to_string(), event_name_hash.to_string()),
                 (
                     "event_namespace_hash".to_string(),
                     event_namespace_hash.to_string(),

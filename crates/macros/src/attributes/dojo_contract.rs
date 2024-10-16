@@ -13,9 +13,7 @@ use cairo_lang_syntax::node::{ast, Terminal, TypedSyntaxNode};
 
 use std::collections::HashMap;
 
-use cairo_lang_syntax::node::ast::{
-    MaybeModuleBody, OptionReturnTypeClause,
-};
+use cairo_lang_syntax::node::ast::{MaybeModuleBody, OptionReturnTypeClause};
 use dojo_types::naming;
 
 use crate::aux_data::ContractAuxData;
@@ -108,14 +106,14 @@ impl DojoContract {
 
         contract.namespace = contract_namespace.to_string();
 
-        contract.diagnostics.extend(validate_attributes(db, module_ast));
+        contract
+            .diagnostics
+            .extend(validate_attributes(db, module_ast));
 
-        contract.diagnostics.extend(validate_namings_diagnostics(
-            &[
-                ("contract namespace", &contract_namespace),
-                ("contract name", &name),
-            ],
-        ));
+        contract.diagnostics.extend(validate_namings_diagnostics(&[
+            ("contract namespace", &contract_namespace),
+            ("contract name", &name),
+        ]));
 
         let contract_name_hash = naming::compute_bytearray_hash(&name);
         let contract_namespace_hash = naming::compute_bytearray_hash(&contract_namespace);
@@ -605,10 +603,7 @@ impl DojoContract {
 ///
 /// Returns:
 /// * A vector of diagnostics.
-fn validate_attributes(
-    db: &dyn SyntaxGroup,
-    module_ast: &ast::ItemModule,
-) -> Vec<Diagnostic> {
+fn validate_attributes(db: &dyn SyntaxGroup, module_ast: &ast::ItemModule) -> Vec<Diagnostic> {
     let mut diagnostics = vec![];
 
     if module_ast
