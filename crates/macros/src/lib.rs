@@ -16,7 +16,7 @@ pub mod diagnostic_ext;
 pub fn debug_expand(loc: &str, code: &str) {
     if std::env::var("DOJO_EXPAND").is_ok() {
         println!(
-            "\n*> EXPAND {} <*\n>>>>>>>>>>>>>>>>>>>>>>>>>>>\n{}\n<<<<<<<<<<<<<<<<<<<<<<<<<<<\n",
+            "\n// *> EXPAND {} <*\n{}\n\n",
             loc, code
         );
     }

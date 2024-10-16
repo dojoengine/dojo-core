@@ -6,15 +6,13 @@ pub mod sn_actions {
 
 // MODELS nested in contracts not supported anymore.
 
-#[dojo_model(namespace: "sn")]
-struct InnerModel {
-    #[key]
-    id: u32,
-    data: felt252,
-}
 
-#[dojo_contract(namespace: "sn")]
-pub mod dojo_1 {
+#[derive(Introspect, Drop, Serde)]
+#[dojo_model(namespace: "sn")]
+pub struct M {
+    #[key]
+    pub a: felt252,
+    pub b: felt252,
 }
 
 #[cfg(test)]

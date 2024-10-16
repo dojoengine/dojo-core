@@ -3,22 +3,18 @@
 //!
 
 use cairo_lang_macro::{
-    attribute_macro, AuxData, Diagnostic, Diagnostics, ProcMacroResult, Severity, TokenStream,
+    attribute_macro, AuxData, Diagnostic, Diagnostics, ProcMacroResult, TokenStream,
 };
 use cairo_lang_parser::utils::SimpleParserDatabase;
-use cairo_lang_plugins::plugins::HasItemsInCfgEx;
 use cairo_lang_syntax::node::db::SyntaxGroup;
 use cairo_lang_syntax::node::helpers::{BodyItems, QueryAttrs};
-use cairo_lang_syntax::node::kind::SyntaxKind::{
-    ItemModule, Member, OptionWrappedGenericParamListEmpty, TerminalStruct, TokenIdentifier,
-    WrappedGenericParamList,
-};
-use cairo_lang_syntax::node::{ast, ids, SyntaxNode, Terminal, TypedStablePtr, TypedSyntaxNode};
+use cairo_lang_syntax::node::kind::SyntaxKind::ItemModule;
+use cairo_lang_syntax::node::{ast, Terminal, TypedSyntaxNode};
 
 use std::collections::HashMap;
 
 use cairo_lang_syntax::node::ast::{
-    ArgClause, Expr, MaybeModuleBody, OptionArgListParenthesized, OptionReturnTypeClause,
+    MaybeModuleBody, OptionReturnTypeClause,
 };
 use dojo_types::naming;
 

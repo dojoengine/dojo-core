@@ -18,13 +18,18 @@ use std::collections::HashMap;
 use dojo_types::naming;
 
 use crate::aux_data::{Member, ModelAuxData};
-use crate::derives::{extract_derive_attr_names, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE};
+use crate::derives::{
+    extract_derive_attr_names, handle_derive_attrs, DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE,
+};
 use crate::diagnostic_ext::DiagnosticsExt;
 use crate::syntax::utils::parse_arguments_kv;
 use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
 
 use super::patches::MODEL_PATCH;
-use super::struct_parser::{deserialize_keys_and_values, parse_members, serialize_keys_and_values, serialize_member_ty, validate_namings_diagnostics};
+use super::struct_parser::{
+    deserialize_keys_and_values, parse_members, serialize_keys_and_values, serialize_member_ty,
+    validate_namings_diagnostics,
+};
 
 const DOJO_MODEL_ATTR: &str = "dojo_model";
 const MODEL_NAMESPACE: &str = "namespace";
@@ -33,6 +38,20 @@ const DEFAULT_VERSION: u64 = 0;
 #[attribute_macro]
 pub fn dojo_model(args: TokenStream, token_stream: TokenStream) -> ProcMacroResult {
     println!("args: {}", args);
+    fn remove_first_line(s: &str) -> String {
+        let mut filtered = vec![];
+
+        for l in s.lines() {
+            if !l.starts_with("#[derive") {
+                filtered.push(l);
+            }
+        }
+
+        filtered.join("\n")
+    }
+
+    let original_input = remove_first_line(&token_stream.clone().to_string());
+    println!("original_input: {}", original_input);
 
     // Arguments of the macro are already parsed. Hence, we can't use the query_attr since the
     // attribute that triggered the macro execution is not available in the syntax node.
@@ -51,10 +70,11 @@ pub fn dojo_model(args: TokenStream, token_stream: TokenStream) -> ProcMacroResu
         if let Ok(version) = model_version.parse::<u64>() {
             version
         } else {
-            return ProcMacroResult::new(TokenStream::empty())
-                .with_diagnostics(Diagnostics::new(vec![Diagnostic::error(
-                    format!("Invalid model version: {model_version}. Expected a number (u64)."),
-                )]));
+            return ProcMacroResult::new(TokenStream::empty()).with_diagnostics(Diagnostics::new(
+                vec![Diagnostic::error(format!(
+                    "Invalid model version: {model_version}. Expected a number (u64)."
+                ))],
+            ));
         }
     } else {
         DEFAULT_VERSION
@@ -69,7 +89,9 @@ pub fn dojo_model(args: TokenStream, token_stream: TokenStream) -> ProcMacroResu
 
             match DojoModel::from_struct(&model_namespace, model_version, &db, &struct_ast) {
                 Some(c) => {
-                    return ProcMacroResult::new(c.token_stream)
+                    // Output the original struct.
+                    let ts = vec![TokenStream::new(original_input), c.token_stream].join_to_token_stream("");
+                    return ProcMacroResult::new(ts)
                         .with_diagnostics(Diagnostics::new(c.diagnostics))
                         .with_aux_data(AuxData::new(
                             serde_json::to_vec(&ModelAuxData {
@@ -119,19 +141,22 @@ impl DojoModel {
             .trim()
             .to_string();
 
-        model.diagnostics.extend(validate_namings_diagnostics(
-            &[
-                ("model namespace", &model_namespace),
-                ("model name", &model_name),
-            ],
-        ));
+        model.diagnostics.extend(validate_namings_diagnostics(&[
+            ("model namespace", &model_namespace),
+            ("model name", &model_name),
+        ]));
 
         let model_tag = naming::get_tag(&model_namespace, &model_name);
         let model_name_hash = naming::compute_bytearray_hash(&model_name);
         let model_namespace_hash = naming::compute_bytearray_hash(&model_namespace);
-        let model_selector = naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash);
+        let model_selector =
+            naming::compute_selector_from_hashes(model_namespace_hash, model_name_hash);
 
-        let members = parse_members(db, &struct_ast.members(db).elements(db), &mut model.diagnostics);
+        let members = parse_members(
+            db,
+            &struct_ast.members(db).elements(db),
+            &mut model.diagnostics,
+        );
 
         let mut serialized_keys: Vec<TokenStream> = vec![];
         let mut serialized_values: Vec<TokenStream> = vec![];
@@ -139,11 +164,15 @@ impl DojoModel {
         serialize_keys_and_values(&members, &mut serialized_keys, &mut serialized_values);
 
         if serialized_keys.is_empty() {
-            model.diagnostics.push_error("Model must define at least one #[key] attribute".to_string());
+            model
+                .diagnostics
+                .push_error("Model must define at least one #[key] attribute".to_string());
         }
 
         if serialized_values.is_empty() {
-            model.diagnostics.push_error("Model must define at least one member that is not a key".to_string());
+            model
+                .diagnostics
+                .push_error("Model must define at least one member that is not a key".to_string());
         }
 
         let mut deserialized_keys: Vec<TokenStream> = vec![];
@@ -199,34 +228,13 @@ impl DojoModel {
             struct_ast.attributes(db).query_attr(db, "derive"),
         );
 
-        // Ensures models always derive Introspect if not already derived.
-        if !derive_attr_names.contains(&DOJO_INTROSPECT_DERIVE.to_string())
-            && !derive_attr_names.contains(&DOJO_PACKED_DERIVE.to_string())
-        {
-            // Default to Introspect, and not packed.
-            derive_attr_names.push(DOJO_INTROSPECT_DERIVE.to_string());
-        }
-
-        // TODO: add the derive.
-/*         let (derive_nodes, derive_diagnostics) = handle_derive_attrs(
-            db,
-            &derive_attr_names,
-            &ModuleItem::Struct(struct_ast.clone()),
-        ); */
-
-        // diagnostics.extend(derive_diagnostics);
+        // TODO: validate that a model has: Introspect/IntrospectPacked, Drop, Serde.
 
         let node = TokenStream::interpolate_patched(
             MODEL_PATCH,
             &HashMap::from([
-                (
-                    "contract_name".to_string(),
-                    model_name.to_case(Case::Snake),
-                ),
-                (
-                    "type_name".to_string(),
-                    model_name.clone(),
-                ),
+                ("contract_name".to_string(), model_name.to_case(Case::Snake)),
+                ("type_name".to_string(), model_name.clone()),
                 (
                     "member_key_names".to_string(),
                     member_key_names.join_to_token_stream("").to_string(),
@@ -253,22 +261,13 @@ impl DojoModel {
                 ),
                 ("model_version".to_string(), model_version.to_string()),
                 ("model_selector".to_string(), model_selector.to_string()),
-                (
-                    "model_namespace".to_string(),
-                    model_namespace.to_string(),
-                ),
-                (
-                    "model_name_hash".to_string(),
-                    model_name_hash.to_string(),
-                ),
+                ("model_namespace".to_string(), model_namespace.to_string()),
+                ("model_name_hash".to_string(), model_name_hash.to_string()),
                 (
                     "model_namespace_hash".to_string(),
                     model_namespace_hash.to_string(),
                 ),
-                (
-                    "model_tag".to_string(),
-                    model_tag.clone(),
-                ),
+                ("model_tag".to_string(), model_tag.clone()),
                 (
                     "members_values".to_string(),
                     members_values.join_to_token_stream("").to_string(),
@@ -288,11 +287,6 @@ impl DojoModel {
                 ),
             ]),
         );
-
-        // Add derives nodes.
-/*         for node in derive_nodes {
-            builder.add_modified(node);
-        } */
 
         model.namespace = model_namespace.to_string();
         model.name = model_name.to_string();
@@ -366,18 +360,12 @@ fn generate_field_accessors(
             ("model_name".to_string(), model_name),
             (
                 "field_selector".to_string(),
-                    get_selector_from_name(&member.name)
-                        .expect("invalid member name")
-                        .to_string(),
+                get_selector_from_name(&member.name)
+                    .expect("invalid member name")
+                    .to_string(),
             ),
-            (
-                "field_name".to_string(),
-                member.name.clone(),
-            ),
-            (
-                "field_type".to_string(),
-                member.ty.clone(),
-            ),
+            ("field_name".to_string(), member.name.clone()),
+            ("field_type".to_string(), member.ty.clone()),
             ("param_keys".to_string(), param_keys),
             (
                 "serialized_param_keys".to_string(),
@@ -439,14 +427,8 @@ fn generate_entity_field_accessors(model_name: String, member: &Member) -> Token
                     .expect("invalid member name")
                     .to_string(),
             ),
-            (
-                "field_name".to_string(),
-                member.name.clone(),
-            ),
-            (
-                "field_type".to_string(),
-                member.ty.clone(),
-            ),
+            ("field_name".to_string(), member.name.clone()),
+            ("field_type".to_string(), member.ty.clone()),
         ]),
     )
 }
