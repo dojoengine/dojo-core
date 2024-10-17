@@ -41,7 +41,7 @@ pub mod world {
     };
     use dojo::contract::{IContractDispatcher, IContractDispatcherTrait};
     use dojo::meta::Layout;
-    use dojo::model::{Model, ResourceMetadata, ResourceMetadataTrait, metadata, ModelIndex};
+    use dojo::model::{Model, ResourceMetadata, metadata, ModelIndex};
     use dojo::storage;
     use dojo::utils::{
         entity_id_from_keys, bytearray_hash, DescriptorTrait, IDescriptorDispatcher,
@@ -321,8 +321,8 @@ pub mod world {
                 entity_id_from_keys([resource_selector].span()),
                 Model::<ResourceMetadata>::layout()
             );
-
-            match ResourceMetadataTrait::from_values(resource_selector, ref values) {
+            let mut keys = [resource_selector].span();
+            match Model::<ResourceMetadata>::from_values(ref keys, ref values) {
                 Option::Some(x) => x,
                 Option::None => panic!("Model `ResourceMetadata`: deserialization failed.")
             }

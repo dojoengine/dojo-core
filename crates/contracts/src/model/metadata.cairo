@@ -3,16 +3,13 @@
 //! Manually expand to ensure that dojo-core
 //! does not depend on dojo plugin to be built.
 //!
-use core::array::ArrayTrait;
-use core::byte_array::ByteArray;
 use core::poseidon::poseidon_hash_span;
-use core::serde::Serde;
 
+use dojo::model::model::{ModelImpl, ModelParser, KeyParser};
 use dojo::meta::introspect::{Introspect, Ty, Struct, Member};
 use dojo::meta::{Layout, FieldLayout};
-use dojo::model::{Model, ModelIndex, ModelDefinition};
 use dojo::utils;
-use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
+use dojo::utils::{serialize_inline};
 
 pub fn initial_address() -> starknet::ContractAddress {
     starknet::contract_address_const::<0>()
@@ -31,79 +28,18 @@ pub struct ResourceMetadata {
     pub metadata_uri: ByteArray,
 }
 
-#[generate_trait]
-pub impl ResourceMetadataImpl of ResourceMetadataTrait {
-    fn from_values(resource_id: felt252, ref values: Span<felt252>) -> Option<ResourceMetadata> {
-        let metadata_uri = Serde::<ByteArray>::deserialize(ref values)?;
-        Option::Some(ResourceMetadata { resource_id, metadata_uri })
-    }
-}
-
-pub impl ResourceMetadataModel of Model<ResourceMetadata> {
-    fn get(world: IWorldDispatcher, keys: Span<felt252>) -> ResourceMetadata {
-        if keys.len() != 1 {
-            panic!("Model `ResourceMetadata`: bad keys length.");
-        };
-
-        let mut values = world.entity(Self::selector(), ModelIndex::Keys(keys), Self::layout());
-
-        match ResourceMetadataTrait::from_values(*keys.at(0), ref values) {
-            Option::Some(x) => x,
-            Option::None => panic!("Model `ResourceMetadata`: deserialization failed.")
-        }
-    }
-
-    fn set_model(self: @ResourceMetadata, world: IWorldDispatcher,) {
-        IWorldDispatcherTrait::set_entity(
-            world, Self::selector(), ModelIndex::Keys(self.keys()), self.values(), Self::layout()
-        );
-    }
-
-    fn delete_model(self: @ResourceMetadata, world: IWorldDispatcher,) {
-        world.delete_entity(Self::selector(), ModelIndex::Keys(self.keys()), Self::layout());
-    }
-
-    fn get_member(
-        world: IWorldDispatcher, keys: Span<felt252>, member_id: felt252
-    ) -> Span<felt252> {
-        match utils::find_model_field_layout(Self::layout(), member_id) {
-            Option::Some(field_layout) => {
-                let entity_id = utils::entity_id_from_keys(keys);
-                world
-                    .entity(
-                        Self::selector(), ModelIndex::MemberId((entity_id, member_id)), field_layout
-                    )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
-    }
-
-    fn set_member(
-        self: @ResourceMetadata, world: IWorldDispatcher, member_id: felt252, values: Span<felt252>
-    ) {
-        match utils::find_model_field_layout(Self::layout(), member_id) {
-            Option::Some(field_layout) => {
-                world
-                    .set_entity(
-                        Self::selector(),
-                        ModelIndex::MemberId((self.entity_id(), member_id)),
-                        values,
-                        field_layout
-                    )
-            },
-            Option::None => core::panic_with_felt252('bad member id')
-        }
-    }
-
+pub impl ResourceMetadataDefinitionImpl of dojo::model::ModelDefinition<ResourceMetadata> {
     #[inline(always)]
     fn name() -> ByteArray {
         "ResourceMetadata"
     }
 
+    #[inline(always)]
     fn namespace() -> ByteArray {
         "__DOJO__"
     }
 
+    #[inline(always)]
     fn tag() -> ByteArray {
         "__DOJO__-ResourceMetadata"
     }
@@ -119,35 +55,13 @@ pub impl ResourceMetadataModel of Model<ResourceMetadata> {
     }
 
     #[inline(always)]
-    fn instance_selector(self: @ResourceMetadata) -> felt252 {
-        Self::selector()
-    }
-
     fn name_hash() -> felt252 {
         utils::bytearray_hash(@Self::name())
     }
 
+    #[inline(always)]
     fn namespace_hash() -> felt252 {
         utils::bytearray_hash(@Self::namespace())
-    }
-
-    #[inline(always)]
-    fn entity_id(self: @ResourceMetadata) -> felt252 {
-        poseidon_hash_span(self.keys())
-    }
-
-    #[inline(always)]
-    fn keys(self: @ResourceMetadata) -> Span<felt252> {
-        let mut serialized = ArrayTrait::new();
-        ArrayTrait::append(ref serialized, *self.resource_id);
-        ArrayTrait::span(@serialized)
-    }
-
-    #[inline(always)]
-    fn values(self: @ResourceMetadata) -> Span<felt252> {
-        let mut serialized = ArrayTrait::new();
-        Serde::serialize(self.metadata_uri, ref serialized);
-        ArrayTrait::span(@serialized)
     }
 
     #[inline(always)]
@@ -156,34 +70,35 @@ pub impl ResourceMetadataModel of Model<ResourceMetadata> {
     }
 
     #[inline(always)]
-    fn instance_layout(self: @ResourceMetadata) -> Layout {
-        Self::layout()
-    }
-
-    #[inline(always)]
-    fn packed_size() -> Option<usize> {
-        Option::None
-    }
-
-    #[inline(always)]
     fn schema() -> Ty {
         Introspect::<ResourceMetadata>::ty()
     }
 
     #[inline(always)]
-    fn definition() -> ModelDefinition {
-        ModelDefinition {
-            name: Self::name(),
-            namespace: Self::namespace(),
-            namespace_selector: Self::namespace_hash(),
-            version: Self::version(),
-            layout: Self::layout(),
-            schema: Self::schema(),
-            packed_size: Self::packed_size(),
-            unpacked_size: Introspect::<ResourceMetadata>::size()
-        }
+    fn size() -> Option<usize> {
+        Introspect::<ResourceMetadata>::size()
     }
 }
+
+
+pub impl ResourceMetadataModelKeyImpl of KeyParser<ResourceMetadata, felt252> {
+    #[inline(always)]
+    fn parse_key(self: @ResourceMetadata) -> felt252 {
+        *self.resource_id
+    }
+}
+
+pub impl ResourceMetadataModelParser of ModelParser<ResourceMetadata> {
+    fn serialize_keys(self: @ResourceMetadata) -> Span<felt252> {
+        [*self.resource_id].span()
+    }
+    fn serialize_values(self: @ResourceMetadata) -> Span<felt252> {
+        serialize_inline(self.metadata_uri)
+    }
+}
+
+pub impl ResourceMetadataModelImpl = ModelImpl<ResourceMetadata>;
+
 
 pub impl ResourceMetadataIntrospect<> of Introspect<ResourceMetadata<>> {
     #[inline(always)]
@@ -215,56 +130,53 @@ pub impl ResourceMetadataIntrospect<> of Introspect<ResourceMetadata<>> {
 
 #[starknet::contract]
 pub mod resource_metadata {
-    use super::ResourceMetadata;
-    use super::ResourceMetadataModel;
+    use super::{ResourceMetadata};
 
-    use dojo::meta::introspect::{Introspect, Ty};
-    use dojo::meta::Layout;
-    use dojo::model::ModelDefinition;
+    use dojo::{meta::{Layout, Ty}, model::{ModelDef, Model}};
 
     #[storage]
     struct Storage {}
 
     #[external(v0)]
     fn selector(self: @ContractState) -> felt252 {
-        ResourceMetadataModel::selector()
+        Model::<ResourceMetadata>::selector()
     }
 
     fn name(self: @ContractState) -> ByteArray {
-        ResourceMetadataModel::name()
+        Model::<ResourceMetadata>::name()
     }
 
     fn version(self: @ContractState) -> u8 {
-        ResourceMetadataModel::version()
+        Model::<ResourceMetadata>::version()
     }
 
     fn namespace(self: @ContractState) -> ByteArray {
-        ResourceMetadataModel::namespace()
+        Model::<ResourceMetadata>::namespace()
     }
 
     #[external(v0)]
     fn unpacked_size(self: @ContractState) -> Option<usize> {
-        Introspect::<ResourceMetadata>::size()
+        Model::<ResourceMetadata>::unpacked_size()
     }
 
     #[external(v0)]
     fn packed_size(self: @ContractState) -> Option<usize> {
-        ResourceMetadataModel::packed_size()
+        Model::<ResourceMetadata>::packed_size()
     }
 
     #[external(v0)]
     fn layout(self: @ContractState) -> Layout {
-        ResourceMetadataModel::layout()
+        Model::<ResourceMetadata>::layout()
     }
 
     #[external(v0)]
     fn schema(self: @ContractState) -> Ty {
-        Introspect::<ResourceMetadata>::ty()
+        Model::<ResourceMetadata>::schema()
     }
 
     #[external(v0)]
-    fn definition(self: @ContractState) -> ModelDefinition {
-        ResourceMetadataModel::definition()
+    fn definition(self: @ContractState) -> ModelDef {
+        Model::<ResourceMetadata>::definition()
     }
 
     #[external(v0)]

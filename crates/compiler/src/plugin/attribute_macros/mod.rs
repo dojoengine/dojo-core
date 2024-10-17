@@ -7,7 +7,6 @@ pub mod element;
 pub mod event;
 pub mod interface;
 pub mod model;
-pub mod patches;
 
 pub use contract::DojoContract;
 pub use event::DojoEvent;

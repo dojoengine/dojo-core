@@ -18,22 +18,38 @@ pub mod event {
 
 pub mod meta {
     pub mod introspect;
+    pub use introspect::{Introspect, Ty};
+
     pub mod layout;
     pub use layout::{Layout, FieldLayout};
 }
 
 pub mod model {
-    pub mod model;
-    pub use model::{
-        Model, ModelDefinition, ModelIndex, ModelEntity, IModel, IModelDispatcher,
-        IModelDispatcherTrait,
-    };
+    pub mod component;
 
-    #[cfg(target: "test")]
-    pub use model::{ModelTest, ModelEntityTest};
+    pub mod definition;
+    pub use definition::{ModelIndex, ModelDefinition, ModelDef};
+
+    pub mod members;
+    pub use members::{MemberStore};
+
+    pub mod model;
+    pub use model::{Model, ModelStore};
+
+    pub mod entity;
+    pub use entity::{Entity, EntityStore};
+
+    pub mod interface;
+    pub use interface::{IModel, IModelDispatcher, IModelDispatcherTrait};
 
     pub mod metadata;
-    pub use metadata::{ResourceMetadata, ResourceMetadataTrait, resource_metadata};
+    pub use metadata::{ResourceMetadata, resource_metadata};
+
+    #[cfg(target: "test")]
+    pub use model::{ModelTest};
+
+    #[cfg(target: "test")]
+    pub use entity::{ModelEntityTest};
 }
 
 pub(crate) mod storage {
@@ -68,7 +84,7 @@ pub mod utils {
     pub use hash::{bytearray_hash, selector_from_names};
 
     pub mod key;
-    pub use key::{entity_id_from_keys, combine_key};
+    pub use key::{entity_id_from_keys, combine_key, entity_id_from_key};
 
     pub mod layout;
     pub use layout::{find_field_layout, find_model_field_layout};
@@ -78,6 +94,9 @@ pub mod utils {
 
     pub mod naming;
     pub use naming::is_name_valid;
+
+    pub mod serde;
+    pub use serde::{serialize_inline, deserialize_unwrap};
 }
 
 pub mod world {
