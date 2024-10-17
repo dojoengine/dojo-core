@@ -4,12 +4,23 @@ use dojo::{
 };
 use core::panic_with_felt252;
 
+/// The `MemberStore` trait.
+///
+/// It provides a standardized way to interact with members of a model.
+///
+/// # Template Parameters
+/// - `M`: The type of the model.
+/// - `T`: The type of the member.
 pub trait MemberStore<M, T> {
+    /// Retrieves a member of type `T` from a model of type `M` using the provided member id and key
+    /// of type `K`.
     fn get_member(self: @IWorldDispatcher, entity_id: felt252, member_id: felt252) -> T;
+    /// Updates a member of type `T` within a model of type `M` using the provided member id, key of
+    /// type `K`, and new value of type `T`.
     fn update_member(self: IWorldDispatcher, entity_id: felt252, member_id: felt252, value: T);
 }
 
-
+/// Updates a serialized member of a model.
 fn update_serialized_member(
     world: IWorldDispatcher,
     model_id: felt252,
@@ -28,6 +39,7 @@ fn update_serialized_member(
     }
 }
 
+/// Retrieves a serialized member of a model.
 fn get_serialized_member(
     world: IWorldDispatcher,
     model_id: felt252,
@@ -44,7 +56,6 @@ fn get_serialized_member(
         Option::None => panic_with_felt252('bad member id')
     }
 }
-
 
 pub impl MemberStoreImpl<M, T, +ModelDefinition<M>, +Serde<T>, +Drop<T>> of MemberStore<M, T> {
     fn get_member(self: @IWorldDispatcher, entity_id: felt252, member_id: felt252) -> T {

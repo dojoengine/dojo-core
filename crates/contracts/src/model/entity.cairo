@@ -5,100 +5,65 @@ use dojo::{
 
 pub trait EntityKey<E, K> {}
 
-
 /// Trait `EntityParser` defines the interface for parsing and serializing entities of type `E`.
-///
-/// # Methods
-/// - `parse_id(self: @E) -> felt252`:
-///   Parses and returns the ID of the entity as a `felt252`.
-///
-/// - `serialize_values(self: @E) -> Span<felt252>`:
-///   Serializes the values of the entity and returns them as a `Span<felt252>`.
 pub trait EntityParser<E> {
+    /// Parses and returns the ID of the entity as a `felt252`.
     fn parse_id(self: @E) -> felt252;
+    /// Serializes the values of the entity and returns them as a `Span<felt252>`.
     fn serialize_values(self: @E) -> Span<felt252>;
 }
-
 
 /// The `Entity` trait defines a set of methods that must be implemented by any entity type `E`.
 /// This trait provides a standardized way to interact with entities, including retrieving their
 /// identifiers, values, and metadata, as well as constructing entities from values.
-///
-/// Methods:
-/// - `id(self: @E) -> felt252`: Returns the unique identifier of the entity.
-/// - `values(self: @E) -> Span<felt252>`: Returns a span of values associated with the entity.
-/// - `from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E>`: Constructs an
-/// entity
-///   from the given identifier and values, returning an `Option` that contains the entity if
-///   successful.
-///
-/// Metadata Methods:
-/// - `name() -> ByteArray`: Returns the name of the entity type.
-/// - `namespace() -> ByteArray`: Returns the namespace of the entity type.
-/// - `tag() -> ByteArray`: Returns the tag associated with the entity type.
-/// - `version() -> u8`: Returns the version of the entity type.
-/// - `selector() -> felt252`: Returns a unique selector for the entity type.
-/// - `layout() -> Layout`: Returns the layout of the entity type.
-/// - `name_hash() -> felt252`: Returns the hash of the entity type's name.
-/// - `namespace_hash() -> felt252`: Returns the hash of the entity type's namespace.
-/// - `instance_selector(self: @E) -> felt252`: Returns a selector for the entity.
-/// - `instance_layout(self: @E) -> Layout`: Returns the layout of the entity.
 pub trait Entity<E> {
+    /// Returns the unique identifier of the entity, being a hash derived from the keys.
     fn id(self: @E) -> felt252;
+    /// Returns a span of values associated with the entity, every field of a model
+    /// that is not a key.
     fn values(self: @E) -> Span<felt252>;
+    /// Constructs an entity from its identifier and values.
     fn from_values(entity_id: felt252, ref values: Span<felt252>) -> Option<E>;
-
+    /// Returns the name of the entity type.
     fn name() -> ByteArray;
+    /// Returns the namespace of the entity type.
     fn namespace() -> ByteArray;
+    /// Returns the tag of the entity type.
     fn tag() -> ByteArray;
+    /// Returns the version of the entity type.
     fn version() -> u8;
+    /// Returns a unique selector for the entity type.
     fn selector() -> felt252;
+    /// Returns the layout of the entity type.
     fn layout() -> Layout;
+    /// Returns the hash of the entity type's name.
     fn name_hash() -> felt252;
+    /// Returns the hash of the entity type's namespace.
     fn namespace_hash() -> felt252;
+    /// Returns a selector for the entity.
     fn instance_selector(self: @E) -> felt252;
+    /// Returns the layout of the entity.
     fn instance_layout(self: @E) -> Layout;
 }
 
-
-/// Trait `EntityStore` provides an interface for managing entities within a world dispatcher.
-///
-/// # Type Parameters
-/// - `E`: The type of the entity.
-///
-/// # Methods
-/// - `fn get_entity<K, +Drop<K>, +Serde<K>, +EntityKey<E, K>>(self: @IWorldDispatcher, key: K) ->
-/// E`
-///   Retrieves an entity based on a given key.
-///
-/// - `fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E`
-///   Retrieves an entity based on its ID.
-///
-/// - `fn update(self: IWorldDispatcher, entity: @E)`
-///   Updates the given entity.
-///
-/// - `fn delete_entity(self: IWorldDispatcher, entity: @E)`
-///   Deletes the given entity.
-///
-/// - `fn delete_from_id(self: IWorldDispatcher, entity_id: felt252)`
-///   Deletes an entity based on its ID.
-///
-/// - `fn get_member_from_id<T, +MemberStore<E, T>>(self: @IWorldDispatcher, member_id: felt252,
-/// entity_id: felt252) -> T`
-///   Retrieves a member of an entity based on the member's ID and the entity's ID.
-///
-/// - `fn update_member_from_id<T, +MemberStore<E, T>>(self: IWorldDispatcher, member_id: felt252,
-/// entity_id: felt252, value: T)`
-///   Updates a member of an entity based on the member's ID and the entity's ID.
+/// Trait `EntityStore` provides an interface for managing entities through a world dispatcher.
 pub trait EntityStore<E> {
+    /// Retrieves an entity based on a given key. The key in this context is a types containing
+    /// all the model keys.
     fn get_entity<K, +Drop<K>, +Serde<K>, +EntityKey<E, K>>(self: @IWorldDispatcher, key: K) -> E;
+    /// Retrieves an entity based on its id.
     fn get_entity_from_id(self: @IWorldDispatcher, entity_id: felt252) -> E;
+    /// Updates an entity in the store.
     fn update(self: IWorldDispatcher, entity: @E);
+    /// Deletes an entity from the store.
     fn delete_entity(self: IWorldDispatcher, entity: @E);
+    /// Deletes an entity based on its id.
     fn delete_from_id(self: IWorldDispatcher, entity_id: felt252);
+    /// Retrieves a member from an entity based on its id and the member's id.
     fn get_member_from_id<T, +MemberStore<E, T>>(
         self: @IWorldDispatcher, entity_id: felt252, member_id: felt252
     ) -> T;
+    /// Updates a member of an entity based on its id and the member's id.
     fn update_member_from_id<T, +MemberStore<E, T>>(
         self: IWorldDispatcher, entity_id: felt252, member_id: felt252, value: T
     );
@@ -199,13 +164,14 @@ pub impl EntityStoreImpl<E, +Entity<E>, +Drop<E>> of EntityStore<E> {
     }
 }
 
+/// Test implementation of the `ModelEntity` trait to bypass permission checks.
 #[cfg(target: "test")]
 pub trait ModelEntityTest<E> {
     fn update_test(self: @E, world: IWorldDispatcher);
     fn delete_test(self: @E, world: IWorldDispatcher);
 }
 
-
+/// Implementation of the `ModelEntityTest` trait for testing purposes, bypassing permission checks.
 #[cfg(target: "test")]
 pub impl ModelEntityTestImpl<E, +Entity<E>> of ModelEntityTest<E> {
     fn update_test(self: @E, world: IWorldDispatcher) {
