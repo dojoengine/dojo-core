@@ -16,9 +16,7 @@ impl<A: starknet::accounts::ConnectedAccount + Sync> ModelContract<A> {
         Self {
             address,
             account,
-            block_id: starknet::core::types::BlockId::Tag(
-                starknet::core::types::BlockTag::Pending,
-            ),
+            block_id: starknet::core::types::BlockId::Tag(starknet::core::types::BlockTag::Pending),
         }
     }
     pub fn set_contract_address(&mut self, address: starknet::core::types::Felt) {
@@ -45,9 +43,7 @@ impl<P: starknet::providers::Provider + Sync> ModelContractReader<P> {
         Self {
             address,
             provider,
-            block_id: starknet::core::types::BlockId::Tag(
-                starknet::core::types::BlockTag::Pending,
-            ),
+            block_id: starknet::core::types::BlockId::Tag(starknet::core::types::BlockTag::Pending),
         }
     }
     pub fn set_contract_address(&mut self, address: starknet::core::types::Felt) {
@@ -76,24 +72,19 @@ impl cainome::cairo_serde::CairoSerde for Enum {
     fn cairo_serialized_size(__rust: &Self::RustType) -> usize {
         let mut __size = 0;
         __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.name);
-        __size
-            += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&__rust.attrs);
-        __size
-            += Vec::<
-                (starknet::core::types::Felt, Ty),
-            >::cairo_serialized_size(&__rust.children);
+        __size += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&__rust.attrs);
+        __size += Vec::<(starknet::core::types::Felt, Ty)>::cairo_serialized_size(&__rust.children);
         __size
     }
     fn cairo_serialize(__rust: &Self::RustType) -> Vec<starknet::core::types::Felt> {
         let mut __out: Vec<starknet::core::types::Felt> = vec![];
         __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.name));
-        __out.extend(Vec::<starknet::core::types::Felt>::cairo_serialize(&__rust.attrs));
-        __out
-            .extend(
-                Vec::<
-                    (starknet::core::types::Felt, Ty),
-                >::cairo_serialize(&__rust.children),
-            );
+        __out.extend(Vec::<starknet::core::types::Felt>::cairo_serialize(
+            &__rust.attrs,
+        ));
+        __out.extend(Vec::<(starknet::core::types::Felt, Ty)>::cairo_serialize(
+            &__rust.children,
+        ));
         __out
     }
     fn cairo_deserialize(
@@ -103,18 +94,16 @@ impl cainome::cairo_serde::CairoSerde for Enum {
         let mut __offset = __offset;
         let name = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&name);
-        let attrs = Vec::<
-            starknet::core::types::Felt,
-        >::cairo_deserialize(__felts, __offset)?;
+        let attrs = Vec::<starknet::core::types::Felt>::cairo_deserialize(__felts, __offset)?;
         __offset += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&attrs);
-        let children = Vec::<
-            (starknet::core::types::Felt, Ty),
-        >::cairo_deserialize(__felts, __offset)?;
-        __offset
-            += Vec::<
-                (starknet::core::types::Felt, Ty),
-            >::cairo_serialized_size(&children);
-        Ok(Enum { name, attrs, children })
+        let children =
+            Vec::<(starknet::core::types::Felt, Ty)>::cairo_deserialize(__felts, __offset)?;
+        __offset += Vec::<(starknet::core::types::Felt, Ty)>::cairo_serialized_size(&children);
+        Ok(Enum {
+            name,
+            attrs,
+            children,
+        })
     }
 }
 #[derive(Clone, serde::Serialize, serde::Deserialize, PartialEq, Debug)]
@@ -134,7 +123,9 @@ impl cainome::cairo_serde::CairoSerde for FieldLayout {
     }
     fn cairo_serialize(__rust: &Self::RustType) -> Vec<starknet::core::types::Felt> {
         let mut __out: Vec<starknet::core::types::Felt> = vec![];
-        __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.selector));
+        __out.extend(starknet::core::types::Felt::cairo_serialize(
+            &__rust.selector,
+        ));
         __out.extend(Layout::cairo_serialize(&__rust.layout));
         __out
     }
@@ -143,10 +134,7 @@ impl cainome::cairo_serde::CairoSerde for FieldLayout {
         __offset: usize,
     ) -> cainome::cairo_serde::Result<Self::RustType> {
         let mut __offset = __offset;
-        let selector = starknet::core::types::Felt::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let selector = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&selector);
         let layout = Layout::cairo_deserialize(__felts, __offset)?;
         __offset += Layout::cairo_serialized_size(&layout);
@@ -166,15 +154,16 @@ impl cainome::cairo_serde::CairoSerde for Member {
     fn cairo_serialized_size(__rust: &Self::RustType) -> usize {
         let mut __size = 0;
         __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.name);
-        __size
-            += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&__rust.attrs);
+        __size += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&__rust.attrs);
         __size += Ty::cairo_serialized_size(&__rust.ty);
         __size
     }
     fn cairo_serialize(__rust: &Self::RustType) -> Vec<starknet::core::types::Felt> {
         let mut __out: Vec<starknet::core::types::Felt> = vec![];
         __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.name));
-        __out.extend(Vec::<starknet::core::types::Felt>::cairo_serialize(&__rust.attrs));
+        __out.extend(Vec::<starknet::core::types::Felt>::cairo_serialize(
+            &__rust.attrs,
+        ));
         __out.extend(Ty::cairo_serialize(&__rust.ty));
         __out
     }
@@ -185,9 +174,7 @@ impl cainome::cairo_serde::CairoSerde for Member {
         let mut __offset = __offset;
         let name = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&name);
-        let attrs = Vec::<
-            starknet::core::types::Felt,
-        >::cairo_deserialize(__felts, __offset)?;
+        let attrs = Vec::<starknet::core::types::Felt>::cairo_deserialize(__felts, __offset)?;
         __offset += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&attrs);
         let ty = Ty::cairo_deserialize(__felts, __offset)?;
         __offset += Ty::cairo_serialized_size(&ty);
@@ -214,15 +201,11 @@ impl cainome::cairo_serde::CairoSerde for ModelDef {
     fn cairo_serialized_size(__rust: &Self::RustType) -> usize {
         let mut __size = 0;
         __size += cainome::cairo_serde::ByteArray::cairo_serialized_size(&__rust.name);
-        __size
-            += cainome::cairo_serde::ByteArray::cairo_serialized_size(&__rust.namespace);
+        __size += cainome::cairo_serde::ByteArray::cairo_serialized_size(&__rust.namespace);
         __size += u8::cairo_serialized_size(&__rust.version);
         __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.selector);
         __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.name_hash);
-        __size
-            += starknet::core::types::Felt::cairo_serialized_size(
-                &__rust.namespace_hash,
-            );
+        __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.namespace_hash);
         __size += Layout::cairo_serialized_size(&__rust.layout);
         __size += Ty::cairo_serialized_size(&__rust.schema);
         __size += Option::<u32>::cairo_serialized_size(&__rust.packed_size);
@@ -231,16 +214,22 @@ impl cainome::cairo_serde::CairoSerde for ModelDef {
     }
     fn cairo_serialize(__rust: &Self::RustType) -> Vec<starknet::core::types::Felt> {
         let mut __out: Vec<starknet::core::types::Felt> = vec![];
-        __out.extend(cainome::cairo_serde::ByteArray::cairo_serialize(&__rust.name));
-        __out
-            .extend(cainome::cairo_serde::ByteArray::cairo_serialize(&__rust.namespace));
+        __out.extend(cainome::cairo_serde::ByteArray::cairo_serialize(
+            &__rust.name,
+        ));
+        __out.extend(cainome::cairo_serde::ByteArray::cairo_serialize(
+            &__rust.namespace,
+        ));
         __out.extend(u8::cairo_serialize(&__rust.version));
-        __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.selector));
-        __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.name_hash));
-        __out
-            .extend(
-                starknet::core::types::Felt::cairo_serialize(&__rust.namespace_hash),
-            );
+        __out.extend(starknet::core::types::Felt::cairo_serialize(
+            &__rust.selector,
+        ));
+        __out.extend(starknet::core::types::Felt::cairo_serialize(
+            &__rust.name_hash,
+        ));
+        __out.extend(starknet::core::types::Felt::cairo_serialize(
+            &__rust.namespace_hash,
+        ));
         __out.extend(Layout::cairo_serialize(&__rust.layout));
         __out.extend(Ty::cairo_serialize(&__rust.schema));
         __out.extend(Option::<u32>::cairo_serialize(&__rust.packed_size));
@@ -252,32 +241,17 @@ impl cainome::cairo_serde::CairoSerde for ModelDef {
         __offset: usize,
     ) -> cainome::cairo_serde::Result<Self::RustType> {
         let mut __offset = __offset;
-        let name = cainome::cairo_serde::ByteArray::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let name = cainome::cairo_serde::ByteArray::cairo_deserialize(__felts, __offset)?;
         __offset += cainome::cairo_serde::ByteArray::cairo_serialized_size(&name);
-        let namespace = cainome::cairo_serde::ByteArray::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let namespace = cainome::cairo_serde::ByteArray::cairo_deserialize(__felts, __offset)?;
         __offset += cainome::cairo_serde::ByteArray::cairo_serialized_size(&namespace);
         let version = u8::cairo_deserialize(__felts, __offset)?;
         __offset += u8::cairo_serialized_size(&version);
-        let selector = starknet::core::types::Felt::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let selector = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&selector);
-        let name_hash = starknet::core::types::Felt::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let name_hash = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&name_hash);
-        let namespace_hash = starknet::core::types::Felt::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let namespace_hash = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&namespace_hash);
         let layout = Layout::cairo_deserialize(__felts, __offset)?;
         __offset += Layout::cairo_serialized_size(&layout);
@@ -312,21 +286,18 @@ impl cainome::cairo_serde::CairoSerde for ResourceMetadata {
     #[inline]
     fn cairo_serialized_size(__rust: &Self::RustType) -> usize {
         let mut __size = 0;
-        __size
-            += starknet::core::types::Felt::cairo_serialized_size(&__rust.resource_id);
-        __size
-            += cainome::cairo_serde::ByteArray::cairo_serialized_size(
-                &__rust.metadata_uri,
-            );
+        __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.resource_id);
+        __size += cainome::cairo_serde::ByteArray::cairo_serialized_size(&__rust.metadata_uri);
         __size
     }
     fn cairo_serialize(__rust: &Self::RustType) -> Vec<starknet::core::types::Felt> {
         let mut __out: Vec<starknet::core::types::Felt> = vec![];
-        __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.resource_id));
-        __out
-            .extend(
-                cainome::cairo_serde::ByteArray::cairo_serialize(&__rust.metadata_uri),
-            );
+        __out.extend(starknet::core::types::Felt::cairo_serialize(
+            &__rust.resource_id,
+        ));
+        __out.extend(cainome::cairo_serde::ByteArray::cairo_serialize(
+            &__rust.metadata_uri,
+        ));
         __out
     }
     fn cairo_deserialize(
@@ -334,17 +305,10 @@ impl cainome::cairo_serde::CairoSerde for ResourceMetadata {
         __offset: usize,
     ) -> cainome::cairo_serde::Result<Self::RustType> {
         let mut __offset = __offset;
-        let resource_id = starknet::core::types::Felt::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
+        let resource_id = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&resource_id);
-        let metadata_uri = cainome::cairo_serde::ByteArray::cairo_deserialize(
-            __felts,
-            __offset,
-        )?;
-        __offset
-            += cainome::cairo_serde::ByteArray::cairo_serialized_size(&metadata_uri);
+        let metadata_uri = cainome::cairo_serde::ByteArray::cairo_deserialize(__felts, __offset)?;
+        __offset += cainome::cairo_serde::ByteArray::cairo_serialized_size(&metadata_uri);
         Ok(ResourceMetadata {
             resource_id,
             metadata_uri,
@@ -364,15 +328,16 @@ impl cainome::cairo_serde::CairoSerde for Struct {
     fn cairo_serialized_size(__rust: &Self::RustType) -> usize {
         let mut __size = 0;
         __size += starknet::core::types::Felt::cairo_serialized_size(&__rust.name);
-        __size
-            += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&__rust.attrs);
+        __size += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&__rust.attrs);
         __size += Vec::<Member>::cairo_serialized_size(&__rust.children);
         __size
     }
     fn cairo_serialize(__rust: &Self::RustType) -> Vec<starknet::core::types::Felt> {
         let mut __out: Vec<starknet::core::types::Felt> = vec![];
         __out.extend(starknet::core::types::Felt::cairo_serialize(&__rust.name));
-        __out.extend(Vec::<starknet::core::types::Felt>::cairo_serialize(&__rust.attrs));
+        __out.extend(Vec::<starknet::core::types::Felt>::cairo_serialize(
+            &__rust.attrs,
+        ));
         __out.extend(Vec::<Member>::cairo_serialize(&__rust.children));
         __out
     }
@@ -383,13 +348,15 @@ impl cainome::cairo_serde::CairoSerde for Struct {
         let mut __offset = __offset;
         let name = starknet::core::types::Felt::cairo_deserialize(__felts, __offset)?;
         __offset += starknet::core::types::Felt::cairo_serialized_size(&name);
-        let attrs = Vec::<
-            starknet::core::types::Felt,
-        >::cairo_deserialize(__felts, __offset)?;
+        let attrs = Vec::<starknet::core::types::Felt>::cairo_deserialize(__felts, __offset)?;
         __offset += Vec::<starknet::core::types::Felt>::cairo_serialized_size(&attrs);
         let children = Vec::<Member>::cairo_deserialize(__felts, __offset)?;
         __offset += Vec::<Member>::cairo_serialized_size(&children);
-        Ok(Struct { name, attrs, children })
+        Ok(Struct {
+            name,
+            attrs,
+            children,
+        })
     }
 }
 #[derive(Clone, serde::Serialize, serde::Deserialize, PartialEq, Debug)]
@@ -416,25 +383,25 @@ impl cainome::cairo_serde::CairoSerde for Event {
         let __index = u128::from_be_bytes(__f.to_bytes_be()[16..].try_into().unwrap());
         match __index as usize {
             _ => {
-                return Err(
-                    cainome::cairo_serde::Error::Deserialize(
-                        format!("Index not handle for enum {}", "Event"),
-                    ),
-                );
+                return Err(cainome::cairo_serde::Error::Deserialize(format!(
+                    "Index not handle for enum {}",
+                    "Event"
+                )));
             }
         }
     }
 }
 impl TryFrom<starknet::core::types::EmittedEvent> for Event {
     type Error = String;
-    fn try_from(
-        event: starknet::core::types::EmittedEvent,
-    ) -> Result<Self, Self::Error> {
+    fn try_from(event: starknet::core::types::EmittedEvent) -> Result<Self, Self::Error> {
         use cainome::cairo_serde::CairoSerde;
         if event.keys.is_empty() {
             return Err("Event has no key".to_string());
         }
-        Err(format!("Could not match any event from keys {:?}", event.keys))
+        Err(format!(
+            "Could not match any event from keys {:?}",
+            event.keys
+        ))
     }
 }
 #[derive(Clone, serde::Serialize, serde::Deserialize, PartialEq, Debug)]
@@ -504,44 +471,32 @@ impl cainome::cairo_serde::CairoSerde for Layout {
         let __f = __felts[__offset];
         let __index = u128::from_be_bytes(__f.to_bytes_be()[16..].try_into().unwrap());
         match __index as usize {
-            0usize => {
-                Ok(Layout::Fixed(Vec::<u8>::cairo_deserialize(__felts, __offset + 1)?))
-            }
-            1usize => {
-                Ok(
-                    Layout::Struct(
-                        Vec::<FieldLayout>::cairo_deserialize(__felts, __offset + 1)?,
-                    ),
-                )
-            }
-            2usize => {
-                Ok(
-                    Layout::Tuple(
-                        Vec::<Layout>::cairo_deserialize(__felts, __offset + 1)?,
-                    ),
-                )
-            }
-            3usize => {
-                Ok(
-                    Layout::Array(
-                        Vec::<Layout>::cairo_deserialize(__felts, __offset + 1)?,
-                    ),
-                )
-            }
+            0usize => Ok(Layout::Fixed(Vec::<u8>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
+            1usize => Ok(Layout::Struct(Vec::<FieldLayout>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
+            2usize => Ok(Layout::Tuple(Vec::<Layout>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
+            3usize => Ok(Layout::Array(Vec::<Layout>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
             4usize => Ok(Layout::ByteArray),
-            5usize => {
-                Ok(
-                    Layout::Enum(
-                        Vec::<FieldLayout>::cairo_deserialize(__felts, __offset + 1)?,
-                    ),
-                )
-            }
+            5usize => Ok(Layout::Enum(Vec::<FieldLayout>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
             _ => {
-                return Err(
-                    cainome::cairo_serde::Error::Deserialize(
-                        format!("Index not handle for enum {}", "Layout"),
-                    ),
-                );
+                return Err(cainome::cairo_serde::Error::Deserialize(format!(
+                    "Index not handle for enum {}",
+                    "Layout"
+                )));
             }
         }
     }
@@ -561,9 +516,7 @@ impl cainome::cairo_serde::CairoSerde for Ty {
     #[inline]
     fn cairo_serialized_size(__rust: &Self::RustType) -> usize {
         match __rust {
-            Ty::Primitive(val) => {
-                starknet::core::types::Felt::cairo_serialized_size(val) + 1
-            }
+            Ty::Primitive(val) => starknet::core::types::Felt::cairo_serialized_size(val) + 1,
             Ty::Struct(val) => Struct::cairo_serialized_size(val) + 1,
             Ty::Enum(val) => Enum::cairo_serialized_size(val) + 1,
             Ty::Tuple(val) => Vec::<Ty>::cairo_serialized_size(val) + 1,
@@ -615,27 +568,28 @@ impl cainome::cairo_serde::CairoSerde for Ty {
         let __f = __felts[__offset];
         let __index = u128::from_be_bytes(__f.to_bytes_be()[16..].try_into().unwrap());
         match __index as usize {
-            0usize => {
-                Ok(
-                    Ty::Primitive(
-                        starknet::core::types::Felt::cairo_deserialize(
-                            __felts,
-                            __offset + 1,
-                        )?,
-                    ),
-                )
-            }
-            1usize => Ok(Ty::Struct(Struct::cairo_deserialize(__felts, __offset + 1)?)),
+            0usize => Ok(Ty::Primitive(
+                starknet::core::types::Felt::cairo_deserialize(__felts, __offset + 1)?,
+            )),
+            1usize => Ok(Ty::Struct(Struct::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
             2usize => Ok(Ty::Enum(Enum::cairo_deserialize(__felts, __offset + 1)?)),
-            3usize => Ok(Ty::Tuple(Vec::<Ty>::cairo_deserialize(__felts, __offset + 1)?)),
-            4usize => Ok(Ty::Array(Vec::<Ty>::cairo_deserialize(__felts, __offset + 1)?)),
+            3usize => Ok(Ty::Tuple(Vec::<Ty>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
+            4usize => Ok(Ty::Array(Vec::<Ty>::cairo_deserialize(
+                __felts,
+                __offset + 1,
+            )?)),
             5usize => Ok(Ty::ByteArray),
             _ => {
-                return Err(
-                    cainome::cairo_serde::Error::Deserialize(
-                        format!("Index not handle for enum {}", "Ty"),
-                    ),
-                );
+                return Err(cainome::cairo_serde::Error::Deserialize(format!(
+                    "Index not handle for enum {}",
+                    "Ty"
+                )));
             }
         }
     }
@@ -643,9 +597,7 @@ impl cainome::cairo_serde::CairoSerde for Ty {
 impl<A: starknet::accounts::ConnectedAccount + Sync> ModelContract<A> {
     #[allow(clippy::ptr_arg)]
     #[allow(clippy::too_many_arguments)]
-    pub fn definition(
-        &self,
-    ) -> cainome::cairo_serde::call::FCall<A::Provider, ModelDef> {
+    pub fn definition(&self) -> cainome::cairo_serde::call::FCall<A::Provider, ModelDef> {
         use cainome::cairo_serde::CairoSerde;
         let mut __calldata = vec![];
         let __call = starknet::core::types::FunctionCall {
@@ -685,9 +637,7 @@ impl<A: starknet::accounts::ConnectedAccount + Sync> ModelContract<A> {
     }
     #[allow(clippy::ptr_arg)]
     #[allow(clippy::too_many_arguments)]
-    pub fn packed_size(
-        &self,
-    ) -> cainome::cairo_serde::call::FCall<A::Provider, Option<u32>> {
+    pub fn packed_size(&self) -> cainome::cairo_serde::call::FCall<A::Provider, Option<u32>> {
         use cainome::cairo_serde::CairoSerde;
         let mut __calldata = vec![];
         let __call = starknet::core::types::FunctionCall {
@@ -725,9 +675,7 @@ impl<A: starknet::accounts::ConnectedAccount + Sync> ModelContract<A> {
     }
     #[allow(clippy::ptr_arg)]
     #[allow(clippy::too_many_arguments)]
-    pub fn unpacked_size(
-        &self,
-    ) -> cainome::cairo_serde::call::FCall<A::Provider, Option<u32>> {
+    pub fn unpacked_size(&self) -> cainome::cairo_serde::call::FCall<A::Provider, Option<u32>> {
         use cainome::cairo_serde::CairoSerde;
         let mut __calldata = vec![];
         let __call = starknet::core::types::FunctionCall {
@@ -753,10 +701,7 @@ impl<P: starknet::providers::Provider + Sync> ModelContractReader<P> {
     }
     #[allow(clippy::ptr_arg)]
     #[allow(clippy::too_many_arguments)]
-    pub fn ensure_abi(
-        &self,
-        model: &ResourceMetadata,
-    ) -> cainome::cairo_serde::call::FCall<P, ()> {
+    pub fn ensure_abi(&self, model: &ResourceMetadata) -> cainome::cairo_serde::call::FCall<P, ()> {
         use cainome::cairo_serde::CairoSerde;
         let mut __calldata = vec![];
         __calldata.extend(ResourceMetadata::cairo_serialize(model));
@@ -805,9 +750,7 @@ impl<P: starknet::providers::Provider + Sync> ModelContractReader<P> {
     }
     #[allow(clippy::ptr_arg)]
     #[allow(clippy::too_many_arguments)]
-    pub fn selector(
-        &self,
-    ) -> cainome::cairo_serde::call::FCall<P, starknet::core::types::Felt> {
+    pub fn selector(&self) -> cainome::cairo_serde::call::FCall<P, starknet::core::types::Felt> {
         use cainome::cairo_serde::CairoSerde;
         let mut __calldata = vec![];
         let __call = starknet::core::types::FunctionCall {

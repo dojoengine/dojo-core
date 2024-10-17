@@ -1,6 +1,7 @@
 use dojo::{
     world::{IWorldDispatcher, IWorldDispatcherTrait},
-    meta::{Layout, introspect::Ty, layout::compute_packed_size}, model::{ModelDefinition, ModelDef, ModelIndex, members::MemberStore},
+    meta::{Layout, introspect::Ty, layout::compute_packed_size},
+    model::{ModelDefinition, ModelDef, ModelIndex, members::MemberStore},
     utils::{entity_id_from_key, serialize_inline, entity_id_from_keys}
 };
 
@@ -175,16 +176,16 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
     fn packed_size() -> Option<usize> {
         compute_packed_size(ModelDefinition::<M>::layout())
     }
-    
+
     fn instance_selector(self: @M) -> felt252 {
         ModelDefinition::<M>::selector()
     }
     fn instance_layout(self: @M) -> Layout {
         ModelDefinition::<M>::layout()
     }
-    
+
     fn definition() -> ModelDef {
-        ModelDef{
+        ModelDef {
             name: Self::name(),
             namespace: Self::namespace(),
             version: Self::version(),
