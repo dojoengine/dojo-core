@@ -1,3 +1,5 @@
+use dojo::world::IWorldDispatcher;
+
 #[starknet::contract]
 pub mod sn_actions {
     #[storage]
