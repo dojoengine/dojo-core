@@ -87,7 +87,7 @@ pub mod world {
     mod iworld;
     pub use iworld::{
         IWorld, IWorldDispatcher, IWorldDispatcherTrait, IUpgradeableWorld,
-        IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait
+        IUpgradeableWorldDispatcher, IUpgradeableWorldDispatcherTrait, get_world_address, get_world
     };
 
     #[cfg(target: "test")]

@@ -3,8 +3,27 @@
 use dojo::meta::Layout;
 use dojo::model::{ModelIndex, ResourceMetadata};
 use starknet::{ClassHash, ContractAddress};
-
+use starknet::{
+    SyscallResultTrait, syscalls::{storage_read_syscall},
+    storage_access::{storage_base_address_from_felt252, storage_address_from_base}
+};
+const WORLD_ADDRESS_STORAGE_ADDRESS: felt252 =
+    0x01704e5494cfadd87ce405d38a662ae6a1d354612ea0ebdc9fefdeb969065774;
 use super::resource::Resource;
+
+pub fn get_world_address() -> ContractAddress {
+    storage_read_syscall(
+        0,
+        storage_address_from_base(storage_base_address_from_felt252(WORLD_ADDRESS_STORAGE_ADDRESS))
+    )
+        .unwrap_syscall()
+        .try_into()
+        .unwrap()
+}
+
+pub fn get_world() -> IWorldDispatcher {
+    IWorldDispatcher { contract_address: get_world_address() }
+}
 
 #[starknet::interface]
 pub trait IUpgradeableWorld<T> {
