@@ -21,9 +21,10 @@ use crate::namespace_config::NamespaceConfig;
 use crate::plugin::syntax::world_param::{self, WorldParamInjectionKind};
 use crate::plugin::syntax::{self_param, utils as syntax_utils};
 
-use super::patches::{CONTRACT_PATCH, DEFAULT_INIT_PATCH};
 use super::DOJO_CONTRACT_ATTR;
 
+const CONTRACT_PATCH: &str = include_str!("./patches/contract.patch.cairo");
+const DEFAULT_INIT_PATCH: &str = include_str!("./patches/default_init.patch.cairo");
 const CONSTRUCTOR_FN: &str = "constructor";
 const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";

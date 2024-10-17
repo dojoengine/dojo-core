@@ -79,16 +79,18 @@ pub mod foo_invalid_name {
             )
         }
 
-        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
-            dojo::model::ModelDefinition {
-                name: self.name(),
-                namespace: self.namespace(),
-                namespace_selector: self.namespace_hash(),
-                version: self.version(),
-                layout: self.layout(),
-                schema: self.schema(),
-                packed_size: self.packed_size(),
-                unpacked_size: self.unpacked_size(),
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::ModelDef {
+                name: Self::name(self),
+                namespace: Self::namespace(self),
+                version: Self::version(self),
+                selector: Self::selector(self),
+                name_hash: Self::name_hash(self),
+                namespace_hash: Self::namespace_hash(self),
+                layout: Self::layout(self),
+                schema: Self::schema(self),
+                packed_size: Self::packed_size(self),
+                unpacked_size: Self::unpacked_size(self),
             }
         }
     }
@@ -152,16 +154,18 @@ pub mod foo_invalid_namespace {
             )
         }
 
-        fn definition(self: @ContractState) -> dojo::model::ModelDefinition {
-            dojo::model::ModelDefinition {
-                name: self.name(),
-                namespace: self.namespace(),
-                namespace_selector: self.namespace_hash(),
-                version: self.version(),
-                layout: self.layout(),
-                schema: self.schema(),
-                packed_size: self.packed_size(),
-                unpacked_size: self.unpacked_size(),
+        fn definition(self: @ContractState) -> dojo::model::ModelDef {
+            dojo::model::ModelDef {
+                name: Self::name(self),
+                namespace: Self::namespace(self),
+                version: Self::version(self),
+                selector: Self::selector(self),
+                name_hash: Self::name_hash(self),
+                namespace_hash: Self::namespace_hash(self),
+                layout: Self::layout(self),
+                schema: Self::schema(self),
+                packed_size: Self::packed_size(self),
+                unpacked_size: Self::unpacked_size(self),
             }
         }
     }
@@ -201,7 +205,7 @@ pub mod test_contract {}
 pub mod test_contract_with_dojo_init_args {
     use dojo::world::IWorldDispatcherTrait;
 
-    fn dojo_init(world: @IWorldDispatcher, _arg1: felt252) {
+    fn dojo_init(ref world: IWorldDispatcher, _arg1: felt252) {
         let _a = world.uuid();
     }
 }

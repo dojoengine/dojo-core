@@ -30,7 +30,7 @@ use super::element::{
     StructParameterParser,
 };
 
-use super::patches::EVENT_PATCH;
+const EVENT_PATCH: &str = include_str!("./patches/event.patch.cairo");
 use super::DOJO_EVENT_ATTR;
 
 pub const PARAMETER_HISTORICAL: &str = "historical";
