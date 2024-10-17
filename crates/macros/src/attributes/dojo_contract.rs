@@ -23,13 +23,15 @@ use crate::syntax::world_param::{self, WorldParamInjectionKind};
 use crate::syntax::{self_param, utils as syntax_utils};
 use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
 
-use super::patches::{CONTRACT_PATCH, DEFAULT_INIT_PATCH};
 use super::struct_parser::validate_namings_diagnostics;
 
 const DOJO_CONTRACT_ATTR: &str = "dojo_contract";
 const CONSTRUCTOR_FN: &str = "constructor";
 const DOJO_INIT_FN: &str = "dojo_init";
 const CONTRACT_NAMESPACE: &str = "namespace";
+
+const CONTRACT_PATCH: &str = include_str!("./patches/contract.patch.cairo");
+const DEFAULT_INIT_PATCH: &str = include_str!("./patches/default_init.patch.cairo");
 
 #[attribute_macro]
 pub fn dojo_contract(args: TokenStream, token_stream: TokenStream) -> ProcMacroResult {

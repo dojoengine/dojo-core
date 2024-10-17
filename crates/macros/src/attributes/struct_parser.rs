@@ -192,22 +192,6 @@ pub fn serialize_keys_and_values(
     });
 }
 
-pub fn deserialize_keys_and_values(
-    members: &[Member],
-    keys_input_name: &str,
-    deserialized_keys: &mut Vec<TokenStream>,
-    values_input_name: &str,
-    deserialized_values: &mut Vec<TokenStream>,
-) {
-    members.iter().for_each(|member| {
-        if member.key {
-            deserialized_keys.push(deserialize_member_ty(member, keys_input_name));
-        } else {
-            deserialized_values.push(deserialize_member_ty(member, values_input_name));
-        }
-    });
-}
-
 /// Creates a [`RewriteNode`] for the member type serialization.
 ///
 /// # Arguments

@@ -26,7 +26,6 @@ use crate::diagnostic_ext::DiagnosticsExt;
 use crate::syntax::utils::parse_arguments_kv;
 use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
 
-use super::patches::EVENT_PATCH;
 use super::struct_parser::{
     parse_members, serialize_keys_and_values, validate_namings_diagnostics,
 };
@@ -36,6 +35,8 @@ const EVENT_NAMESPACE: &str = "namespace";
 const DEFAULT_VERSION: u64 = 0;
 pub const PARAMETER_HISTORICAL: &str = "historical";
 pub const DEFAULT_HISTORICAL_VALUE: bool = true;
+
+const EVENT_PATCH: &str = include_str!("./patches/event.patch.cairo");
 
 /// `#[dojo_event(...)]` attribute macro.
 #[attribute_macro]
