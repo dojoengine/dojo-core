@@ -19,20 +19,17 @@ pub struct Member {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ModelAuxData {
     pub name: String,
-    pub namespace: String,
     pub members: Vec<Member>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ContractAuxData {
     pub name: String,
-    pub namespace: String,
     pub systems: Vec<String>,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct EventAuxData {
     pub name: String,
-    pub namespace: String,
     pub members: Vec<Member>,
 }

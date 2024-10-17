@@ -24,38 +24,12 @@ pub mod $model_type_snake$_definition {
         fn name() -> ByteArray {
             "$model_type$"
         }
-        
-        #[inline(always)]
-        fn namespace() -> ByteArray {
-            "$model_namespace$"
-        }
-        
-        #[inline(always)]
-        fn tag() -> ByteArray {
-            "$model_tag$"
-        }
 
         #[inline(always)]
         fn version() -> u8 {
             $model_version$
         }
-       
-        #[inline(always)]
-        fn selector() -> felt252 {
-            $model_selector$
-        }
-        
-        #[inline(always)]
-        fn name_hash() -> felt252 {
-            $model_name_hash$
-        }
-    
-        #[inline(always)]
-        fn namespace_hash() -> felt252 {
-            $model_namespace_hash$
-        }
-        
-    
+
         #[inline(always)]
         fn layout() -> dojo::meta::Layout {
             dojo::meta::Introspect::<$model_type$>::layout()
@@ -71,9 +45,7 @@ pub mod $model_type_snake$_definition {
             dojo::meta::Introspect::<$model_type$>::size()
         }
     }
-    
 }
-
 
 pub impl $model_type$Definition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$>;
 pub impl $model_type$EntityDefinition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$Entity>;
@@ -102,19 +74,16 @@ pub impl $model_type$EntityParser of dojo::model::entity::EntityParser<$model_ty
     }
 }
 
-
 pub impl $model_type$ModelImpl = dojo::model::model::ModelImpl<$model_type$>;
 pub impl $model_type$Store = dojo::model::model::ModelStoreImpl<$model_type$>;
 
 pub impl $model_type$EntityImpl = dojo::model::entity::EntityImpl<$model_type$Entity>;
 pub impl $model_type$EntityStore = dojo::model::entity::EntityStoreImpl<$model_type$Entity>;
 
-
 #[generate_trait]
 pub impl $model_type$MembersStoreImpl of $model_type$MembersStore {
 $field_accessors$
 }
-
 
 #[starknet::interface]
 pub trait I$model_type$<T> {

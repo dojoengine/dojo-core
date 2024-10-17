@@ -35,18 +35,8 @@ pub trait Model<M> {
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>;
     /// Returns the name of the model.
     fn name() -> ByteArray;
-    /// Returns the namespace of the model.
-    fn namespace() -> ByteArray;
-    /// Returns the tag of the model.
-    fn tag() -> ByteArray;
     /// Returns the version of the model.
     fn version() -> u8;
-    /// Returns the selector of the model.
-    fn selector() -> felt252;
-    /// Returns the name hash of the model.
-    fn name_hash() -> felt252;
-    /// Returns the namespace hash of the model.
-    fn namespace_hash() -> felt252;
     /// Returns the schema of the model.
     fn schema() -> Ty;
     /// Returns the memory layout of the model.
@@ -56,8 +46,6 @@ pub trait Model<M> {
     /// Returns the packed size of the model. Only applicable for fixed size models.
     fn packed_size() -> Option<usize>;
     /// Returns the instance selector of the model.
-    fn instance_selector(self: @M) -> felt252;
-    /// Returns the instance layout of the model.
     fn instance_layout(self: @M) -> Layout;
     /// Returns the definition of the model.
     fn definition() -> ModelDef;
@@ -119,28 +107,8 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
         ModelDefinition::<M>::name()
     }
 
-    fn namespace() -> ByteArray {
-        ModelDefinition::<M>::namespace()
-    }
-
-    fn tag() -> ByteArray {
-        ModelDefinition::<M>::tag()
-    }
-
     fn version() -> u8 {
         ModelDefinition::<M>::version()
-    }
-
-    fn selector() -> felt252 {
-        ModelDefinition::<M>::selector()
-    }
-
-    fn name_hash() -> felt252 {
-        ModelDefinition::<M>::name_hash()
-    }
-
-    fn namespace_hash() -> felt252 {
-        ModelDefinition::<M>::namespace_hash()
     }
 
     fn layout() -> Layout {
@@ -159,10 +127,6 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
         compute_packed_size(ModelDefinition::<M>::layout())
     }
 
-    fn instance_selector(self: @M) -> felt252 {
-        ModelDefinition::<M>::selector()
-    }
-
     fn instance_layout(self: @M) -> Layout {
         ModelDefinition::<M>::layout()
     }
@@ -170,11 +134,7 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
     fn definition() -> ModelDef {
         ModelDef {
             name: Self::name(),
-            namespace: Self::namespace(),
             version: Self::version(),
-            selector: Self::selector(),
-            name_hash: Self::name_hash(),
-            namespace_hash: Self::namespace_hash(),
             layout: Self::layout(),
             schema: Self::schema(),
             packed_size: Self::packed_size(),

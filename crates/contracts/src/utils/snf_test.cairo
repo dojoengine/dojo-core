@@ -10,6 +10,12 @@ pub enum TestResource {
     Contract: ByteArray,
 }
 
+#[derive(Drop)]
+pub struct NamespaceDef {
+    pub namespace: ByteArray,
+    pub resources: Span<TestResource>,
+}
+
 /// Spawns a test world registering namespaces and resources.
 ///
 /// # Arguments
@@ -20,35 +26,45 @@ pub enum TestResource {
 /// # Returns
 ///
 /// * World dispatcher
-pub fn spawn_test_world(
-    namespaces: Span<ByteArray>, resources: Span<TestResource>
-) -> IWorldDispatcher {
+pub fn spawn_test_world(namespaces_defs: Span<NamespaceDef>) -> IWorldDispatcher {
     let world_contract = declare("world").unwrap().contract_class();
     let class_hash_felt: felt252 = (*world_contract.class_hash).into();
     let (world_address, _) = world_contract.deploy(@array![class_hash_felt]).unwrap();
 
     let world = IWorldDispatcher { contract_address: world_address };
 
-    let mut namespaces = namespaces;
-    while let Option::Some(namespace) = namespaces.pop_front() {
+    for ns in namespaces_defs {
+        let namespace = ns.namespace.clone();
         world.register_namespace(namespace.clone());
-    };
 
-    for r in resources {
-        match r {
-            TestResource::Event(name) => {
-                let ch: ClassHash = *declare(name.clone()).unwrap().contract_class().class_hash;
-                world.register_event(ch);
-            },
-            TestResource::Model(name) => {
-                let ch: ClassHash = *declare(name.clone()).unwrap().contract_class().class_hash;
-                world.register_model(ch);
-            },
-            TestResource::Contract(name) => {
-                let ch: ClassHash = *declare(name.clone()).unwrap().contract_class().class_hash;
-                world.register_model(ch);
-            },
-        }
+        for r in ns
+            .resources
+            .clone() {
+                match r {
+                    TestResource::Event(name) => {
+                        let ch: ClassHash = *declare(name.clone())
+                            .unwrap()
+                            .contract_class()
+                            .class_hash;
+                        world.register_event(ch);
+                    },
+                    TestResource::Model(name) => {
+                        let ch: ClassHash = *declare(name.clone())
+                            .unwrap()
+                            .contract_class()
+                            .class_hash;
+                        world.register_model(namespace.clone(), ch);
+                    },
+                    TestResource::Contract(name) => {
+                        let ch: ClassHash = *declare(name.clone())
+                            .unwrap()
+                            .contract_class()
+                            .class_hash;
+                        let salt = dojo::utils::bytearray_hash(name);
+                        world.register_contract(salt, ch);
+                    },
+                }
+            }
     };
 
     world

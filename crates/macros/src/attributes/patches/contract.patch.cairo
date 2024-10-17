@@ -15,28 +15,8 @@ pub mod $name$ {
 
     #[abi(embed_v0)]
     pub impl ContractImpl of IContract<ContractState> {
-        fn name(self: @ContractState) -> ByteArray {
+        fn dojo_name(self: @ContractState) -> ByteArray {
             "$name$"
-        }
-
-        fn namespace(self: @ContractState) -> ByteArray {
-            "$contract_namespace$"
-        }
-
-        fn tag(self: @ContractState) -> ByteArray {
-            "$contract_tag$"
-        }
-
-        fn name_hash(self: @ContractState) -> felt252 {
-            $contract_name_hash$
-        }
-
-        fn namespace_hash(self: @ContractState) -> felt252 {
-            $contract_namespace_hash$
-        }
-
-        fn selector(self: @ContractState) -> felt252 {
-            $contract_selector$
         }
     }
 

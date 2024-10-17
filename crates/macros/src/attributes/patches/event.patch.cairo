@@ -23,38 +23,8 @@ pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
     }
 
     #[inline(always)]
-    fn namespace() -> ByteArray {
-        "$event_namespace$"
-    }
-
-    #[inline(always)]
-    fn tag() -> ByteArray {
-        "$event_tag$"
-    }
-
-    #[inline(always)]
     fn version() -> u8 {
         $event_version$
-    }
-
-    #[inline(always)]
-    fn selector() -> felt252 {
-        $event_selector$
-    }
-
-    #[inline(always)]
-    fn instance_selector(self: @$type_name$) -> felt252 {
-        Self::selector()
-    }
-
-    #[inline(always)]
-    fn name_hash() -> felt252 {
-        $event_name_hash$
-    }
-
-    #[inline(always)]
-    fn namespace_hash() -> felt252 {
-        $event_namespace_hash$
     }
 
     #[inline(always)]
@@ -124,32 +94,12 @@ pub mod $contract_name$ {
 
     #[abi(embed_v0)]
     impl DojoEventImpl of dojo::event::IEvent<ContractState>{
-        fn name(self: @ContractState) -> ByteArray {
+        fn dojo_name(self: @ContractState) -> ByteArray {
            "$type_name$"
-        }
-
-        fn namespace(self: @ContractState) -> ByteArray {
-           "$event_namespace$"
-        }
-
-        fn tag(self: @ContractState) -> ByteArray {
-            "$event_tag$"
         }
 
         fn version(self: @ContractState) -> u8 {
            $event_version$
-        }
-
-        fn selector(self: @ContractState) -> felt252 {
-           $event_selector$
-        }
-
-        fn name_hash(self: @ContractState) -> felt252 {
-            $event_name_hash$
-        }
-
-        fn namespace_hash(self: @ContractState) -> felt252 {
-            $event_namespace_hash$
         }
 
         fn definition(self: @ContractState) -> dojo::event::EventDefinition {

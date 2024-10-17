@@ -14,11 +14,9 @@ use cairo_lang_syntax::node::{ast, Terminal, TypedSyntaxNode};
 use std::collections::HashMap;
 
 use cairo_lang_syntax::node::ast::{MaybeModuleBody, OptionReturnTypeClause};
-use dojo_types::naming;
 
 use crate::aux_data::ContractAuxData;
 use crate::diagnostic_ext::DiagnosticsExt;
-use crate::syntax::utils::parse_arguments_kv;
 use crate::syntax::world_param::{self, WorldParamInjectionKind};
 use crate::syntax::{self_param, utils as syntax_utils};
 use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
@@ -28,26 +26,12 @@ use super::struct_parser::validate_namings_diagnostics;
 const DOJO_CONTRACT_ATTR: &str = "dojo_contract";
 const CONSTRUCTOR_FN: &str = "constructor";
 const DOJO_INIT_FN: &str = "dojo_init";
-const CONTRACT_NAMESPACE: &str = "namespace";
 
 const CONTRACT_PATCH: &str = include_str!("./patches/contract.patch.cairo");
 const DEFAULT_INIT_PATCH: &str = include_str!("./patches/default_init.patch.cairo");
 
 #[attribute_macro]
-pub fn dojo_contract(args: TokenStream, token_stream: TokenStream) -> ProcMacroResult {
-    // Arguments of the macro are already parsed. Hence, we can't use the query_attr since the
-    // attribute that triggered the macro execution is not available in the syntax node.
-    let parsed_args = parse_arguments_kv(&args.to_string());
-
-    let contract_namespace = if let Some(contract_namespace) = parsed_args.get(CONTRACT_NAMESPACE) {
-        contract_namespace.to_string()
-    } else {
-        return ProcMacroResult::new(TokenStream::empty())
-            .with_diagnostics(Diagnostics::new(vec![Diagnostic::error(
-                format!("{DOJO_CONTRACT_ATTR} attribute requires a '{CONTRACT_NAMESPACE}' argument. Use `#[{DOJO_CONTRACT_ATTR} ({CONTRACT_NAMESPACE}: \"<namespace>\")]` to specify the namespace.",
-                ))]));
-    };
-
+pub fn dojo_contract(_args: TokenStream, token_stream: TokenStream) -> ProcMacroResult {
     let db = SimpleParserDatabase::default();
     let (syn_file, _diagnostics) = db.parse_virtual_with_diagnostics(token_stream);
 
@@ -58,14 +42,13 @@ pub fn dojo_contract(args: TokenStream, token_stream: TokenStream) -> ProcMacroR
 
             // TODO: for the error, we need more information like line number of at least the file name.
             // Check first the behavior on error.
-            match DojoContract::from_module(&contract_namespace, &db, &module_ast) {
+            match DojoContract::from_module(&db, &module_ast) {
                 Some(c) => {
                     return ProcMacroResult::new(c.token_stream)
                         .with_diagnostics(Diagnostics::new(c.diagnostics))
                         .with_aux_data(AuxData::new(
                             serde_json::to_vec(&ContractAuxData {
                                 name: c.name.to_string(),
-                                namespace: c.namespace.to_string(),
                                 systems: c.systems.clone(),
                             })
                             .expect("Failed to serialize contract aux data to bytes"),
@@ -82,18 +65,13 @@ pub fn dojo_contract(args: TokenStream, token_stream: TokenStream) -> ProcMacroR
 #[derive(Debug)]
 pub struct DojoContract {
     pub name: String,
-    pub namespace: String,
     pub diagnostics: Vec<Diagnostic>,
     pub systems: Vec<String>,
     pub token_stream: TokenStream,
 }
 
 impl DojoContract {
-    pub fn from_module(
-        contract_namespace: &str,
-        db: &dyn SyntaxGroup,
-        module_ast: &ast::ItemModule,
-    ) -> Option<DojoContract> {
+    pub fn from_module(db: &dyn SyntaxGroup, module_ast: &ast::ItemModule) -> Option<DojoContract> {
         let name = module_ast.name(db).text(db);
 
         let mut contract = DojoContract {
@@ -101,26 +79,15 @@ impl DojoContract {
             systems: vec![],
             token_stream: TokenStream::empty(),
             name: name.to_string(),
-            namespace: String::new(),
         };
-
-        let contract_tag = naming::get_tag(contract_namespace, &name);
-
-        contract.namespace = contract_namespace.to_string();
 
         contract
             .diagnostics
             .extend(validate_attributes(db, module_ast));
 
-        contract.diagnostics.extend(validate_namings_diagnostics(&[
-            ("contract namespace", contract_namespace),
-            ("contract name", &name),
-        ]));
-
-        let contract_name_hash = naming::compute_bytearray_hash(&name);
-        let contract_namespace_hash = naming::compute_bytearray_hash(contract_namespace);
-        let contract_selector =
-            naming::compute_selector_from_hashes(contract_namespace_hash, contract_name_hash);
+        contract
+            .diagnostics
+            .extend(validate_namings_diagnostics(&[("contract name", &name)]));
 
         let mut has_event = false;
         let mut has_storage = false;
@@ -210,28 +177,11 @@ impl DojoContract {
                         "body".to_string(),
                         format!("{}", body_nodes.join_to_token_stream("")),
                     ),
-                    (
-                        "contract_namespace".to_string(),
-                        contract_namespace.to_string(),
-                    ),
-                    (
-                        "contract_name_hash".to_string(),
-                        contract_name_hash.to_string(),
-                    ),
-                    (
-                        "contract_namespace_hash".to_string(),
-                        contract_namespace_hash.to_string(),
-                    ),
-                    (
-                        "contract_selector".to_string(),
-                        contract_selector.to_string(),
-                    ),
-                    ("contract_tag".to_string(), contract_tag),
                 ]),
             );
 
             crate::debug_expand(
-                &format!("CONTRACT PATCH: {contract_namespace}-{name}"),
+                &format!("CONTRACT PATCH: {name}"),
                 &contract.token_stream.to_string(),
             );
 

@@ -1,6 +1,6 @@
 pub mod contract {
-    pub mod contract;
-    pub use contract::{IContract, IContractDispatcher, IContractDispatcherTrait};
+    pub mod interface;
+    pub use interface::{IContract, IContractDispatcher, IContractDispatcherTrait};
 
     pub mod components {
         pub mod upgradeable;
@@ -10,7 +10,10 @@ pub mod contract {
 
 pub mod event {
     pub mod event;
-    pub use event::{Event, EventDefinition, IEvent, IEventDispatcher, IEventDispatcherTrait};
+    pub use event::{Event, EventDefinition};
+
+    pub mod interface;
+    pub use interface::{IEvent, IEventDispatcher, IEventDispatcherTrait};
 
     #[cfg(target: "test")]
     pub use event::{EventTest};
@@ -43,7 +46,7 @@ pub mod model {
     pub use interface::{IModel, IModelDispatcher, IModelDispatcherTrait};
 
     pub mod metadata;
-    pub use metadata::{ResourceMetadata, resource_metadata};
+    pub use metadata::ResourceMetadata;
 
     #[cfg(target: "test")]
     pub use model::{ModelTest};
@@ -81,7 +84,7 @@ pub mod utils {
     };
 
     pub mod hash;
-    pub use hash::{bytearray_hash, selector_from_names};
+    pub use hash::{bytearray_hash, selector_from_names, selector_from_namespace_and_name};
 
     pub mod key;
     pub use key::{entity_id_from_keys, combine_key, entity_id_from_key};
