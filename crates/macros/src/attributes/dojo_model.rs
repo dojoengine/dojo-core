@@ -24,9 +24,7 @@ use crate::diagnostic_ext::DiagnosticsExt;
 use crate::syntax::utils::parse_arguments_kv;
 use crate::token_stream_ext::{TokenStreamExt, TokenStreamsExt};
 
-use super::struct_parser::{
-    parse_members, serialize_member_ty, validate_namings_diagnostics,
-};
+use super::struct_parser::{parse_members, serialize_member_ty, validate_namings_diagnostics};
 
 const DOJO_MODEL_ATTR: &str = "dojo_model";
 const MODEL_NAMESPACE: &str = "namespace";
@@ -183,11 +181,15 @@ impl DojoModel {
         });
 
         if keys.is_empty() {
-            model.diagnostics.push_error("Model must define at least one #[key] attribute".to_string());
+            model
+                .diagnostics
+                .push_error("Model must define at least one #[key] attribute".to_string());
         }
 
         if values.is_empty() {
-            model.diagnostics.push_error("Model must define at least one member that is not a key".to_string());
+            model
+                .diagnostics
+                .push_error("Model must define at least one member that is not a key".to_string());
         }
 
         if !model.diagnostics.is_empty() {
@@ -254,30 +256,15 @@ impl DojoModel {
         let node = TokenStream::interpolate_patched(
             MODEL_CODE_PATCH,
             &HashMap::from([
-                (
-                    "model_type".to_string(),
-                    model_type.clone(),
-                ),
-                (
-                    "model_type_snake".to_string(),
-                    model_type_snake.clone(),
-                ),
-                (
-                    "model_namespace".to_string(),
-                    model_namespace.to_string(),
-                ),
-                (
-                    "model_name_hash".to_string(),
-                    model_name_hash.to_string(),
-                ),
+                ("model_type".to_string(), model_type.clone()),
+                ("model_type_snake".to_string(), model_type_snake.clone()),
+                ("model_namespace".to_string(), model_namespace.to_string()),
+                ("model_name_hash".to_string(), model_name_hash.to_string()),
                 (
                     "model_namespace_hash".to_string(),
                     model_namespace_hash.to_string(),
                 ),
-                (
-                    "model_tag".to_string(),
-                    model_tag.clone(),
-                ),
+                ("model_tag".to_string(), model_tag.clone()),
                 ("model_version".to_string(), model_version.to_string()),
                 ("model_selector".to_string(), model_selector.to_string()),
                 (
@@ -288,10 +275,7 @@ impl DojoModel {
                     "serialized_values".to_string(),
                     serialized_values.join_to_token_stream("\n").to_string(),
                 ),
-                (
-                    "keys_to_tuple".to_string(),
-                    keys_to_tuple,
-                ),
+                ("keys_to_tuple".to_string(), keys_to_tuple),
                 ("key_type".to_string(), key_type),
                 (
                     "members_values".to_string(),

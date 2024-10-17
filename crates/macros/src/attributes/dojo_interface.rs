@@ -163,9 +163,6 @@ impl DojoInterface {
         let params_str =
             self.rewrite_parameters(db, fn_ast.declaration(db).signature(db).parameters(db));
 
-        let declaration_node =
-            TokenStream::new(format!("fn {}({}) {};", fn_name, params_str, return_type));
-
-        declaration_node
+        TokenStream::new(format!("fn {}({}) {};", fn_name, params_str, return_type))
     }
 }
