@@ -27,8 +27,8 @@ use super::element::{
 };
 use super::DOJO_MODEL_ATTR;
 
-const MODEL_CODE_PATCH: &str = include_str!("./templates/model_store.generate.cairo");
-const MODEL_FIELD_CODE_PATCH: &str = include_str!("./templates/model_field_store.generate.cairo");
+const MODEL_CODE_PATCH: &str = include_str!("./patches/model_store.patch.cairo");
+const MODEL_FIELD_CODE_PATCH: &str = include_str!("./patches/model_field_store.patch.cairo");
 type ModelParameters = CommonStructParameters;
 const ENTITY_DERIVE_IGNORE: [&str; 2] = [DOJO_INTROSPECT_DERIVE, DOJO_PACKED_DERIVE];
 
