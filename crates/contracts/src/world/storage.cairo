@@ -21,7 +21,16 @@ pub struct WorldStorage {
 }
 
 #[generate_trait]
-pub impl WorldStorageInternalImpl of WorldStorageInternalTrait {
+pub impl WorldStorageInternalImpl of WorldStorageTrait {
+    fn new(world: IWorldDispatcher, namespace: ByteArray) -> WorldStorage {
+        let namespace_hash = dojo::utils::bytearray_hash(@namespace);
+
+        WorldStorage {
+            world,
+            namespace,
+            namespace_hash,
+        }
+    }
     fn set_namespace(mut self: WorldStorage, namespace: ByteArray) {
         self.namespace = namespace;
         self.namespace_hash = dojo::utils::bytearray_hash(@namespace);

@@ -126,6 +126,7 @@ pub mod world {
     pub use world_contract::world;
 
     pub mod storage;
+    pub use storage::{WorldStorage, WorldStorageTrait};
 }
 
 #[cfg(test)]

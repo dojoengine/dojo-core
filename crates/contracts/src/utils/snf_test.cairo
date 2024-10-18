@@ -46,7 +46,7 @@ pub fn spawn_test_world(namespaces_defs: Span<NamespaceDef>) -> IWorldDispatcher
                             .unwrap()
                             .contract_class()
                             .class_hash;
-                        world.register_event(ch);
+                        world.register_event(namespace.clone(), ch);
                     },
                     TestResource::Model(name) => {
                         let ch: ClassHash = *declare(name.clone())
@@ -61,7 +61,7 @@ pub fn spawn_test_world(namespaces_defs: Span<NamespaceDef>) -> IWorldDispatcher
                             .contract_class()
                             .class_hash;
                         let salt = dojo::utils::bytearray_hash(name);
-                        world.register_contract(salt, ch);
+                        world.register_contract(salt, namespace.clone(), ch);
                     },
                 }
             }
