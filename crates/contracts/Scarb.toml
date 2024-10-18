@@ -3,11 +3,14 @@ cairo-version = "=2.8.4"
 edition = "2024_07"
 description = "The Dojo Core library for autonomous worlds."
 name = "dojo"
-version = "1.0.0-rc.1"
+version = "1.0.0-rc.0"
 
 [dependencies]
 starknet = "=2.8.4"
 dojo_macros = { path = "../macros" }
+
+[dev-dependencies]
+cairo_test = "=2.8.4"
 
 [lib]
 
