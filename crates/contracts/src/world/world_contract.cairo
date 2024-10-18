@@ -46,9 +46,7 @@ pub mod world {
     };
     use dojo::event::{IEventDispatcher, IEventDispatcherTrait};
     use dojo::storage;
-    use dojo::utils::{
-        entity_id_from_keys, bytearray_hash, selector_from_namespace_and_name
-    };
+    use dojo::utils::{entity_id_from_keys, bytearray_hash, selector_from_namespace_and_name};
     use dojo::world::{IWorld, IUpgradeableWorld, Resource, ResourceIsNoneTrait};
     use super::Permission;
 

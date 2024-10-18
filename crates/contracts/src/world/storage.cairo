@@ -2,9 +2,15 @@
 
 use core::panic_with_felt252;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
-use dojo::model::{Model, ModelIndex, ModelDefinition, ModelStorage, MemberModelStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest, ModelValueKey, MemberStore, ModelValue};
+use dojo::model::{
+    Model, ModelIndex, ModelDefinition, ModelStorage, MemberModelStorage, ModelStorageTest,
+    ModelValueStorage, ModelValueStorageTest, ModelValueKey, MemberStore, ModelValue
+};
 use dojo::meta::Layout;
-use dojo::utils::{entity_id_from_key, serialize_inline, entity_id_from_keys, deserialize_unwrap, find_model_field_layout};
+use dojo::utils::{
+    entity_id_from_key, serialize_inline, entity_id_from_keys, deserialize_unwrap,
+    find_model_field_layout
+};
 
 
 #[derive(Drop)]
@@ -26,7 +32,10 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
     fn get<K, +Drop<K>, +Serde<K>>(self: @WorldStorage, key: K) -> M {
         let mut keys = serialize_inline::<K>(@key);
         let mut values = IWorldDispatcherTrait::entity(
-            *self.world, Model::<M>::selector(*self.namespace_hash), ModelIndex::Keys(keys), Model::<M>::layout()
+            *self.world,
+            Model::<M>::selector(*self.namespace_hash),
+            ModelIndex::Keys(keys),
+            Model::<M>::layout()
         );
         match Model::<M>::from_values(ref keys, ref values) {
             Option::Some(model) => model,
@@ -69,13 +78,17 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
     fn get_member<T, K, +MemberModelStorage<WorldStorage, M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: @WorldStorage, key: K, member_id: felt252
     ) -> T {
-        MemberModelStorage::<WorldStorage, M, T>::get_member(self, entity_id_from_key::<K>(@key), member_id)
+        MemberModelStorage::<
+            WorldStorage, M, T
+        >::get_member(self, entity_id_from_key::<K>(@key), member_id)
     }
 
     fn update_member<T, K, +MemberModelStorage<WorldStorage, M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
         self: WorldStorage, key: K, member_id: felt252, value: T
     ) {
-        MemberModelStorage::<WorldStorage, M, T>::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
+        MemberModelStorage::<
+            WorldStorage, M, T
+        >::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
     }
 
     fn namespace_hash(self: @WorldStorage) -> felt252 {
@@ -83,7 +96,9 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
     }
 }
 
-pub impl MemberModelStorageWorldStorageImpl<M, T, +Model<M>, +ModelDefinition<M>, +Serde<T>, +Drop<T>> of MemberModelStorage<WorldStorage, M, T> {
+pub impl MemberModelStorageWorldStorageImpl<
+    M, T, +Model<M>, +ModelDefinition<M>, +Serde<T>, +Drop<T>
+> of MemberModelStorage<WorldStorage, M, T> {
     fn get_member(self: @WorldStorage, entity_id: felt252, member_id: felt252) -> T {
         deserialize_unwrap::<
             T
@@ -114,13 +129,18 @@ pub impl MemberModelStorageWorldStorageImpl<M, T, +Model<M>, +ModelDefinition<M>
 }
 
 impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<WorldStorage, V> {
-    fn get_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(self: @WorldStorage, key: K) -> V {
+    fn get_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(
+        self: @WorldStorage, key: K
+    ) -> V {
         Self::get_model_value_from_id(self, entity_id_from_key(@key))
     }
 
     fn get_model_value_from_id(self: @WorldStorage, entity_id: felt252) -> V {
         let mut values = IWorldDispatcherTrait::entity(
-            *self.world, ModelValue::<V>::selector(*self.namespace_hash), ModelIndex::Id(entity_id), ModelValue::<V>::layout()
+            *self.world,
+            ModelValue::<V>::selector(*self.namespace_hash),
+            ModelIndex::Id(entity_id),
+            ModelValue::<V>::layout()
         );
         match ModelValue::<V>::from_values(entity_id, ref values) {
             Option::Some(entity) => entity,
@@ -148,7 +168,10 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<W
 
     fn delete_from_id(self: WorldStorage, entity_id: felt252) {
         IWorldDispatcherTrait::delete_entity(
-            self.world, ModelValue::<V>::selector(self.namespace_hash), ModelIndex::Id(entity_id), ModelValue::<V>::layout()
+            self.world,
+            ModelValue::<V>::selector(self.namespace_hash),
+            ModelIndex::Id(entity_id),
+            ModelValue::<V>::layout()
         );
     }
 
@@ -165,7 +188,8 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<W
     }
 }
 
-/// Implementation of the `ModelStorageTest` trait for testing purposes, bypassing permission checks.
+/// Implementation of the `ModelStorageTest` trait for testing purposes, bypassing permission
+/// checks.
 #[cfg(target: "test")]
 pub impl ModelStorageTestWorldStorageImpl<M, +Model<M>> of ModelStorageTest<WorldStorage, M> {
     fn set_test(self: WorldStorage, model: @M) {
@@ -195,9 +219,12 @@ pub impl ModelStorageTestWorldStorageImpl<M, +Model<M>> of ModelStorageTest<Worl
     }
 }
 
-/// Implementation of the `ModelValueStorageTest` trait for testing purposes, bypassing permission checks.
+/// Implementation of the `ModelValueStorageTest` trait for testing purposes, bypassing permission
+/// checks.
 #[cfg(target: "test")]
-pub impl ModelValueStorageTestWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorageTest<WorldStorage, V> {
+pub impl ModelValueStorageTestWorldStorageImpl<
+    V, +ModelValue<V>
+> of ModelValueStorageTest<WorldStorage, V> {
     fn update_test(self: WorldStorage, value: @V) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address

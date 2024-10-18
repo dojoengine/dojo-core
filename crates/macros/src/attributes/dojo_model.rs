@@ -2,7 +2,7 @@
 //!
 //!
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use cairo_lang_macro::{
     attribute_macro, AuxData, Diagnostic, Diagnostics, ProcMacroResult, TokenStream,
@@ -121,6 +121,11 @@ impl DojoModel {
         let mut serialized_values: Vec<TokenStream> = vec![];
         let mut field_accessors: Vec<TokenStream> = vec![];
 
+        // The impl constraint for a model `MemberStore` must be defined for each member type.
+        // To avoid double, we keep track of the processed types to skip the double impls.
+        let mut model_member_store_impls_processed: HashSet<String> = HashSet::new();
+        let mut model_member_store_impls: Vec<String> = vec![];
+
         let members = parse_members(
             db,
             &struct_ast.members(db).elements(db),
@@ -141,6 +146,25 @@ impl DojoModel {
                     member.name, member.ty
                 )));
                 field_accessors.push(generate_field_accessors(model_type.clone(), member));
+
+                if !model_member_store_impls_processed.contains(&member.ty.to_string()) {
+                    model_member_store_impls.extend(vec![
+                        format!(
+                            "+dojo::model::storage::MemberModelStorage<S, {}, {}>",
+                            model_type, member.ty
+                        ),
+                        format!(
+                            "+dojo::model::storage::MemberModelStorage<S, {}Value, {}>",
+                            model_type, member.ty
+                        ),
+                        format!(
+                            "+dojo::model::members::MemberStore::<S, {}Value, {}>",
+                            model_type, member.ty
+                        ),
+                    ]);
+
+                    model_member_store_impls_processed.insert(member.ty.to_string());
+                }
             }
         });
 
@@ -244,6 +268,12 @@ impl DojoModel {
                 (
                     "model_value_derive_attr_names".to_string(),
                     model_value_derive_attr_names,
+                ),
+                (
+                    "model_member_store_impls".to_string(),
+                    model_member_store_impls
+                        .join_to_token_stream(",\n")
+                        .to_string(),
                 ),
             ]),
         );

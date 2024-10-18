@@ -15,7 +15,8 @@ pub trait ModelValueParser<V> {
     fn serialize_values(self: @V) -> Span<felt252>;
 }
 
-/// The `ModelValue` trait defines a set of methods that must be implemented by any model value type `V`.
+/// The `ModelValue` trait defines a set of methods that must be implemented by any model value type
+/// `V`.
 /// This trait provides a standardized way to interact with model values, including retrieving their
 /// identifiers, values, and metadata, as well as constructing entities from values.
 pub trait ModelValue<V> {
@@ -38,7 +39,8 @@ pub trait ModelValue<V> {
     fn selector(namespace_hash: felt252) -> felt252;
 }
 
-/// Trait `ModelValueStore` provides an interface for managing model values through a world dispatcher.
+/// Trait `ModelValueStore` provides an interface for managing model values through a world
+/// dispatcher.
 pub trait ModelValueStore<S, V> {
     /// Retrieves a model value based on a given key. The key in this context is a types containing
     /// all the model keys.
@@ -98,7 +100,9 @@ pub impl ModelValueImpl<V, +Serde<V>, +ModelDefinition<V>, +ModelValueParser<V>>
     }
 }
 
-pub impl ModelValueStoreImpl<S, V, +ModelValueStorage<S, V>, +ModelValue<V>, +Drop<V>> of ModelValueStore<S, V> {
+pub impl ModelValueStoreImpl<
+    S, V, +ModelValueStorage<S, V>, +ModelValue<V>, +Drop<V>
+> of ModelValueStore<S, V> {
     fn get_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(self: @S, key: K) -> V {
         ModelValueStorage::<S, V>::get_model_value(self, key)
     }
@@ -141,7 +145,9 @@ pub trait ModelValueTest<S, V> {
 
 /// Implementation of the `ModelValueTest` trait for testing purposes, bypassing permission checks.
 #[cfg(target: "test")]
-pub impl ModelValueTestImpl<S, V, +ModelValueStorageTest<S, V>, +ModelValue<V>> of ModelValueTest<S, V> {
+pub impl ModelValueTestImpl<
+    S, V, +ModelValueStorageTest<S, V>, +ModelValue<V>
+> of ModelValueTest<S, V> {
     fn update_test(self: S, value: V) {
         ModelValueStorageTest::<S, V>::update_test(self, value)
     }

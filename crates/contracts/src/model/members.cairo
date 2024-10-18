@@ -18,7 +18,9 @@ pub trait MemberStore<S, M, T> {
     fn update_member(self: S, entity_id: felt252, member_id: felt252, value: T);
 }
 
-pub impl MemberStoreImpl<S, M, T, +Model<M>, +MemberModelStorage<S, M, T>, +ModelDefinition<M>, +Serde<T>, +Drop<T>> of MemberStore<S, M, T> {
+pub impl MemberStoreImpl<
+    S, M, T, +Model<M>, +MemberModelStorage<S, M, T>, +ModelDefinition<M>, +Serde<T>, +Drop<T>
+> of MemberStore<S, M, T> {
     fn get_member(self: @S, entity_id: felt252, member_id: felt252) -> T {
         MemberModelStorage::<S, M, T>::get_member(self, entity_id, member_id)
     }

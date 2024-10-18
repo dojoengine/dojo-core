@@ -49,7 +49,9 @@ pub mod model {
     pub use metadata::ResourceMetadata;
 
     pub mod storage;
-    pub use storage::{ModelStorage, MemberModelStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest};
+    pub use storage::{
+        ModelStorage, MemberModelStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest
+    };
 
     #[cfg(target: "test")]
     pub use model::{ModelTest};

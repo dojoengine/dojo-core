@@ -84,7 +84,8 @@ pub trait ModelValueStorage<S, V> {
     );
 }
 
-/// A `ModelValueStorageTest` trait that abstracts where the storage is and bypass the permission checks.
+/// A `ModelValueStorageTest` trait that abstracts where the storage is and bypass the permission
+/// checks.
 pub trait ModelValueStorageTest<S, V> {
     /// Updates a model value of type `V`.
     fn update_test(self: S, value: @V);

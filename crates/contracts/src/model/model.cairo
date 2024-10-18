@@ -34,7 +34,8 @@ pub trait Model<M> {
     fn values(self: @M) -> Span<felt252>;
     /// Constructs a model from the given keys and values.
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>;
-    /// Returns the name of the model. (TODO: internalizing the name_hash could reduce poseidon costs).
+    /// Returns the name of the model. (TODO: internalizing the name_hash could reduce poseidon
+    /// costs).
     fn name() -> ByteArray;
     /// Returns the version of the model.
     fn version() -> u8;
@@ -72,12 +73,23 @@ pub trait ModelStore<S, M> {
     fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: S, key: K);
     /// Retrieves a member of type `T` from a model of type `M` using the provided member id and key
     /// of type `K`.
-    fn get_member<T, K, +MemberStore<S, M, T>, +MemberModelStorage<S, M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
+    fn get_member<
+        T, K, +MemberStore<S, M, T>, +MemberModelStorage<S, M, T>, +Drop<T>, +Drop<K>, +Serde<K>
+    >(
         self: @S, key: K, member_id: felt252
     ) -> T;
     /// Updates a member of type `T` within a model of type `M` using the provided member id, key of
     /// type `K`, and new value of type `T`.
-    fn update_member<T, K, +MemberStore<S, M, T>, +MemberModelStorage<S, M, T>, +Drop<S>, +Drop<T>, +Drop<K>, +Serde<K>>(
+    fn update_member<
+        T,
+        K,
+        +MemberStore<S, M, T>,
+        +MemberModelStorage<S, M, T>,
+        +Drop<S>,
+        +Drop<T>,
+        +Drop<K>,
+        +Serde<K>
+    >(
         self: S, key: K, member_id: felt252, value: T
     );
 }
@@ -168,16 +180,29 @@ pub impl ModelStoreImpl<S, M, +ModelStorage<S, M>, +Model<M>, +Drop<M>> of Model
         ModelStorage::<S, M>::delete_from_key(self, key)
     }
 
-    fn get_member<T, K, +MemberStore<S, M, T>, +MemberModelStorage<S, M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
+    fn get_member<
+        T, K, +MemberStore<S, M, T>, +MemberModelStorage<S, M, T>, +Drop<T>, +Drop<K>, +Serde<K>
+    >(
         self: @S, key: K, member_id: felt252
     ) -> T {
         MemberModelStorage::<S, M, T>::get_member(self, entity_id_from_key::<K>(@key), member_id)
     }
 
-    fn update_member<T, K, +MemberStore<S, M, T>, +MemberModelStorage<S, M, T>, +Drop<S>, +Drop<T>, +Drop<K>, +Serde<K>>(
+    fn update_member<
+        T,
+        K,
+        +MemberStore<S, M, T>,
+        +MemberModelStorage<S, M, T>,
+        +Drop<S>,
+        +Drop<T>,
+        +Drop<K>,
+        +Serde<K>
+    >(
         self: S, key: K, member_id: felt252, value: T
     ) {
-        MemberModelStorage::<S, M, T>::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
+        MemberModelStorage::<
+            S, M, T
+        >::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
     }
 }
 
