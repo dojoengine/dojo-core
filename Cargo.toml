@@ -8,6 +8,7 @@ members = [
     "crates/contracts",
     "crates/compiler",
     "crates/types",
+    "crates/macros",
 ]
 
 [workspace.package]
@@ -27,6 +28,7 @@ lto = "fat"
 dojo-contracts = { path = "crates/contracts" }
 dojo-types = { path = "crates/types" }
 dojo-compiler = { path = "crates/compiler" }
+dojo-macros = { path = "crates/macros" }
 
 anyhow = "1.0.80"
 assert_fs = "1.1"

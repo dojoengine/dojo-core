@@ -1,4 +1,4 @@
-use dojo::model::{Model, Entity, ModelStore, EntityStore};
+use dojo::model::{Model, ModelValue, ModelStore};
 use dojo::world::{IWorldDispatcherTrait};
 
 use dojo::tests::helpers::{deploy_world};
@@ -31,8 +31,6 @@ fn test_model_definition() {
     let definition = dojo::model::Model::<Foo>::definition();
 
     assert_eq!(definition.name, dojo::model::Model::<Foo>::name());
-    assert_eq!(definition.namespace, dojo::model::Model::<Foo>::namespace());
-    assert_eq!(definition.namespace_hash, dojo::model::Model::<Foo>::namespace_hash());
     assert_eq!(definition.version, dojo::model::Model::<Foo>::version());
     assert_eq!(definition.layout, dojo::model::Model::<Foo>::layout());
     assert_eq!(definition.schema, dojo::model::Model::<Foo>::schema());
@@ -42,13 +40,13 @@ fn test_model_definition() {
 
 #[test]
 fn test_id() {
-    let mvalues = FooEntity { __id: 1, v1: 3, v2: 4 };
+    let mvalues = FooModelValue { __id: 1, v1: 3, v2: 4 };
     assert!(mvalues.id() == 1);
 }
 
 #[test]
 fn test_values() {
-    let mvalues = FooEntity { __id: 1, v1: 3, v2: 4 };
+    let mvalues = FooModelValue { __id: 1, v1: 3, v2: 4 };
     let expected_values = [3, 4].span();
 
     let values = mvalues.values();

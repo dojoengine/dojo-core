@@ -831,6 +831,17 @@ dependencies = [
 [[package]]
 name = "cairo-lang-macro"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "26c60c78d20f833d8229fa6442de629d73d01e6a238714afdf9c7269d56b4bb7"
+dependencies = [
+ "cairo-lang-macro-attributes",
+ "cairo-lang-macro-stable",
+ "linkme",
+]
+
+[[package]]
+name = "cairo-lang-macro"
+version = "0.1.0"
 source = "git+https://github.com/software-mansion/scarb?tag=v2.8.4#2aa4e193ec930417a8789ceafcfb9dc29963f8e7"
 dependencies = [
  "cairo-lang-macro-attributes",
@@ -1935,6 +1946,21 @@ dependencies = [
  "cairo-lang-language-server",
  "clap",
  "dojo-compiler",
+]
+
+[[package]]
+name = "dojo-macros"
+version = "0.1.0"
+dependencies = [
+ "cairo-lang-macro 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "cairo-lang-parser",
+ "cairo-lang-plugins",
+ "cairo-lang-syntax",
+ "convert_case",
+ "dojo-types",
+ "serde",
+ "serde_json",
+ "starknet",
 ]
 
 [[package]]
@@ -4977,7 +5003,7 @@ dependencies = [
  "cairo-lang-filesystem",
  "cairo-lang-formatter",
  "cairo-lang-lowering",
- "cairo-lang-macro",
+ "cairo-lang-macro 0.1.0 (git+https://github.com/software-mansion/scarb?tag=v2.8.4)",
  "cairo-lang-macro-stable",
  "cairo-lang-parser",
  "cairo-lang-semantic",

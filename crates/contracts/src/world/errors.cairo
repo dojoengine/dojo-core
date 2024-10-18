@@ -38,7 +38,7 @@ pub fn contract_already_registered(namespace: @ByteArray, name: @ByteArray) -> B
     format!("Resource `{}-{}` is already registered", namespace, name)
 }
 
-pub fn model_not_registered(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
+pub fn resource_not_registered_details(namespace: @ByteArray, name: @ByteArray) -> ByteArray {
     format!("Resource `{}-{}` is not registered", namespace, name)
 }
 

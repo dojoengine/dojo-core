@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Result};
 use cainome::cairo_serde::{ByteArray, CairoSerde};
+use regex::Regex;
 use starknet::core::types::Felt;
 use starknet_crypto::poseidon_hash_many;
 
@@ -35,9 +36,13 @@ pub fn is_valid_tag(tag: &str) -> bool {
         Err(_) => return false,
     };
 
-    let re = regex::Regex::new(r"^[a-zA-Z0-9_]+$").unwrap();
+    is_name_valid(&namespace) && is_name_valid(&name)
+}
 
-    re.is_match(&namespace) && re.is_match(&name)
+/// Check if the provided name follows the format rules for Dojo toolchain.
+/// It's not yet enforced at the world level though.
+pub fn is_name_valid(name: &str) -> bool {
+    Regex::new(r"^[a-zA-Z0-9_]+$").unwrap().is_match(name)
 }
 
 /// Get the namespace and the name of a world element from its tag.

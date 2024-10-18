@@ -12,3 +12,8 @@ pub fn bytearray_hash(data: @ByteArray) -> felt252 {
 pub fn selector_from_names(namespace: @ByteArray, name: @ByteArray) -> felt252 {
     poseidon_hash_span([bytearray_hash(namespace), bytearray_hash(name)].span())
 }
+
+/// Computes the selector namespace hash and the name of the resource.
+pub fn selector_from_namespace_and_name(namespace_hash: felt252, name: @ByteArray) -> felt252 {
+    poseidon_hash_span([namespace_hash, bytearray_hash(name)].span())
+}
