@@ -31,8 +31,6 @@ pub impl $type_name$EventImpl of dojo::event::Event<$type_name$> {
     fn definition() -> dojo::event::EventDefinition {
         dojo::event::EventDefinition {
             name: Self::name(),
-            namespace: Self::namespace(),
-            namespace_selector: Self::namespace_hash(),
             version: Self::version(),
             layout: Self::layout(),
             schema: Self::schema()

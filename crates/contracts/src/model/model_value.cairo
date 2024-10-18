@@ -48,18 +48,18 @@ pub trait ModelValueStore<S, V> {
     /// Retrieves a model value based on its id.
     fn get_model_value_from_id(self: @S, entity_id: felt252) -> V;
     /// Updates a model value in the store.
-    fn update(self: S, entity: @V);
+    fn update(ref self: S, entity: @V);
     /// Deletes a model value from the store.
-    fn delete_model_value(self: S, entity: @V);
+    fn delete_model_value(ref self: S, entity: @V);
     /// Deletes a model value based on its id.
-    fn delete_from_id(self: S, entity_id: felt252);
+    fn delete_from_id(ref self: S, entity_id: felt252);
     /// Retrieves a member from a model value based on its id and the member's id.
     fn get_member_from_id<T, +MemberStore<S, V, T>>(
         self: @S, entity_id: felt252, member_id: felt252
     ) -> T;
     /// Updates a member of a model value based on its id and the member's id.
     fn update_member_from_id<T, +MemberStore<S, V, T>>(
-        self: S, entity_id: felt252, member_id: felt252, value: T
+        ref self: S, entity_id: felt252, member_id: felt252, value: T
     );
 }
 
@@ -111,36 +111,36 @@ pub impl ModelValueStoreImpl<
         ModelValueStorage::<S, V>::get_model_value_from_id(self, entity_id)
     }
 
-    fn update(self: S, entity: @V) {
-        ModelValueStorage::<S, V>::update(self, entity)
+    fn update(ref self: S, entity: @V) {
+        ModelValueStorage::<S, V>::update(ref self, entity)
     }
 
-    fn delete_model_value(self: S, entity: @V) {
-        ModelValueStorage::<S, V>::delete_model_value(self, entity)
+    fn delete_model_value(ref self: S, entity: @V) {
+        ModelValueStorage::<S, V>::delete_model_value(ref self, entity)
     }
 
-    fn delete_from_id(self: S, entity_id: felt252) {
-        ModelValueStorage::<S, V>::delete_from_id(self, entity_id)
+    fn delete_from_id(ref self: S, entity_id: felt252) {
+        ModelValueStorage::<S, V>::delete_from_id(ref self, entity_id)
     }
 
-    fn get_member_from_id<T, +MemberStore<S, V, T>>(
+    fn get_member_from_id<T, +MemberModelStorage<S, V, T>>(
         self: @S, entity_id: felt252, member_id: felt252
     ) -> T {
-        MemberStore::<S, V, T>::get_member(self, entity_id, member_id)
+        MemberModelStorage::<S, V, T>::get_member(self, entity_id, member_id)
     }
 
-    fn update_member_from_id<T, +MemberStore<S, V, T>>(
-        self: S, entity_id: felt252, member_id: felt252, value: T
+    fn update_member_from_id<T, +MemberModelStorage<S, V, T>>(
+        ref self: S, entity_id: felt252, member_id: felt252, value: T
     ) {
-        MemberStore::<S, V, T>::update_member(self, entity_id, member_id, value);
+        MemberModelStorage::<S, V, T>::update_member(ref self, entity_id, member_id, value);
     }
 }
 
 /// Test implementation of the `ModelValueTest` trait to bypass permission checks.
 #[cfg(target: "test")]
 pub trait ModelValueTest<S, V> {
-    fn update_test(self: S, value: V);
-    fn delete_test(self: S, value: V);
+    fn update_test(ref self: S, value: @V);
+    fn delete_test(ref self: S, value: @V);
 }
 
 /// Implementation of the `ModelValueTest` trait for testing purposes, bypassing permission checks.
@@ -148,11 +148,11 @@ pub trait ModelValueTest<S, V> {
 pub impl ModelValueTestImpl<
     S, V, +ModelValueStorageTest<S, V>, +ModelValue<V>
 > of ModelValueTest<S, V> {
-    fn update_test(self: S, value: V) {
-        ModelValueStorageTest::<S, V>::update_test(self, value)
+    fn update_test(ref self: S, value: @V) {
+        ModelValueStorageTest::<S, V>::update_test(ref self, value)
     }
 
-    fn delete_test(self: S, value: V) {
-        ModelValueStorageTest::<S, V>::delete_test(self, value)
+    fn delete_test(ref self: S, value: @V) {
+        ModelValueStorageTest::<S, V>::delete_test(ref self, value)
     }
 }

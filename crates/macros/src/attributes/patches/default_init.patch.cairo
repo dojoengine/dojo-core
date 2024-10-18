@@ -6,7 +6,7 @@ pub impl IDojoInitImpl of IDojoInit {
         if starknet::get_caller_address() != self.world_provider.world().contract_address {
             core::panics::panic_with_byte_array(
                 @format!("Only the world can init contract `{}`, but caller is `{:?}`",
-                self.tag(),
+                self.dojo_name(),
                 starknet::get_caller_address(),
             ));
         }

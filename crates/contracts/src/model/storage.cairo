@@ -6,16 +6,16 @@ use dojo::model::model_value::ModelValueKey;
 /// storage solutions (micro worlds).
 pub trait ModelStorage<S, M> {
     /// Sets a model of type `M`.
-    fn set(self: S, model: @M);
+    fn set(ref self: S, model: @M);
 
     /// Retrieves a model of type `M` using the provided key of type `K`.
     fn get<K, +Drop<K>, +Serde<K>>(self: @S, key: K) -> M;
 
     /// Deletes a model of type `M`.
-    fn delete(self: S, model: @M);
+    fn delete(ref self: S, model: @M);
 
     /// Deletes a model of type `M` using the provided key of type `K`.
-    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: S, key: K);
+    fn delete_from_key<K, +Drop<K>, +Serde<K>>(ref self: S, key: K);
 
     /// Retrieves a member of type `T` from a model of type `M` using the provided member id and key
     /// of type `K`.
@@ -26,7 +26,7 @@ pub trait ModelStorage<S, M> {
     /// Updates a member of type `T` within a model of type `M` using the provided member id, key of
     /// type `K`, and new value of type `T`.
     fn update_member<T, K, +MemberModelStorage<S, M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: S, key: K, member_id: felt252, value: T
+        ref self: S, key: K, member_id: felt252, value: T
     );
 
     /// Returns the current namespace hash.
@@ -39,7 +39,7 @@ pub trait MemberModelStorage<S, M, T> {
     fn get_member(self: @S, entity_id: felt252, member_id: felt252) -> T;
 
     /// Updates a member of type `T` for the given entity id and member id.
-    fn update_member(self: S, entity_id: felt252, member_id: felt252, value: T);
+    fn update_member(ref self: S, entity_id: felt252, member_id: felt252, value: T);
 
     /// Returns the current namespace hash.
     fn namespace_hash(self: @S) -> felt252;
@@ -51,9 +51,9 @@ pub trait MemberModelStorage<S, M, T> {
 /// storage solutions (micro worlds).
 pub trait ModelStorageTest<S, M> {
     /// Sets a model of type `M`.
-    fn set_test(self: S, model: @M);
+    fn set_test(ref self: S, model: @M);
     /// Deletes a model of type `M`.
-    fn delete_test(self: S, model: @M);
+    fn delete_test(ref self: S, model: @M);
 }
 
 /// A `ModelValueStorage` trait that abstracts where the storage is.
@@ -65,13 +65,13 @@ pub trait ModelValueStorage<S, V> {
     fn get_model_value_from_id(self: @S, entity_id: felt252) -> V;
 
     /// Updates a model value of type `V`.
-    fn update(self: S, value: @V);
+    fn update(ref self: S, value: @V);
 
     /// Deletes a model value of type `V`.
-    fn delete_model_value(self: S, value: @V);
+    fn delete_model_value(ref self: S, value: @V);
 
     /// Deletes a model value of type `V` using the provided entity id.
-    fn delete_from_id(self: S, entity_id: felt252);
+    fn delete_from_id(ref self: S, entity_id: felt252);
 
     /// Retrieves a member of type `T` from a model value of type `V` using the provided member id.
     fn get_member_from_id<T, +MemberModelStorage<S, V, T>>(
@@ -80,7 +80,7 @@ pub trait ModelValueStorage<S, V> {
 
     /// Updates a member of type `T` within a model value of type `V` using the provided member id.
     fn update_member_from_id<T, +MemberModelStorage<S, V, T>>(
-        self: S, entity_id: felt252, member_id: felt252, value: T
+        ref self: S, entity_id: felt252, member_id: felt252, value: T
     );
 }
 
@@ -88,7 +88,7 @@ pub trait ModelValueStorage<S, V> {
 /// checks.
 pub trait ModelValueStorageTest<S, V> {
     /// Updates a model value of type `V`.
-    fn update_test(self: S, value: @V);
+    fn update_test(ref self: S, value: @V);
     /// Deletes a model value of type `V`.
-    fn delete_test(self: S, value: @V);
+    fn delete_test(ref self: S, value: @V);
 }

@@ -66,11 +66,11 @@ pub trait ModelStore<S, M> {
     /// Retrieves a model of type `M` using the provided key of type `K`.
     fn get<K, +Drop<K>, +Serde<K>>(self: @S, key: K) -> M;
     /// Sets a model of type `M`.
-    fn set(self: S, model: @M);
+    fn set(ref self: S, model: @M);
     /// Deletes a model of type `M`.
-    fn delete(self: S, model: @M);
+    fn delete(ref self: S, model: @M);
     /// Deletes a model of type `M` using the provided key of type `K`.
-    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: S, key: K);
+    fn delete_from_key<K, +Drop<K>, +Serde<K>>(ref self: S, key: K);
     /// Retrieves a member of type `T` from a model of type `M` using the provided member id and key
     /// of type `K`.
     fn get_member<
@@ -90,7 +90,7 @@ pub trait ModelStore<S, M> {
         +Drop<K>,
         +Serde<K>
     >(
-        self: S, key: K, member_id: felt252, value: T
+        ref self: S, key: K, member_id: felt252, value: T
     );
 }
 
@@ -168,16 +168,16 @@ pub impl ModelStoreImpl<S, M, +ModelStorage<S, M>, +Model<M>, +Drop<M>> of Model
         ModelStorage::<S, M>::get(self, key)
     }
 
-    fn set(self: S, model: @M) {
-        ModelStorage::<S, M>::set(self, model)
+    fn set(ref self: S, model: @M) {
+        ModelStorage::<S, M>::set(ref self, model)
     }
 
-    fn delete(self: S, model: @M) {
-        ModelStorage::<S, M>::delete(self, model)
+    fn delete(ref self: S, model: @M) {
+        ModelStorage::<S, M>::delete(ref self, model)
     }
 
-    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: S, key: K) {
-        ModelStorage::<S, M>::delete_from_key(self, key)
+    fn delete_from_key<K, +Drop<K>, +Serde<K>>(ref self: S, key: K) {
+        ModelStorage::<S, M>::delete_from_key(ref self, key)
     }
 
     fn get_member<
@@ -198,11 +198,11 @@ pub impl ModelStoreImpl<S, M, +ModelStorage<S, M>, +Model<M>, +Drop<M>> of Model
         +Drop<K>,
         +Serde<K>
     >(
-        self: S, key: K, member_id: felt252, value: T
+        ref self: S, key: K, member_id: felt252, value: T
     ) {
         MemberModelStorage::<
             S, M, T
-        >::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
+        >::update_member(ref self, entity_id_from_key::<K>(@key), member_id, value);
     }
 }
 
@@ -212,18 +212,18 @@ pub impl ModelStoreImpl<S, M, +ModelStorage<S, M>, +Model<M>, +Drop<M>> of Model
 /// bypassing the permission checks.
 #[cfg(target: "test")]
 pub trait ModelTest<S, M> {
-    fn set_test(self: S, model: @M);
-    fn delete_test(self: S, model: @M);
+    fn set_test(ref self: S, model: @M);
+    fn delete_test(ref self: S, model: @M);
 }
 
 /// The `ModelTestImpl` implementation for testing purposes.
 #[cfg(target: "test")]
 pub impl ModelTestImpl<S, M, +ModelStorageTest<S, M>, +Model<M>> of ModelTest<S, M> {
-    fn set_test(self: S, model: @M) {
-        ModelStorageTest::<S, M>::set_test(self, model);
+    fn set_test(ref self: S, model: @M) {
+        ModelStorageTest::<S, M>::set_test(ref self, model);
     }
 
-    fn delete_test(self: S, model: @M) {
-        ModelStorageTest::<S, M>::delete_test(self, model);
+    fn delete_test(ref self: S, model: @M) {
+        ModelStorageTest::<S, M>::delete_test(ref self, model);
     }
 }

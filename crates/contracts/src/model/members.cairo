@@ -15,7 +15,7 @@ pub trait MemberStore<S, M, T> {
     fn get_member(self: @S, entity_id: felt252, member_id: felt252) -> T;
     /// Updates a member of type `T` within a model of type `M` using the provided member id, key of
     /// type `K`, and new value of type `T`.
-    fn update_member(self: S, entity_id: felt252, member_id: felt252, value: T);
+    fn update_member(ref self: S, entity_id: felt252, member_id: felt252, value: T);
 }
 
 pub impl MemberStoreImpl<
@@ -25,7 +25,7 @@ pub impl MemberStoreImpl<
         MemberModelStorage::<S, M, T>::get_member(self, entity_id, member_id)
     }
 
-    fn update_member(self: S, entity_id: felt252, member_id: felt252, value: T) {
-        MemberModelStorage::<S, M, T>::update_member(self, entity_id, member_id, value)
+    fn update_member(ref self: S, entity_id: felt252, member_id: felt252, value: T) {
+        MemberModelStorage::<S, M, T>::update_member(ref self, entity_id, member_id, value)
     }
 }

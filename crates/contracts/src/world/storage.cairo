@@ -16,8 +16,8 @@ use dojo::utils::{
 #[derive(Drop)]
 pub struct WorldStorage {
     pub world: IWorldDispatcher,
-    namespace: ByteArray,
-    namespace_hash: felt252,
+    pub namespace: ByteArray,
+    pub namespace_hash: felt252,
 }
 
 #[generate_trait]
@@ -25,19 +25,16 @@ pub impl WorldStorageInternalImpl of WorldStorageTrait {
     fn new(world: IWorldDispatcher, namespace: ByteArray) -> WorldStorage {
         let namespace_hash = dojo::utils::bytearray_hash(@namespace);
 
-        WorldStorage {
-            world,
-            namespace,
-            namespace_hash,
-        }
+        WorldStorage { world, namespace, namespace_hash, }
     }
-    fn set_namespace(mut self: WorldStorage, namespace: ByteArray) {
-        self.namespace = namespace;
+
+    fn set_namespace(ref self: WorldStorage, namespace: ByteArray) {
+        self.namespace = namespace.clone();
         self.namespace_hash = dojo::utils::bytearray_hash(@namespace);
     }
 }
 
-pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage<WorldStorage, M> {
+pub impl ModelStorageWorldStorageImpl<M, +Model<M>, +Drop<M>> of ModelStorage<WorldStorage, M> {
     fn get<K, +Drop<K>, +Serde<K>>(self: @WorldStorage, key: K) -> M {
         let mut keys = serialize_inline::<K>(@key);
         let mut values = IWorldDispatcherTrait::entity(
@@ -56,7 +53,7 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
         }
     }
 
-    fn set(self: WorldStorage, model: @M) {
+    fn set(ref self: WorldStorage, model: @M) {
         IWorldDispatcherTrait::set_entity(
             self.world,
             Model::<M>::selector(self.namespace_hash),
@@ -66,7 +63,7 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
         );
     }
 
-    fn delete(self: WorldStorage, model: @M) {
+    fn delete(ref self: WorldStorage, model: @M) {
         IWorldDispatcherTrait::delete_entity(
             self.world,
             Model::<M>::selector(self.namespace_hash),
@@ -75,7 +72,7 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
         );
     }
 
-    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: WorldStorage, key: K) {
+    fn delete_from_key<K, +Drop<K>, +Serde<K>>(ref self: WorldStorage, key: K) {
         IWorldDispatcherTrait::delete_entity(
             self.world,
             Model::<M>::selector(self.namespace_hash),
@@ -93,11 +90,11 @@ pub impl ModelStorageWorldStorageImpl<M, T, +Model<M>, +Drop<M>> of ModelStorage
     }
 
     fn update_member<T, K, +MemberModelStorage<WorldStorage, M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: WorldStorage, key: K, member_id: felt252, value: T
+        ref self: WorldStorage, key: K, member_id: felt252, value: T
     ) {
         MemberModelStorage::<
             WorldStorage, M, T
-        >::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
+        >::update_member(ref self, entity_id_from_key::<K>(@key), member_id, value);
     }
 
     fn namespace_hash(self: @WorldStorage) -> felt252 {
@@ -121,7 +118,8 @@ pub impl MemberModelStorageWorldStorageImpl<
             )
         )
     }
-    fn update_member(self: WorldStorage, entity_id: felt252, member_id: felt252, value: T,) {
+
+    fn update_member(ref self: WorldStorage, entity_id: felt252, member_id: felt252, value: T,) {
         update_serialized_member(
             self.world,
             Model::<M>::selector(self.namespace_hash),
@@ -161,7 +159,7 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<W
         }
     }
 
-    fn update(self: WorldStorage, value: @V) {
+    fn update(ref self: WorldStorage, value: @V) {
         IWorldDispatcherTrait::set_entity(
             self.world,
             ModelValue::<V>::selector(self.namespace_hash),
@@ -171,11 +169,11 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<W
         );
     }
 
-    fn delete_model_value(self: WorldStorage, value: @V) {
-        Self::delete_from_id(self, ModelValue::<V>::id(value));
+    fn delete_model_value(ref self: WorldStorage, value: @V) {
+        Self::delete_from_id(ref self, ModelValue::<V>::id(value));
     }
 
-    fn delete_from_id(self: WorldStorage, entity_id: felt252) {
+    fn delete_from_id(ref self: WorldStorage, entity_id: felt252) {
         IWorldDispatcherTrait::delete_entity(
             self.world,
             ModelValue::<V>::selector(self.namespace_hash),
@@ -191,9 +189,9 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<W
     }
 
     fn update_member_from_id<T, +MemberStore<WorldStorage, V, T>>(
-        self: WorldStorage, entity_id: felt252, member_id: felt252, value: T
+        ref self: WorldStorage, entity_id: felt252, member_id: felt252, value: T
     ) {
-        MemberStore::<WorldStorage, V, T>::update_member(self, entity_id, member_id, value);
+        MemberStore::<WorldStorage, V, T>::update_member(ref self, entity_id, member_id, value);
     }
 }
 
@@ -201,7 +199,7 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of ModelValueStorage<W
 /// checks.
 #[cfg(target: "test")]
 pub impl ModelStorageTestWorldStorageImpl<M, +Model<M>> of ModelStorageTest<WorldStorage, M> {
-    fn set_test(self: WorldStorage, model: @M) {
+    fn set_test(ref self: WorldStorage, model: @M) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address
         };
@@ -214,7 +212,7 @@ pub impl ModelStorageTestWorldStorageImpl<M, +Model<M>> of ModelStorageTest<Worl
         );
     }
 
-    fn delete_test(self: WorldStorage, model: @M) {
+    fn delete_test(ref self: WorldStorage, model: @M) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address
         };
@@ -234,7 +232,7 @@ pub impl ModelStorageTestWorldStorageImpl<M, +Model<M>> of ModelStorageTest<Worl
 pub impl ModelValueStorageTestWorldStorageImpl<
     V, +ModelValue<V>
 > of ModelValueStorageTest<WorldStorage, V> {
-    fn update_test(self: WorldStorage, value: @V) {
+    fn update_test(ref self: WorldStorage, value: @V) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address
         };
@@ -248,7 +246,7 @@ pub impl ModelValueStorageTestWorldStorageImpl<
         );
     }
 
-    fn delete_test(self: WorldStorage, value: @V) {
+    fn delete_test(ref self: WorldStorage, value: @V) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address
         };

@@ -66,13 +66,15 @@ pub fn spawn_test_world(namespaces: Span<ByteArray>, models: Span<felt252>) -> I
         world.register_namespace(namespace.clone());
     };
 
+    let dummy_ns = "dummy";
+
     // Register all models.
     let mut index = 0;
     loop {
         if index == models.len() {
             break ();
         }
-        world.register_model((*models[index]).try_into().unwrap());
+        world.register_model(dummy_ns.clone(), (*models[index]).try_into().unwrap());
         index += 1;
     };
 

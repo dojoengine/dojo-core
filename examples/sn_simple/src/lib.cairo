@@ -43,27 +43,19 @@ pub mod c1 {
     }
 }
 
-#[derive(Introspect, Drop, Serde)]
-#[dojo_event]
-pub struct MyEvent {
-    #[key]
-    pub a: felt252,
-    pub b: felt252,
-}
-
 #[cfg(test)]
 mod tests {
-    use dojo::utils::snf_test::{spawn_test_world, TestResource, WorldTestExt, NamespaceDef};
+    use dojo::utils::snf_test::{spawn_test_world, TestResource, NamespaceDef};
     use dojo::model::ModelStore;
     use dojo::world::WorldStorageTrait;
-    use super::{MyEvent, MyEventEmitter, M};
+    use super::{M, MValue, MMembersStore};
 
     #[test]
     fn dojo_event_emit() {
-        let ns = "sn".to_string();
+        let ns = "sn";
 
         let resources: Span<TestResource> = [
-            TestResource::Event("my_event"),
+            //TestResource::Event("my_event"),
             TestResource::Model("m"),
         ].span();
 
@@ -74,16 +66,24 @@ mod tests {
 
         let world = spawn_test_world([namespace_def].span());
 
-        let world_storage = WorldStorageTrait::new(world, ns);
+        let mut world_storage = WorldStorageTrait::new(world, ns);
+        println!("world_storage: {:?}", world_storage.namespace);
 
-        world_storage.set(@M { a: 1, b: 2 });
-        let m: M = world_storage.get(1);
-        assert(m.a == 1, 'bad a');
-        assert(m.b == 2, 'bad b');
+        let m = M { a: 1, b: 2 };
+        world_storage.set(@m);
 
-        let e1 = MyEvent { a: 1, b: 2 };
-        e1.emit(world);
+        let m2: M = world_storage.get(1);
+        assert(m2.a == 1, 'bad a');
+        assert(m2.b == 2, 'bad b');
 
-        let _e1_address = world_storage.world.resource_contract_address("sn", "MyEvent");
+        world_storage.set_namespace("ns1");
+        println!("world_storage: {:?}", world_storage.namespace);
+
+        let m3: M = world_storage.get(1);
+        assert(m3.a == 1, 'bad a');
+        assert(m3.b == 0, 'bad b');
+
+        //let a: felt252 = MMembersStore::get_b(@world_storage, 1);
+
     }
 }
