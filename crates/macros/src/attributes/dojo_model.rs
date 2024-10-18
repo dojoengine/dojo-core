@@ -210,7 +210,7 @@ impl DojoModel {
         let original_struct = remove_derives(db, struct_ast);
 
         // Ensures models always derive Introspect if not already derived.
-        let entity_derive_attr_names = derive_attr_names
+        let model_value_derive_attr_names = derive_attr_names
             .iter()
             .map(|d| d.as_str())
             .filter(|&d| d != DOJO_INTROSPECT_DERIVE && d != DOJO_PACKED_DERIVE)
@@ -242,15 +242,15 @@ impl DojoModel {
                     field_accessors.join_to_token_stream("\n").to_string(),
                 ),
                 (
-                    "entity_derive_attr_names".to_string(),
-                    entity_derive_attr_names,
+                    "model_value_derive_attr_names".to_string(),
+                    model_value_derive_attr_names,
                 ),
             ]),
         );
 
         model.name = model_name.to_string();
         model.members = members;
-        model.token_stream = vec![derive_node, original_struct, node].join_to_token_stream("");
+        model.token_stream = vec![derive_node, original_struct, node].join_to_token_stream("\n");
 
         crate::debug_expand(
             &format!("MODEL PATCH: {model_name}"),

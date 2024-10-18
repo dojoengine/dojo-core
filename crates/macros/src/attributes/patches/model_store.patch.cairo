@@ -1,5 +1,5 @@
-#[derive($entity_derive_attr_names$)]
-pub struct $model_type$Entity {
+#[derive($model_value_derive_attr_names$)]
+pub struct $model_type$Value {
     __id: felt252, // private field
     $members_values$
 } 
@@ -13,7 +13,7 @@ pub impl $model_type$KeyParser of dojo::model::model::KeyParser<$model_type$, $m
     }
 }
 
-impl $model_type$EntityKey of dojo::model::entity::EntityKey<$model_type$Entity, $model_type$KeyType> {
+impl $model_type$ModelValueKey of dojo::model::model_value::ModelValueKey<$model_type$Value, $model_type$KeyType> {
 }
 
 // Impl to get the static definition of a model
@@ -48,7 +48,7 @@ pub mod $model_type_snake$_definition {
 }
 
 pub impl $model_type$Definition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$>;
-pub impl $model_type$EntityDefinition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$Entity>;
+pub impl $model_type$ModelValueDefinition = $model_type_snake$_definition::$model_type$DefinitionImpl<$model_type$Value>;
 
 pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$>{
     fn serialize_keys(self: @$model_type$) -> Span<felt252> {
@@ -63,11 +63,11 @@ pub impl $model_type$ModelParser of dojo::model::model::ModelParser<$model_type$
     }
 } 
 
-pub impl $model_type$EntityParser of dojo::model::entity::EntityParser<$model_type$Entity>{
-    fn parse_id(self: @$model_type$Entity) -> felt252 {
+pub impl $model_type$ModelValueParser of dojo::model::model_value::ModelValueParser<$model_type$Value>{
+    fn parse_id(self: @$model_type$Value) -> felt252 {
         *self.__id
     }
-    fn serialize_values(self: @$model_type$Entity) -> Span<felt252> {
+    fn serialize_values(self: @$model_type$Value) -> Span<felt252> {
         let mut serialized = core::array::ArrayTrait::new();
         $serialized_values$
         core::array::ArrayTrait::span(@serialized)
@@ -77,8 +77,8 @@ pub impl $model_type$EntityParser of dojo::model::entity::EntityParser<$model_ty
 pub impl $model_type$ModelImpl = dojo::model::model::ModelImpl<$model_type$>;
 pub impl $model_type$Store = dojo::model::model::ModelStoreImpl<$model_type$>;
 
-pub impl $model_type$EntityImpl = dojo::model::entity::EntityImpl<$model_type$Entity>;
-pub impl $model_type$EntityStore = dojo::model::entity::EntityStoreImpl<$model_type$Entity>;
+pub impl $model_type$ModelValueImpl = dojo::model::model_value::ModelValueImpl<$model_type$Value>;
+pub impl $model_type$ModelValueStore = dojo::model::model_value::ModelValueStoreImpl<$model_type$Value>;
 
 #[generate_trait]
 pub impl $model_type$MembersStoreImpl of $model_type$MembersStore {
@@ -113,4 +113,4 @@ pub mod $model_type_snake$ {
 pub impl $model_type$ModelTestImpl = dojo::model::model::ModelTestImpl<$model_type$>;
 
 #[cfg(target: "test")]
-pub impl $model_type$ModelEntityTestImpl = dojo::model::entity::ModelEntityTestImpl<$model_type$Entity>;
+pub impl $model_type$ModelValueTestImpl = dojo::model::model_value::ModelValueTestImpl<$model_type$Value>;

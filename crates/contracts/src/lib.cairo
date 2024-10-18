@@ -39,8 +39,8 @@ pub mod model {
     pub mod model;
     pub use model::{Model, ModelStore};
 
-    pub mod entity;
-    pub use entity::{Entity, EntityStore};
+    pub mod model_value;
+    pub use model_value::{ModelValue, ModelValueStore, ModelValueKey};
 
     pub mod interface;
     pub use interface::{IModel, IModelDispatcher, IModelDispatcherTrait};
@@ -48,11 +48,14 @@ pub mod model {
     pub mod metadata;
     pub use metadata::ResourceMetadata;
 
+    pub mod storage;
+    pub use storage::{ModelStorage, MemberModelStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest};
+
     #[cfg(target: "test")]
     pub use model::{ModelTest};
 
     #[cfg(target: "test")]
-    pub use entity::{ModelEntityTest};
+    pub use model_value::{ModelValueTest};
 }
 
 pub(crate) mod storage {
@@ -119,6 +122,8 @@ pub mod world {
 
     mod world_contract;
     pub use world_contract::world;
+
+    pub mod storage;
 }
 
 #[cfg(test)]
