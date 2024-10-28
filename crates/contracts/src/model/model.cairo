@@ -1,9 +1,9 @@
 use dojo::{
-    world::{IWorldDispatcher, IWorldDispatcherTrait},
     meta::{Layout, introspect::Ty, layout::compute_packed_size},
-    model::{ModelDefinition, ModelDef, ModelIndex, members::MemberStore},
-    utils::{entity_id_from_key, serialize_inline, entity_id_from_keys}
+    utils::entity_id_from_keys
 };
+
+use super::{ModelDefinition, ModelDef};
 
 /// Trait `KeyParser` defines a trait for parsing keys from a given model.
 pub trait KeyParser<M, K> {
@@ -33,20 +33,11 @@ pub trait Model<M> {
     fn values(self: @M) -> Span<felt252>;
     /// Constructs a model from the given keys and values.
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>;
-    /// Returns the name of the model.
+    /// Returns the name of the model. (TODO: internalizing the name_hash could reduce poseidon
+    /// costs).
     fn name() -> ByteArray;
-    /// Returns the namespace of the model.
-    fn namespace() -> ByteArray;
-    /// Returns the tag of the model.
-    fn tag() -> ByteArray;
     /// Returns the version of the model.
     fn version() -> u8;
-    /// Returns the selector of the model.
-    fn selector() -> felt252;
-    /// Returns the name hash of the model.
-    fn name_hash() -> felt252;
-    /// Returns the namespace hash of the model.
-    fn namespace_hash() -> felt252;
     /// Returns the schema of the model.
     fn schema() -> Ty;
     /// Returns the memory layout of the model.
@@ -56,38 +47,11 @@ pub trait Model<M> {
     /// Returns the packed size of the model. Only applicable for fixed size models.
     fn packed_size() -> Option<usize>;
     /// Returns the instance selector of the model.
-    fn instance_selector(self: @M) -> felt252;
-    /// Returns the instance layout of the model.
     fn instance_layout(self: @M) -> Layout;
     /// Returns the definition of the model.
     fn definition() -> ModelDef;
-}
-
-/// The `ModelStore` trait defines a set of methods for managing models through a world dispatcher.
-///
-/// # Type Parameters
-/// - `M`: The type of the model.
-/// - `K`: The type of the key used to identify models.
-/// - `T`: The type of the member within the model.
-pub trait ModelStore<M> {
-    /// Retrieves a model of type `M` using the provided key of type `K`.
-    fn get<K, +Drop<K>, +Serde<K>>(self: @IWorldDispatcher, key: K) -> M;
-    /// Sets a model of type `M`.
-    fn set(self: IWorldDispatcher, model: @M);
-    /// Deletes a model of type `M`.
-    fn delete(self: IWorldDispatcher, model: @M);
-    /// Deletes a model of type `M` using the provided key of type `K`.
-    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K);
-    /// Retrieves a member of type `T` from a model of type `M` using the provided member id and key
-    /// of type `K`.
-    fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: @IWorldDispatcher, key: K, member_id: felt252
-    ) -> T;
-    /// Updates a member of type `T` within a model of type `M` using the provided member id, key of
-    /// type `K`, and new value of type `T`.
-    fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: IWorldDispatcher, key: K, member_id: felt252, value: T
-    );
+    /// Returns the selector of the model computed for the given namespace hash.
+    fn selector(namespace_hash: felt252) -> felt252;
 }
 
 pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<M> {
@@ -119,28 +83,12 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
         ModelDefinition::<M>::name()
     }
 
-    fn namespace() -> ByteArray {
-        ModelDefinition::<M>::namespace()
-    }
-
-    fn tag() -> ByteArray {
-        ModelDefinition::<M>::tag()
+    fn selector(namespace_hash: felt252) -> felt252 {
+        dojo::utils::selector_from_namespace_and_name(namespace_hash, @Self::name())
     }
 
     fn version() -> u8 {
         ModelDefinition::<M>::version()
-    }
-
-    fn selector() -> felt252 {
-        ModelDefinition::<M>::selector()
-    }
-
-    fn name_hash() -> felt252 {
-        ModelDefinition::<M>::name_hash()
-    }
-
-    fn namespace_hash() -> felt252 {
-        ModelDefinition::<M>::namespace_hash()
     }
 
     fn layout() -> Layout {
@@ -159,10 +107,6 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
         compute_packed_size(ModelDefinition::<M>::layout())
     }
 
-    fn instance_selector(self: @M) -> felt252 {
-        ModelDefinition::<M>::selector()
-    }
-
     fn instance_layout(self: @M) -> Layout {
         ModelDefinition::<M>::layout()
     }
@@ -170,11 +114,7 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
     fn definition() -> ModelDef {
         ModelDef {
             name: Self::name(),
-            namespace: Self::namespace(),
             version: Self::version(),
-            selector: Self::selector(),
-            name_hash: Self::name_hash(),
-            namespace_hash: Self::namespace_hash(),
             layout: Self::layout(),
             schema: Self::schema(),
             packed_size: Self::packed_size(),
@@ -183,99 +123,24 @@ pub impl ModelImpl<M, +ModelParser<M>, +ModelDefinition<M>, +Serde<M>> of Model<
     }
 }
 
-pub impl ModelStoreImpl<M, +Model<M>, +Drop<M>> of ModelStore<M> {
-    fn get<K, +Drop<K>, +Serde<K>>(self: @IWorldDispatcher, key: K) -> M {
-        let mut keys = serialize_inline::<K>(@key);
-        let mut values = IWorldDispatcherTrait::entity(
-            *self, Model::<M>::selector(), ModelIndex::Keys(keys), Model::<M>::layout()
-        );
-        match Model::<M>::from_values(ref keys, ref values) {
-            Option::Some(model) => model,
-            Option::None => {
-                panic!(
-                    "Model: deserialization failed. Ensure the length of the keys tuple is matching the number of #[key] fields in the model struct."
-                )
-            }
-        }
-    }
-
-    fn set(self: IWorldDispatcher, model: @M) {
-        IWorldDispatcherTrait::set_entity(
-            self,
-            Model::<M>::selector(),
-            ModelIndex::Keys(Model::<M>::keys(model)),
-            Model::<M>::values(model),
-            Model::<M>::layout()
-        );
-    }
-
-    fn delete(self: IWorldDispatcher, model: @M) {
-        IWorldDispatcherTrait::delete_entity(
-            self,
-            Model::<M>::selector(),
-            ModelIndex::Keys(Model::<M>::keys(model)),
-            Model::<M>::layout()
-        );
-    }
-
-    fn delete_from_key<K, +Drop<K>, +Serde<K>>(self: IWorldDispatcher, key: K) {
-        IWorldDispatcherTrait::delete_entity(
-            self,
-            Model::<M>::selector(),
-            ModelIndex::Keys(serialize_inline::<K>(@key)),
-            Model::<M>::layout()
-        );
-    }
-
-    fn get_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: @IWorldDispatcher, key: K, member_id: felt252
-    ) -> T {
-        MemberStore::<M, T>::get_member(self, entity_id_from_key::<K>(@key), member_id)
-    }
-
-    fn update_member<T, K, +MemberStore<M, T>, +Drop<T>, +Drop<K>, +Serde<K>>(
-        self: IWorldDispatcher, key: K, member_id: felt252, value: T
-    ) {
-        MemberStore::<M, T>::update_member(self, entity_id_from_key::<K>(@key), member_id, value);
-    }
-}
-
 /// The `ModelTest` trait.
 ///
 /// It provides a standardized way to interact with models for testing purposes,
 /// bypassing the permission checks.
 #[cfg(target: "test")]
-pub trait ModelTest<T> {
-    fn set_test(self: @T, world: IWorldDispatcher);
-    fn delete_test(self: @T, world: IWorldDispatcher);
+pub trait ModelTest<S, M> {
+    fn set_model_test(ref self: S, model: @M);
+    fn delete_model_test(ref self: S, model: @M);
 }
 
 /// The `ModelTestImpl` implementation for testing purposes.
 #[cfg(target: "test")]
-pub impl ModelTestImpl<M, +Model<M>> of ModelTest<M> {
-    fn set_test(self: @M, world: dojo::world::IWorldDispatcher) {
-        let world_test = dojo::world::IWorldTestDispatcher {
-            contract_address: world.contract_address
-        };
-        dojo::world::IWorldTestDispatcherTrait::set_entity_test(
-            world_test,
-            Model::<M>::selector(),
-            ModelIndex::Keys(Model::keys(self)),
-            Model::<M>::values(self),
-            Model::<M>::layout()
-        );
+pub impl ModelTestImpl<S, M, +dojo::model::ModelStorageTest<S, M>, +Model<M>> of ModelTest<S, M> {
+    fn set_model_test(ref self: S, model: @M) {
+        dojo::model::ModelStorageTest::<S, M>::write_model_test(ref self, model);
     }
 
-    fn delete_test(self: @M, world: dojo::world::IWorldDispatcher) {
-        let world_test = dojo::world::IWorldTestDispatcher {
-            contract_address: world.contract_address
-        };
-
-        dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
-            world_test,
-            Model::<M>::selector(),
-            ModelIndex::Keys(Model::keys(self)),
-            Model::<M>::layout()
-        );
+    fn delete_model_test(ref self: S, model: @M) {
+        dojo::model::ModelStorageTest::<S, M>::erase_model_test(ref self, model);
     }
 }

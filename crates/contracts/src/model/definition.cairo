@@ -19,25 +19,17 @@ pub enum ModelIndex {
 /// Definition of the model containing all the fields that makes up a model.
 pub trait ModelDefinition<T> {
     fn name() -> ByteArray;
-    fn namespace() -> ByteArray;
-    fn tag() -> ByteArray;
     fn version() -> u8;
-    fn selector() -> felt252;
-    fn name_hash() -> felt252;
-    fn namespace_hash() -> felt252;
     fn layout() -> Layout;
     fn schema() -> Ty;
     fn size() -> Option<usize>;
 }
 
+/// A plain struct with all the fields of a model definition.
 #[derive(Drop, Serde, Debug, PartialEq)]
 pub struct ModelDef {
     pub name: ByteArray,
-    pub namespace: ByteArray,
     pub version: u8,
-    pub selector: felt252,
-    pub name_hash: felt252,
-    pub namespace_hash: felt252,
     pub layout: Layout,
     pub schema: Ty,
     pub packed_size: Option<usize>,

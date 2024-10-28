@@ -59,15 +59,17 @@ pub trait IWorld<T> {
     ///
     /// # Arguments
     ///
+    /// * `namespace` - The namespace of the event to be registered.
     /// * `class_hash` - The class hash of the event to be registered.
-    fn register_event(ref self: T, class_hash: ClassHash);
+    fn register_event(ref self: T, namespace: ByteArray, class_hash: ClassHash);
 
     /// Registers a model in the world.
     ///
     /// # Arguments
     ///
+    /// * `namespace` - The namespace of the model to be registered.
     /// * `class_hash` - The class hash of the model to be registered.
-    fn register_model(ref self: T, class_hash: ClassHash);
+    fn register_model(ref self: T, namespace: ByteArray, class_hash: ClassHash);
 
     /// Registers and deploys a contract associated with the world and returns the address of newly
     /// deployed contract.
@@ -75,8 +77,11 @@ pub trait IWorld<T> {
     /// # Arguments
     ///
     /// * `salt` - The salt use for contract deployment.
+    /// * `namespace` - The namespace of the contract to be registered.
     /// * `class_hash` - The class hash of the contract.
-    fn register_contract(ref self: T, salt: felt252, class_hash: ClassHash) -> ContractAddress;
+    fn register_contract(
+        ref self: T, salt: felt252, namespace: ByteArray, class_hash: ClassHash
+    ) -> ContractAddress;
 
     /// Initializes a contract associated registered in the world.
     ///
@@ -91,23 +96,26 @@ pub trait IWorld<T> {
     ///
     /// # Arguments
     ///
+    /// * `namespace` - The namespace of the event to be upgraded.
     /// * `class_hash` - The class hash of the event to be upgraded.
-    fn upgrade_event(ref self: T, class_hash: ClassHash);
+    fn upgrade_event(ref self: T, namespace: ByteArray, class_hash: ClassHash);
 
     /// Upgrades a model in the world.
     ///
     /// # Arguments
     ///
+    /// * `namespace` - The namespace of the model to be upgraded.
     /// * `class_hash` - The class hash of the model to be upgraded.
-    fn upgrade_model(ref self: T, class_hash: ClassHash);
+    fn upgrade_model(ref self: T, namespace: ByteArray, class_hash: ClassHash);
 
     /// Upgrades an already deployed contract associated with the world and returns the new class
     /// hash.
     ///
     /// # Arguments
     ///
+    /// * `namespace` - The namespace of the contract to be upgraded.
     /// * `class_hash` - The class hash of the contract.
-    fn upgrade_contract(ref self: T, class_hash: ClassHash) -> ClassHash;
+    fn upgrade_contract(ref self: T, namespace: ByteArray, class_hash: ClassHash) -> ClassHash;
 
     /// Emits a custom event that was previously registered in the world.
     /// The dojo event emission is permissioned, since data are collected by
@@ -256,4 +264,7 @@ pub trait IWorldTest<T> {
         values: Span<felt252>,
         historical: bool
     );
+
+    /// Returns the address of a registered contract, panics otherwise.
+    fn dojo_contract_address(self: @T, contract_selector: felt252) -> ContractAddress;
 }

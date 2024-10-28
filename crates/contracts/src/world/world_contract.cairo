@@ -41,12 +41,12 @@ pub mod world {
     };
     use dojo::contract::{IContractDispatcher, IContractDispatcherTrait};
     use dojo::meta::Layout;
-    use dojo::model::{Model, ResourceMetadata, metadata, ModelIndex};
-    use dojo::storage;
-    use dojo::utils::{
-        entity_id_from_keys, bytearray_hash, DescriptorTrait, IDescriptorDispatcher,
-        IDescriptorDispatcherTrait
+    use dojo::model::{
+        Model, ResourceMetadata, metadata, ModelIndex, IModelDispatcher, IModelDispatcherTrait
     };
+    use dojo::event::{IEventDispatcher, IEventDispatcherTrait};
+    use dojo::storage;
+    use dojo::utils::{entity_id_from_keys, bytearray_hash, selector_from_namespace_and_name};
     use dojo::world::{IWorld, IUpgradeableWorld, Resource, ResourceIsNoneTrait};
     use super::Permission;
 
@@ -90,7 +90,9 @@ pub mod world {
     #[derive(Drop, starknet::Event)]
     pub struct ContractRegistered {
         #[key]
-        pub selector: felt252,
+        pub name: ByteArray,
+        #[key]
+        pub namespace: ByteArray,
         pub address: ContractAddress,
         pub class_hash: ClassHash,
         pub salt: felt252,
@@ -254,22 +256,24 @@ pub mod world {
     fn constructor(ref self: ContractState, world_class_hash: ClassHash) {
         let creator = starknet::get_tx_info().unbox().account_contract_address;
 
+        let (internal_ns, internal_ns_hash) = self.world_internal_namespace();
+
+        self.resources.write(internal_ns_hash, Resource::Namespace(internal_ns));
+        self.owners.write((internal_ns_hash, creator), true);
+
         self.resources.write(WORLD, Resource::World);
+        self.owners.write((WORLD, creator), true);
+
+        // This model doesn't need to have the class hash or the contract address
+        // set since they are manually controlled by the world contract.
         self
             .resources
             .write(
-                Model::<ResourceMetadata>::selector(),
+                metadata::resource_metadata_selector(internal_ns_hash),
                 Resource::Model(
-                    (metadata::initial_address(), Model::<ResourceMetadata>::namespace_hash())
+                    (metadata::default_address(), metadata::default_class_hash().into())
                 )
             );
-        self.owners.write((WORLD, creator), true);
-
-        let dojo_namespace = "__DOJO__";
-        let dojo_namespace_hash = bytearray_hash(@dojo_namespace);
-
-        self.resources.write(dojo_namespace_hash, Resource::Namespace(dojo_namespace));
-        self.owners.write((dojo_namespace_hash, creator), true);
 
         self.emit(WorldSpawned { creator, class_hash: world_class_hash });
     }
@@ -311,17 +315,32 @@ pub mod world {
                     }
                 );
         }
+
+        fn dojo_contract_address(
+            self: @ContractState, contract_selector: felt252
+        ) -> ContractAddress {
+            match self.resources.read(contract_selector) {
+                Resource::Contract((a, _)) => a,
+                _ => core::panics::panic_with_byte_array(
+                    @format!("Contract not registered: {}", contract_selector)
+                )
+            }
+        }
     }
 
     #[abi(embed_v0)]
     impl World of IWorld<ContractState> {
         fn metadata(self: @ContractState, resource_selector: felt252) -> ResourceMetadata {
+            let (_, internal_ns_hash) = self.world_internal_namespace();
+
             let mut values = storage::entity_model::read_model_entity(
-                Model::<ResourceMetadata>::selector(),
+                metadata::resource_metadata_selector(internal_ns_hash),
                 entity_id_from_keys([resource_selector].span()),
                 Model::<ResourceMetadata>::layout()
             );
+
             let mut keys = [resource_selector].span();
+
             match Model::<ResourceMetadata>::from_values(ref keys, ref values) {
                 Option::Some(x) => x,
                 Option::None => panic!("Model `ResourceMetadata`: deserialization failed.")
@@ -331,11 +350,13 @@ pub mod world {
         fn set_metadata(ref self: ContractState, metadata: ResourceMetadata) {
             self.assert_caller_permissions(metadata.resource_id, Permission::Owner);
 
+            let (_, internal_ns_hash) = self.world_internal_namespace();
+
             storage::entity_model::write_model_entity(
-                metadata.instance_selector(),
-                metadata.entity_id(),
+                metadata::resource_metadata_selector(internal_ns_hash),
+                metadata.resource_id,
                 metadata.values(),
-                metadata.instance_layout()
+                Model::<ResourceMetadata>::layout()
             );
 
             self
@@ -400,9 +421,11 @@ pub mod world {
             self.emit(WriterUpdated { resource, contract, value: false });
         }
 
-        fn register_event(ref self: ContractState, class_hash: ClassHash) {
+        fn register_event(ref self: ContractState, namespace: ByteArray, class_hash: ClassHash) {
             let caller = get_caller_address();
             let salt = self.events_salt.read();
+
+            let namespace_hash = bytearray_hash(@namespace);
 
             let (contract_address, _) = starknet::syscalls::deploy_syscall(
                 class_hash, salt.into(), [].span(), false,
@@ -410,41 +433,41 @@ pub mod world {
                 .unwrap_syscall();
             self.events_salt.write(salt + 1);
 
-            let descriptor = DescriptorTrait::from_contract_assert(contract_address);
+            let event = IEventDispatcher { contract_address };
+            let event_name = event.dojo_name();
 
-            if !self.is_namespace_registered(descriptor.namespace_hash()) {
-                panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
+            self.assert_name(@event_name);
+
+            let event_selector = selector_from_namespace_and_name(namespace_hash, @event_name);
+
+            if !self.is_namespace_registered(namespace_hash) {
+                panic_with_byte_array(@errors::namespace_not_registered(@namespace));
             }
 
-            self.assert_caller_permissions(descriptor.namespace_hash(), Permission::Owner);
+            self.assert_caller_permissions(namespace_hash, Permission::Owner);
 
-            let maybe_existing_event = self.resources.read(descriptor.selector());
+            let maybe_existing_event = self.resources.read(event_selector);
             if !maybe_existing_event.is_unregistered() {
-                panic_with_byte_array(
-                    @errors::event_already_registered(descriptor.namespace(), descriptor.name())
-                );
+                panic_with_byte_array(@errors::event_already_registered(@namespace, @event_name));
             }
 
             self
                 .resources
-                .write(
-                    descriptor.selector(),
-                    Resource::Event((contract_address, descriptor.namespace_hash()))
-                );
-            self.owners.write((descriptor.selector(), caller), true);
+                .write(event_selector, Resource::Event((contract_address, namespace_hash)));
+            self.owners.write((event_selector, caller), true);
 
             self
                 .emit(
                     EventRegistered {
-                        name: descriptor.name().clone(),
-                        namespace: descriptor.namespace().clone(),
+                        name: event_name.clone(),
+                        namespace: namespace.clone(),
                         address: contract_address,
                         class_hash
                     }
                 );
         }
 
-        fn upgrade_event(ref self: ContractState, class_hash: ClassHash) {
+        fn upgrade_event(ref self: ContractState, namespace: ByteArray, class_hash: ClassHash) {
             let salt = self.events_salt.read();
 
             let (new_contract_address, _) = starknet::syscalls::deploy_syscall(
@@ -454,48 +477,42 @@ pub mod world {
 
             self.events_salt.write(salt + 1);
 
-            let new_descriptor = DescriptorTrait::from_contract_assert(new_contract_address);
+            let namespace_hash = bytearray_hash(@namespace);
 
-            if !self.is_namespace_registered(new_descriptor.namespace_hash()) {
-                panic_with_byte_array(
-                    @errors::namespace_not_registered(new_descriptor.namespace())
-                );
+            let event = IEventDispatcher { contract_address: new_contract_address };
+            let event_name = event.dojo_name();
+            let event_selector = selector_from_namespace_and_name(namespace_hash, @event_name);
+
+            if !self.is_namespace_registered(namespace_hash) {
+                panic_with_byte_array(@errors::namespace_not_registered(@namespace));
             }
 
-            self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
+            self.assert_caller_permissions(event_selector, Permission::Owner);
 
             let mut prev_address = core::num::traits::Zero::<ContractAddress>::zero();
 
-            // If the namespace or name of the event have been changed, the descriptor
+            // If the namespace or name of the event have been changed, the selector
             // will be different, hence not upgradeable.
-            match self.resources.read(new_descriptor.selector()) {
+            match self.resources.read(event_selector) {
                 Resource::Event((model_address, _)) => { prev_address = model_address; },
                 Resource::Unregistered => {
                     panic_with_byte_array(
-                        @errors::event_not_registered(
-                            new_descriptor.namespace(), new_descriptor.name()
-                        )
+                        @errors::resource_not_registered_details(@namespace, @event_name)
                     )
                 },
                 _ => panic_with_byte_array(
-                    @errors::resource_conflict(
-                        @format!("{}-{}", new_descriptor.namespace(), new_descriptor.name()),
-                        @"event"
-                    )
+                    @errors::resource_conflict(@format!("{}-{}", @namespace, @event_name), @"event")
                 )
             };
 
             self
                 .resources
-                .write(
-                    new_descriptor.selector(),
-                    Resource::Event((new_contract_address, new_descriptor.namespace_hash()))
-                );
+                .write(event_selector, Resource::Event((new_contract_address, namespace_hash)));
 
             self
                 .emit(
                     EventUpgraded {
-                        selector: new_descriptor.selector(),
+                        selector: event_selector,
                         prev_address,
                         address: new_contract_address,
                         class_hash,
@@ -503,9 +520,11 @@ pub mod world {
                 );
         }
 
-        fn register_model(ref self: ContractState, class_hash: ClassHash) {
+        fn register_model(ref self: ContractState, namespace: ByteArray, class_hash: ClassHash) {
             let caller = get_caller_address();
             let salt = self.models_salt.read();
+
+            let namespace_hash = bytearray_hash(@namespace);
 
             let (contract_address, _) = starknet::syscalls::deploy_syscall(
                 class_hash, salt.into(), [].span(), false,
@@ -513,44 +532,41 @@ pub mod world {
                 .unwrap_syscall();
             self.models_salt.write(salt + 1);
 
-            let descriptor = DescriptorTrait::from_contract_assert(contract_address);
+            let model = IModelDispatcher { contract_address };
+            let model_name = model.dojo_name();
 
-            self.assert_namespace(descriptor.namespace());
-            self.assert_name(descriptor.name());
+            self.assert_name(@model_name);
 
-            if !self.is_namespace_registered(descriptor.namespace_hash()) {
-                panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
+            let model_selector = selector_from_namespace_and_name(namespace_hash, @model_name);
+
+            if !self.is_namespace_registered(namespace_hash) {
+                panic_with_byte_array(@errors::namespace_not_registered(@namespace));
             }
 
-            self.assert_caller_permissions(descriptor.namespace_hash(), Permission::Owner);
+            self.assert_caller_permissions(namespace_hash, Permission::Owner);
 
-            let maybe_existing_model = self.resources.read(descriptor.selector());
+            let maybe_existing_model = self.resources.read(model_selector);
             if !maybe_existing_model.is_unregistered() {
-                panic_with_byte_array(
-                    @errors::model_already_registered(descriptor.namespace(), descriptor.name())
-                );
+                panic_with_byte_array(@errors::model_already_registered(@namespace, @model_name));
             }
 
             self
                 .resources
-                .write(
-                    descriptor.selector(),
-                    Resource::Model((contract_address, descriptor.namespace_hash()))
-                );
-            self.owners.write((descriptor.selector(), caller), true);
+                .write(model_selector, Resource::Model((contract_address, namespace_hash)));
+            self.owners.write((model_selector, caller), true);
 
             self
                 .emit(
                     ModelRegistered {
-                        name: descriptor.name().clone(),
-                        namespace: descriptor.namespace().clone(),
+                        name: model_name.clone(),
+                        namespace: namespace.clone(),
                         address: contract_address,
                         class_hash
                     }
                 );
         }
 
-        fn upgrade_model(ref self: ContractState, class_hash: ClassHash) {
+        fn upgrade_model(ref self: ContractState, namespace: ByteArray, class_hash: ClassHash) {
             let salt = self.models_salt.read();
 
             let (new_contract_address, _) = starknet::syscalls::deploy_syscall(
@@ -560,51 +576,45 @@ pub mod world {
 
             self.models_salt.write(salt + 1);
 
-            let new_descriptor = DescriptorTrait::from_contract_assert(new_contract_address);
+            let namespace_hash = bytearray_hash(@namespace);
 
-            self.assert_namespace(new_descriptor.namespace());
-            self.assert_name(new_descriptor.name());
+            let model = IModelDispatcher { contract_address: new_contract_address };
+            let model_name = model.dojo_name();
+            let model_selector = selector_from_namespace_and_name(namespace_hash, @model_name);
 
-            if !self.is_namespace_registered(new_descriptor.namespace_hash()) {
-                panic_with_byte_array(
-                    @errors::namespace_not_registered(new_descriptor.namespace())
-                );
+            if !self.is_namespace_registered(namespace_hash) {
+                panic_with_byte_array(@errors::namespace_not_registered(@namespace));
             }
 
-            self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
+            self.assert_caller_permissions(model_selector, Permission::Owner);
 
             let mut prev_address = core::num::traits::Zero::<ContractAddress>::zero();
 
-            // If the namespace or name of the model have been changed, the descriptor
-            // will be different, hence not upgradeable.
-            match self.resources.read(new_descriptor.selector()) {
+            // If the namespace or name of the model have been changed, the selector
+            // will be different, hence detected as not registered as model.
+            match self.resources.read(model_selector) {
                 Resource::Model((model_address, _)) => { prev_address = model_address; },
                 Resource::Unregistered => {
                     panic_with_byte_array(
-                        @errors::model_not_registered(
-                            new_descriptor.namespace(), new_descriptor.name()
-                        )
+                        @errors::resource_not_registered_details(@namespace, @model_name)
                     )
                 },
                 _ => panic_with_byte_array(
-                    @errors::resource_conflict(
-                        @format!("{}-{}", new_descriptor.namespace(), new_descriptor.name()),
-                        @"model"
-                    )
+                    @errors::resource_conflict(@format!("{}-{}", @namespace, @model_name), @"model")
                 )
             };
 
+            // TODO(@remy): check upgradeability with the actual content of the model.
+            // Use `prev_address` to get the previous model address and get `Ty` from it.
+
             self
                 .resources
-                .write(
-                    new_descriptor.selector(),
-                    Resource::Model((new_contract_address, new_descriptor.namespace_hash()))
-                );
+                .write(model_selector, Resource::Model((new_contract_address, namespace_hash)));
 
             self
                 .emit(
                     ModelUpgraded {
-                        selector: new_descriptor.selector(),
+                        selector: model_selector,
                         prev_address,
                         address: new_contract_address,
                         class_hash,
@@ -636,85 +646,89 @@ pub mod world {
         }
 
         fn register_contract(
-            ref self: ContractState, salt: felt252, class_hash: ClassHash,
+            ref self: ContractState, salt: felt252, namespace: ByteArray, class_hash: ClassHash,
         ) -> ContractAddress {
             let caller = get_caller_address();
 
             let (contract_address, _) = deploy_syscall(class_hash, salt, [].span(), false)
                 .unwrap_syscall();
 
-            let descriptor = DescriptorTrait::from_contract_assert(contract_address);
+            let namespace_hash = bytearray_hash(@namespace);
 
-            self.assert_namespace(descriptor.namespace());
-            self.assert_name(descriptor.name());
+            let contract = IContractDispatcher { contract_address };
+            let contract_name = contract.dojo_name();
+            let contract_selector = selector_from_namespace_and_name(
+                namespace_hash, @contract_name
+            );
 
-            let maybe_existing_contract = self.resources.read(descriptor.selector());
+            self.assert_name(@contract_name);
+
+            let maybe_existing_contract = self.resources.read(contract_selector);
             if !maybe_existing_contract.is_unregistered() {
                 panic_with_byte_array(
-                    @errors::contract_already_registered(descriptor.namespace(), descriptor.name())
+                    @errors::contract_already_registered(@namespace, @contract_name)
                 );
             }
 
-            if !self.is_namespace_registered(descriptor.namespace_hash()) {
-                panic_with_byte_array(@errors::namespace_not_registered(descriptor.namespace()));
+            if !self.is_namespace_registered(namespace_hash) {
+                panic_with_byte_array(@errors::namespace_not_registered(@namespace));
             }
 
-            self.assert_caller_permissions(descriptor.namespace_hash(), Permission::Owner);
+            self.assert_caller_permissions(namespace_hash, Permission::Owner);
 
-            self.owners.write((descriptor.selector(), caller), true);
+            self.owners.write((contract_selector, caller), true);
             self
                 .resources
-                .write(
-                    descriptor.selector(),
-                    Resource::Contract((contract_address, descriptor.namespace_hash()))
-                );
+                .write(contract_selector, Resource::Contract((contract_address, namespace_hash)));
 
             self
                 .emit(
                     ContractRegistered {
-                        salt,
-                        class_hash,
-                        address: contract_address,
-                        selector: descriptor.selector(),
+                        salt, class_hash, address: contract_address, namespace, name: contract_name,
                     }
                 );
 
             contract_address
         }
 
-        fn upgrade_contract(ref self: ContractState, class_hash: ClassHash) -> ClassHash {
-            // Using a library call is not safe as arbitrary code is executed.
-            // But deploying the contract we can check the descriptor.
-            // If a new syscall supports calling library code with safety checks, we could switch
-            // back to using it. But for now, this is the safest option even if it's more expensive.
-            let (check_address, _) = deploy_syscall(
+        fn upgrade_contract(
+            ref self: ContractState, namespace: ByteArray, class_hash: ClassHash
+        ) -> ClassHash {
+            let (new_contract_address, _) = deploy_syscall(
                 class_hash, starknet::get_tx_info().unbox().transaction_hash, [].span(), false
             )
                 .unwrap_syscall();
 
-            let new_descriptor = DescriptorTrait::from_contract_assert(check_address);
+            let namespace_hash = bytearray_hash(@namespace);
 
-            self.assert_namespace(new_descriptor.namespace());
-            self.assert_name(new_descriptor.name());
+            let contract = IContractDispatcher { contract_address: new_contract_address };
+            let contract_name = contract.dojo_name();
+            let contract_selector = selector_from_namespace_and_name(
+                namespace_hash, @contract_name
+            );
 
-            if let Resource::Contract((contract_address, _)) = self
-                .resources
-                .read(new_descriptor.selector()) {
-                self.assert_caller_permissions(new_descriptor.selector(), Permission::Owner);
+            // If namespace and name are the same, the contract is already registered and we
+            // can upgrade it.
+            match self.resources.read(contract_selector) {
+                Resource::Contract((
+                    contract_address, _
+                )) => {
+                    self.assert_caller_permissions(contract_selector, Permission::Owner);
 
-                let existing_descriptor = DescriptorTrait::from_contract_assert(contract_address);
+                    IUpgradeableDispatcher { contract_address }.upgrade(class_hash);
+                    self.emit(ContractUpgraded { class_hash, selector: contract_selector });
 
-                assert!(
-                    existing_descriptor == new_descriptor, "invalid contract descriptor for upgrade"
-                );
-
-                IUpgradeableDispatcher { contract_address }.upgrade(class_hash);
-                self.emit(ContractUpgraded { class_hash, selector: new_descriptor.selector() });
-
-                class_hash
-            } else {
-                panic_with_byte_array(
-                    @errors::resource_conflict(new_descriptor.name(), @"contract")
+                    class_hash
+                },
+                Resource::Unregistered => {
+                    panic_with_byte_array(
+                        @errors::resource_not_registered_details(@namespace, @contract_name)
+                    )
+                },
+                _ => panic_with_byte_array(
+                    @errors::resource_conflict(
+                        @format!("{}-{}", @namespace, @contract_name), @"contract"
+                    )
                 )
             }
         }
@@ -723,7 +737,9 @@ pub mod world {
             if let Resource::Contract((contract_address, _)) = self.resources.read(selector) {
                 if self.initialized_contracts.read(selector) {
                     let dispatcher = IContractDispatcher { contract_address };
-                    panic_with_byte_array(@errors::contract_already_initialized(@dispatcher.tag()));
+                    panic_with_byte_array(
+                        @errors::contract_already_initialized(@dispatcher.dojo_name())
+                    );
                 } else {
                     self.assert_caller_permissions(selector, Permission::Owner);
 
@@ -953,20 +969,20 @@ pub mod world {
                 Resource::Contract((
                     contract_address, _
                 )) => {
-                    let d = IDescriptorDispatcher { contract_address };
-                    format!("contract (or its namespace) `{}`", d.tag())
+                    let d = IContractDispatcher { contract_address };
+                    format!("contract (or its namespace) `{}`", d.dojo_name())
                 },
                 Resource::Event((
                     contract_address, _
                 )) => {
-                    let d = IDescriptorDispatcher { contract_address };
-                    format!("event (or its namespace) `{}`", d.tag())
+                    let d = IEventDispatcher { contract_address };
+                    format!("event (or its namespace) `{}`", d.dojo_name())
                 },
                 Resource::Model((
                     contract_address, _
                 )) => {
-                    let d = IDescriptorDispatcher { contract_address };
-                    format!("model (or its namespace) `{}`", d.tag())
+                    let d = IModelDispatcher { contract_address };
+                    format!("model (or its namespace) `{}`", d.dojo_name())
                 },
                 Resource::Namespace(ns) => { format!("namespace `{}`", ns) },
                 Resource::World => { format!("world") },
@@ -984,8 +1000,8 @@ pub mod world {
                 // If the contract is not an account or a dojo contract, tests will display
                 // "CONTRACT_NOT_DEPLOYED" as the error message. In production, the error message
                 // will display "ENTRYPOINT_NOT_FOUND".
-                let d = IDescriptorDispatcher { contract_address: caller };
-                format!("Contract `{}`", d.tag())
+                let d = IContractDispatcher { contract_address: caller };
+                format!("Contract `{}`", d.dojo_name())
             };
 
             panic_with_byte_array(
@@ -1072,6 +1088,14 @@ pub mod world {
                 },
                 ModelIndex::MemberId(_) => { panic_with_felt252(errors::DELETE_ENTITY_MEMBER); }
             }
+        }
+
+        /// Returns the hash of the internal namespace for a dojo world.
+        fn world_internal_namespace(self: @ContractState) -> (ByteArray, felt252) {
+            let name = "__DOJO__";
+            let hash = bytearray_hash(@name);
+
+            (name, hash)
         }
     }
 }
