@@ -920,6 +920,7 @@ pub mod world {
             let namespace_hash = match self.resources.read(resource_selector) {
                 Resource::Contract((_, namespace_hash)) => { namespace_hash },
                 Resource::Model((_, namespace_hash)) => { namespace_hash },
+                Resource::Event((_, namespace_hash)) => { namespace_hash },
                 Resource::Unregistered => {
                     panic_with_byte_array(@errors::resource_not_registered(resource_selector))
                 },
