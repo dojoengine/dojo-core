@@ -132,28 +132,9 @@ Block(
                     pattern: Variable(
                         __Health,
                     ),
-                    expr: FunctionCall(
-                        ExprFunctionCall {
-                            function: ?4::get::<core::felt252, core::felt252Drop, core::Felt252Serde>,
-                            args: [
-                                Value(
-                                    Snapshot(
-                                        ExprSnapshot {
-                                            inner: Var(
-                                                LocalVarId(test::world),
-                                            ),
-                                            ty: @dojo::world::iworld::IWorldDispatcher,
-                                        },
-                                    ),
-                                ),
-                                Value(
-                                    Var(
-                                        LocalVarId(test::key),
-                                    ),
-                                ),
-                            ],
-                            coupon_arg: None,
-                            ty: test::Health,
+                    expr: Missing(
+                        ExprMissing {
+                            ty: <missing>,
                         },
                     ),
                 },
@@ -169,7 +150,17 @@ Block(
 )
 
 //! > semantic_diagnostics
-error: Trait has no implementation in context: dojo::model::model::ModelStore::<test::Health>.
+error: Identifier not found.
  --> lib.cairo:12:1
 get!(world, key, (Health))
 ^************************^
+
+warning[E0001]: Unused variable. Consider ignoring by prefixing with `_`.
+ --> lib.cairo:10:22
+fn test_func() { let key: felt252 = 0xb0b;
+                     ^*^
+
+warning[E0001]: Unused variable. Consider ignoring by prefixing with `_`.
+ --> lib.cairo:11:5
+let world = IWorldDispatcher{contract_address: 0x0.try_into().unwrap()}; {
+    ^***^

@@ -1,6 +1,6 @@
 pub mod contract {
-    pub mod contract;
-    pub use contract::{IContract, IContractDispatcher, IContractDispatcherTrait};
+    pub mod interface;
+    pub use interface::{IContract, IContractDispatcher, IContractDispatcherTrait};
 
     pub mod components {
         pub mod upgradeable;
@@ -10,10 +10,13 @@ pub mod contract {
 
 pub mod event {
     pub mod event;
-    pub use event::{Event, EventDefinition, IEvent, IEventDispatcher, IEventDispatcherTrait};
+    pub use event::{Event, EventDefinition};
 
-    #[cfg(target: "test")]
-    pub use event::{EventTest};
+    pub mod interface;
+    pub use interface::{IEvent, IEventDispatcher, IEventDispatcherTrait};
+
+    pub mod storage;
+    pub use storage::{EventStorage, EventStorageTest};
 }
 
 pub mod meta {
@@ -30,56 +33,41 @@ pub mod model {
     pub mod definition;
     pub use definition::{ModelIndex, ModelDefinition, ModelDef};
 
-    pub mod members;
-    pub use members::{MemberStore};
-
     pub mod model;
-    pub use model::{Model, ModelStore};
+    pub use model::{Model, KeyParser};
 
-    pub mod entity;
-    pub use entity::{Entity, EntityStore};
+    pub mod model_value;
+    pub use model_value::{ModelValue, ModelValueKey};
 
     pub mod interface;
     pub use interface::{IModel, IModelDispatcher, IModelDispatcherTrait};
 
     pub mod metadata;
-    pub use metadata::{ResourceMetadata, resource_metadata};
+    pub use metadata::ResourceMetadata;
+
+    pub mod storage;
+    pub use storage::{
+        ModelStorage, ModelMemberStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest
+    };
 
     #[cfg(target: "test")]
     pub use model::{ModelTest};
 
     #[cfg(target: "test")]
-    pub use entity::{ModelEntityTest};
+    pub use model_value::{ModelValueTest};
 }
 
-pub(crate) mod storage {
-    pub(crate) mod database;
-    pub(crate) mod packing;
-    pub(crate) mod layout;
-    pub(crate) mod storage;
-    pub(crate) mod entity_model;
+pub mod storage {
+    pub mod database;
+    pub mod packing;
+    pub mod layout;
+    pub mod storage;
+    pub mod entity_model;
 }
 
 pub mod utils {
-    // Since Scarb 2.6.0 there's an optimization that does not
-    // build tests for dependencies and it's not configurable.
-    //
-    // To expose correctly the test utils for a package using dojo-core,
-    // we need to it in the `lib` target or using the `#[cfg(target: "test")]`
-    // attribute.
-    //
-    // Since `test_utils` is using `TEST_CLASS_HASH` to factorize some deployment
-    // core, we place it under the test target manually.
-    #[cfg(target: "test")]
-    pub mod test;
-
-    pub mod descriptor;
-    pub use descriptor::{
-        Descriptor, DescriptorTrait, IDescriptorDispatcher, IDescriptorDispatcherTrait
-    };
-
     pub mod hash;
-    pub use hash::{bytearray_hash, selector_from_names};
+    pub use hash::{bytearray_hash, selector_from_names, selector_from_namespace_and_name};
 
     pub mod key;
     pub use key::{entity_id_from_keys, combine_key, entity_id_from_key};
@@ -114,43 +102,7 @@ pub mod world {
 
     mod world_contract;
     pub use world_contract::world;
-}
 
-#[cfg(test)]
-mod tests {
-    mod meta {
-        mod introspect;
-    }
-
-    mod event {
-        mod event;
-    }
-
-    mod model {
-        mod model;
-    }
-    mod storage {
-        mod database;
-        mod packing;
-        mod storage;
-    }
-    mod contract;
-    mod benchmarks;
-    mod expanded {
-        pub(crate) mod selector_attack;
-    }
-    mod helpers;
-    mod world {
-        mod acl;
-        mod entities;
-        mod resources;
-        mod world;
-    }
-    mod utils {
-        mod hash;
-        mod key;
-        mod layout;
-        mod misc;
-        mod naming;
-    }
+    pub mod storage;
+    pub use storage::{WorldStorage, WorldStorageTrait};
 }
