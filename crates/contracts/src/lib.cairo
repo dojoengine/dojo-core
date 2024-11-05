@@ -9,6 +9,8 @@ pub mod contract {
 }
 
 pub mod event {
+    pub mod component;
+
     pub mod event;
     pub use event::{Event, EventDefinition};
 
@@ -20,11 +22,17 @@ pub mod event {
 }
 
 pub mod meta {
+    pub mod interface;
+    pub use interface::{
+        IDeployedResource, IDeployedResourceDispatcher, IDeployedResourceDispatcherTrait,
+        IStoredResource, IStoredResourceDispatcher, IStoredResourceDispatcherTrait
+    };
+
     pub mod introspect;
-    pub use introspect::{Introspect, Ty};
+    pub use introspect::{Introspect, Ty, StructCompareTrait};
 
     pub mod layout;
-    pub use layout::{Layout, FieldLayout};
+    pub use layout::{Layout, FieldLayout, LayoutCompareTrait};
 }
 
 pub mod model {
@@ -34,7 +42,7 @@ pub mod model {
     pub use definition::{ModelIndex, ModelDefinition, ModelDef};
 
     pub mod model;
-    pub use model::{Model, KeyParser};
+    pub use model::{Model, KeyParser, ModelPtr};
 
     pub mod model_value;
     pub use model_value::{ModelValue, ModelValueKey};
@@ -46,9 +54,7 @@ pub mod model {
     pub use metadata::ResourceMetadata;
 
     pub mod storage;
-    pub use storage::{
-        ModelStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest, ModelPtr,
-    };
+    pub use storage::{ModelStorage, ModelStorageTest, ModelValueStorage, ModelValueStorageTest,};
 }
 
 pub mod storage {
