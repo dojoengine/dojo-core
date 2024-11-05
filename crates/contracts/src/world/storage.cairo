@@ -3,8 +3,7 @@
 use core::panic_with_felt252;
 use dojo::world::{IWorldDispatcher, IWorldDispatcherTrait};
 use dojo::model::{
-    Model, ModelIndex, ModelDefinition, ModelMemberStorage,
-    ModelValueKey, ModelValue, ModelStorage
+    Model, ModelIndex, ModelDefinition, ModelMemberStorage, ModelValueKey, ModelValue, ModelStorage
 };
 use dojo::event::{Event, EventStorage};
 use dojo::meta::Layout;
@@ -139,7 +138,9 @@ pub impl MemberModelStorageWorldStorageImpl<
         )
     }
 
-    fn write_member_from_id(ref self: WorldStorage, entity_id: felt252, member_id: felt252, value: T,) {
+    fn write_member_from_id(
+        ref self: WorldStorage, entity_id: felt252, member_id: felt252, value: T,
+    ) {
         update_serialized_member(
             self.world,
             Model::<M>::selector(self.namespace_hash),
@@ -155,7 +156,9 @@ pub impl MemberModelStorageWorldStorageImpl<
     }
 }
 
-impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of dojo::model::ModelValueStorage<WorldStorage, V> {
+impl ModelValueStorageWorldStorageImpl<
+    V, +ModelValue<V>
+> of dojo::model::ModelValueStorage<WorldStorage, V> {
     fn read_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(
         self: @WorldStorage, key: K
     ) -> V {
@@ -179,7 +182,9 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of dojo::model::ModelV
         }
     }
 
-    fn write_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(ref self: WorldStorage, key: K, value: @V) {
+    fn write_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(
+        ref self: WorldStorage, key: K, value: @V
+    ) {
         IWorldDispatcherTrait::set_entity(
             self.world,
             ModelValue::<V>::selector(self.namespace_hash),
@@ -201,7 +206,9 @@ impl ModelValueStorageWorldStorageImpl<V, +ModelValue<V>> of dojo::model::ModelV
 }
 
 #[cfg(target: "test")]
-pub impl EventStorageTestWorldStorageImpl<E, +Event<E>> of dojo::event::EventStorageTest<WorldStorage, E> {
+pub impl EventStorageTestWorldStorageImpl<
+    E, +Event<E>
+> of dojo::event::EventStorageTest<WorldStorage, E> {
     fn emit_event_test(ref self: WorldStorage, event: @E) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address
@@ -219,7 +226,9 @@ pub impl EventStorageTestWorldStorageImpl<E, +Event<E>> of dojo::event::EventSto
 /// Implementation of the `ModelStorageTest` trait for testing purposes, bypassing permission
 /// checks.
 #[cfg(target: "test")]
-pub impl ModelStorageTestWorldStorageImpl<M, +Model<M>> of dojo::model::ModelStorageTest<WorldStorage, M> {
+pub impl ModelStorageTestWorldStorageImpl<
+    M, +Model<M>
+> of dojo::model::ModelStorageTest<WorldStorage, M> {
     fn write_model_test(ref self: WorldStorage, model: @M) {
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.world.contract_address

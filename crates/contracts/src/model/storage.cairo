@@ -57,7 +57,9 @@ pub trait ModelValueStorage<S, V> {
     fn read_model_value_from_id(self: @S, entity_id: felt252) -> V;
 
     /// Updates a model value of type `V`.
-    fn write_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(ref self: S, key: K, value: @V);
+    fn write_model_value<K, +Drop<K>, +Serde<K>, +ModelValueKey<V, K>>(
+        ref self: S, key: K, value: @V
+    );
 
     /// Updates a model value of type `V`.
     fn write_model_value_from_id(ref self: S, entity_id: felt252, value: @V);
