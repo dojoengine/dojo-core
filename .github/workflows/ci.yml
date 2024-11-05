@@ -11,6 +11,16 @@ env:
   RUST_VERSION: 1.80.0
 
 jobs:
+  cairofmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: software-mansion/setup-scarb@v1
+        with:
+          scarb-version: "2.8.4"
+      - run: |
+          bash scripts/cairo_fmt.sh --check
+
   rustfmt:
     runs-on: ubuntu-latest
     container:
