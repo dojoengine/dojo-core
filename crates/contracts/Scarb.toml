@@ -7,7 +7,7 @@ version = "1.0.0-rc.0"
 
 [dependencies]
 starknet = "=2.8.4"
-dojo_plugin = { path = "../lang" }
+dojo_plugin = { path = "../contracts" }
 #dojo_macros = { path = "../macros" }
 
 [dev-dependencies]
