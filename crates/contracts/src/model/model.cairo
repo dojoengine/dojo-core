@@ -39,8 +39,7 @@ pub trait Model<M> {
     fn values(self: @M) -> Span<felt252>;
     /// Constructs a model from the given keys and values.
     fn from_values(ref keys: Span<felt252>, ref values: Span<felt252>) -> Option<M>;
-    /// Returns the name of the model. (TODO: internalizing the name_hash could reduce poseidon
-    /// costs).
+    /// Returns the name of the model.
     fn name() -> ByteArray;
     /// Returns the schema of the model.
     fn schema() -> Struct;
