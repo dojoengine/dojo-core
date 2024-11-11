@@ -160,20 +160,38 @@ pub impl ModelStorageWorldStorageImpl<M, +Model<M>, +Drop<M>> of ModelStorage<Wo
     }
 
     fn erase_models(ref self: WorldStorage, models: Span<@M>) {
+<<<<<<< HEAD
         let mut ids: Array<ModelIndex> = array![];
         for m in models {
             ids.append(ModelIndex::Id(Model::<M>::entity_id(*m)));
+=======
+        let mut keys: Array<ModelIndex> = array![];
+        for m in models {
+            keys.append(ModelIndex::Keys(Model::<M>::keys(*m)));
+>>>>>>> origin/main
         };
 
         IWorldDispatcherTrait::delete_entities(
             self.dispatcher,
             Model::<M>::selector(self.namespace_hash),
+<<<<<<< HEAD
             ids.span(),
+=======
+            keys.span(),
+>>>>>>> origin/main
             Model::<M>::layout()
         );
     }
 
     fn erase_model_ptr(ref self: WorldStorage, ptr: ModelPtr<M>) {
+<<<<<<< HEAD
+=======
+        let entity_id = match ptr {
+            ModelPtr::Id(id) => id,
+            ModelPtr::Keys(keys) => entity_id_from_keys(keys),
+        };
+
+>>>>>>> origin/main
         IWorldDispatcherTrait::delete_entity(
             self.dispatcher,
             Model::<M>::selector(self.namespace_hash),
@@ -182,6 +200,7 @@ pub impl ModelStorageWorldStorageImpl<M, +Model<M>, +Drop<M>> of ModelStorage<Wo
         );
     }
 
+<<<<<<< HEAD
     fn read_member<T, +Serde<T>>(
         self: @WorldStorage, ptr: ModelPtr<M>, field_selector: felt252
     ) -> T {
@@ -215,6 +234,23 @@ pub impl ModelStorageWorldStorageImpl<M, +Model<M>, +Drop<M>> of ModelStorage<Wo
         IWorldDispatcherTrait::delete_entities(
             self.dispatcher,
             Model::<M>::selector(self.namespace_hash),
+=======
+    fn erase_models_ptrs(ref self: WorldStorage, ptrs: Span<ModelPtr<M>>) {
+        let mut indexes: Array<ModelIndex> = array![];
+        for p in ptrs {
+            indexes
+                .append(
+                    match p {
+                        ModelPtr::Id(id) => ModelIndex::Id(*id),
+                        ModelPtr::Keys(keys) => ModelIndex::Id(entity_id_from_keys(*keys)),
+                    }
+                );
+        };
+
+        IWorldDispatcherTrait::delete_entities(
+            self.dispatcher,
+            Model::<M>::selector(self.namespace_hash),
+>>>>>>> origin/main
             indexes.span(),
             Model::<M>::layout()
         );
@@ -420,6 +456,14 @@ pub impl ModelStorageTestWorldStorageImpl<
     }
 
     fn erase_model_ptr_test(ref self: WorldStorage, ptr: ModelPtr<M>) {
+<<<<<<< HEAD
+=======
+        let entity_id = match ptr {
+            ModelPtr::Id(id) => id,
+            ModelPtr::Keys(keys) => entity_id_from_keys(keys),
+        };
+
+>>>>>>> origin/main
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.dispatcher.contract_address
         };
@@ -427,21 +471,47 @@ pub impl ModelStorageTestWorldStorageImpl<
         dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
             world_test,
             Model::<M>::selector(self.namespace_hash),
+<<<<<<< HEAD
             ModelIndex::Id(ptr.id),
+=======
+            ModelIndex::Id(entity_id),
+>>>>>>> origin/main
             Model::<M>::layout()
         );
     }
 
     fn erase_models_ptrs_test(ref self: WorldStorage, ptrs: Span<ModelPtr<M>>) {
+<<<<<<< HEAD
+=======
+        let mut ids: Array<felt252> = array![];
+        for p in ptrs {
+            ids
+                .append(
+                    match p {
+                        ModelPtr::Id(id) => *id,
+                        ModelPtr::Keys(keys) => entity_id_from_keys(*keys),
+                    }
+                );
+        };
+
+>>>>>>> origin/main
         let world_test = dojo::world::IWorldTestDispatcher {
             contract_address: self.dispatcher.contract_address
         };
 
+<<<<<<< HEAD
         for ptr in ptrs {
             dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
                 world_test,
                 Model::<M>::selector(self.namespace_hash),
                 ModelIndex::Id(*ptr.id),
+=======
+        for i in ids {
+            dojo::world::IWorldTestDispatcherTrait::delete_entity_test(
+                world_test,
+                Model::<M>::selector(self.namespace_hash),
+                ModelIndex::Id(i),
+>>>>>>> origin/main
                 Model::<M>::layout()
             );
         }
